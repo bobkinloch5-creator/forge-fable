@@ -27,7 +27,8 @@ export const Route = createFileRoute("/_authenticated/studio")({
       { title: "Studio | FableForge AI" },
       {
         name: "description",
-        content: "Create, manage, and export AI-built games for web, mobile, and PC.",
+        content:
+          "Create, manage, and export AI-built games for web, mobile, and PC.",
       },
     ],
   }),
@@ -45,14 +46,20 @@ function StudioDashboard() {
   }, [getOverview]);
   const games = data?.games ?? [];
   return (
-    <StudioShell title="Project hub" subtitle="Build across web, mobile, and PC">
+    <StudioShell
+      title="Project hub"
+      subtitle="Build across web, mobile, and PC"
+    >
       <main className="mx-auto max-w-[1500px] p-3 pb-24 sm:p-6 sm:pb-24 lg:p-8">
         <section className="mb-8 grid gap-4 xl:grid-cols-[1.5fr_1fr]">
           <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-5 sm:p-9">
             <div className="panel-grid absolute inset-0 opacity-20" />
             <div className="aurora-orb absolute -right-24 -top-32 size-80 rounded-full bg-neon-violet/20 blur-3xl" />
             <div className="relative max-w-2xl">
-              <Badge variant="outline" className="mb-5 border-primary/40 text-primary">
+              <Badge
+                variant="outline"
+                className="mb-5 border-primary/40 text-primary"
+              >
                 <Zap className="mr-1 size-3" /> AI GAME ENGINE
               </Badge>
               <h2 className="text-balance text-3xl font-semibold tracking-[-.035em] sm:text-5xl sm:tracking-[-.045em]">
@@ -63,8 +70,8 @@ function StudioDashboard() {
                 </span>
               </h2>
               <p className="mt-5 max-w-xl text-sm leading-6 text-muted-foreground">
-                Start from a concept or template. FableForge plans the systems, writes the files,
-                and keeps every major change reviewable.
+                Start from a concept or template. FableForge plans the systems,
+                writes the files, and keeps every major change reviewable.
               </p>
               <div className="mt-7 grid gap-3 sm:flex">
                 <NewProjectButton onClick={() => setOpen(true)} />
@@ -75,7 +82,11 @@ function StudioDashboard() {
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: "Active projects", value: games.length, icon: Gamepad2 },
-              { label: "Forge credits", value: data?.profile?.credits ?? 250, icon: Zap },
+              {
+                label: "Forge credits",
+                value: data?.profile?.credits ?? 250,
+                icon: Zap,
+              },
               { label: "Build artifacts", value: games.length * 4, icon: Box },
               {
                 label: "Plan",
@@ -88,8 +99,12 @@ function StudioDashboard() {
                 className="glass-panel rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50"
               >
                 <stat.icon className="mb-6 size-4 text-primary" />
-                <div className="text-2xl font-semibold capitalize">{stat.value}</div>
-                <div className="mt-1 text-xs text-muted-foreground">{stat.label}</div>
+                <div className="text-2xl font-semibold capitalize">
+                  {stat.value}
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
@@ -98,12 +113,18 @@ function StudioDashboard() {
           <div className="mb-4 flex items-end justify-between">
             <div>
               <h3 className="text-lg font-semibold">Recent projects</h3>
-              <p className="text-sm text-muted-foreground">Continue where you left off.</p>
+              <p className="text-sm text-muted-foreground">
+                Continue where you left off.
+              </p>
             </div>
             <NewProjectButton onClick={() => setOpen(true)} />
           </div>
           {games.length === 0 ? (
-            <Button variant="outline" onClick={() => setOpen(true)} className="flex h-auto min-h-48 w-full flex-col items-center justify-center rounded-xl border-dashed bg-panel/50 text-center hover:border-primary">
+            <Button
+              variant="outline"
+              onClick={() => setOpen(true)}
+              className="flex h-auto min-h-48 w-full flex-col items-center justify-center rounded-xl border-dashed bg-panel/50 text-center hover:border-primary"
+            >
               <span className="mb-4 grid size-12 place-items-center rounded-full bg-secondary">
                 <Plus className="text-primary" />
               </span>
@@ -132,11 +153,16 @@ function StudioDashboard() {
                       <span className="grid size-10 place-items-center rounded-lg bg-secondary">
                         <Icon className="size-5 text-accent" />
                       </span>
-                      <Badge variant="outline" className="font-mono text-[10px] uppercase">
+                      <Badge
+                        variant="outline"
+                        className="font-mono text-[10px] uppercase"
+                      >
                         {game.status}
                       </Badge>
                     </div>
-                    <h4 className="font-semibold group-hover:text-primary">{game.name}</h4>
+                    <h4 className="font-semibold group-hover:text-primary">
+                      {game.name}
+                    </h4>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {game.art_style} {game.genre} · {game.player_mode}
                     </p>

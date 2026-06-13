@@ -119,7 +119,9 @@ export function StudioShell({
               <p className="font-mono text-[9px] uppercase tracking-[.18em] text-muted-foreground">
                 Project
               </p>
-              <h1 className="truncate font-mono text-xs font-semibold uppercase">{title}</h1>
+              <h1 className="truncate font-mono text-xs font-semibold uppercase">
+                {title}
+              </h1>
             </div>
             <span className="hidden items-center gap-1 font-mono text-[9px] text-success md:flex">
               <Cloud className="size-3" /> SAVED
@@ -137,7 +139,11 @@ export function StudioShell({
             <span className="hidden items-center gap-1 rounded-md border border-border bg-background/50 px-2 py-1 font-mono text-[10px] text-muted-foreground lg:flex">
               <BadgeDollarSign className="size-3 text-accent" /> 2,400
             </span>
-            <Button variant="outline" size="sm" className="hidden md:inline-flex">
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden md:inline-flex"
+            >
               <Eye /> Preview
             </Button>
             <Button
@@ -149,9 +155,16 @@ export function StudioShell({
           </div>
         </header>
         {children}
-        <nav className="glass-panel fixed inset-x-2 bottom-[max(.5rem,env(safe-area-inset-bottom))] z-30 grid grid-cols-4 rounded-2xl p-1 lg:hidden" aria-label="Mobile navigation">
+        <nav
+          className="glass-panel fixed inset-x-2 bottom-[max(.5rem,env(safe-area-inset-bottom))] z-30 grid grid-cols-4 rounded-2xl p-1 lg:hidden"
+          aria-label="Mobile navigation"
+        >
           {workspaceNav.map((item, index) => (
-            <Link key={item.label} to="/studio" className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[9px] ${index === 0 ? "bg-primary/10 text-neon-cyan" : "text-muted-foreground"}`}>
+            <Link
+              key={item.label}
+              to="/studio"
+              className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[9px] ${index === 0 ? "bg-primary/10 text-neon-cyan" : "text-muted-foreground"}`}
+            >
               <item.icon className="size-4" /> {item.label}
             </Link>
           ))}
