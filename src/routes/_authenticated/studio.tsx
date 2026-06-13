@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 export const Route = createFileRoute("/_authenticated/studio")({ component: StudioDashboard, head: () => ({ meta: [{ title: "Studio | FableForge AI" }, { name: "description", content: "Create, manage, and export AI-built games for web, mobile, and PC." }] }) });
 
 function StudioDashboard() {
-  const [open, setOpen] = useState(false); const [data, setData] = useState<Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getStudioOverview>>>> | null>(null);
+  const [open, setOpen] = useState(false); const [data, setData] = useState<{ profile: { display_name: string; plan: string; credits: number } | null; games: any[] } | null>(null);
   const getOverview = useServerFn(getStudioOverview);
   useEffect(() => { getOverview().then(setData); }, [getOverview]);
   const games = data?.games ?? [];

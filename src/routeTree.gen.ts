@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as AuthenticatedStudioGameIdRouteImport } from './routes/_authenticated/studio.$gameId'
+import { Route as AuthenticatedStudioGameIdThreadIdRouteImport } from './routes/_authenticated/studio.$gameId.$threadId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -52,6 +53,12 @@ const AuthenticatedStudioGameIdRoute =
     path: '/$gameId',
     getParentRoute: () => AuthenticatedStudioRoute,
   } as any)
+const AuthenticatedStudioGameIdThreadIdRoute =
+  AuthenticatedStudioGameIdThreadIdRouteImport.update({
+    id: '/$threadId',
+    path: '/$threadId',
+    getParentRoute: () => AuthenticatedStudioGameIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,7 +66,8 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
-  '/studio/$gameId': typeof AuthenticatedStudioGameIdRoute
+  '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
+  '/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,7 +75,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
-  '/studio/$gameId': typeof AuthenticatedStudioGameIdRoute
+  '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
+  '/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,7 +86,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
-  '/_authenticated/studio/$gameId': typeof AuthenticatedStudioGameIdRoute
+  '/_authenticated/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
+  '/_authenticated/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/api/chat'
     | '/studio/$gameId'
+    | '/studio/$gameId/$threadId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/api/chat'
     | '/studio/$gameId'
+    | '/studio/$gameId/$threadId'
   id:
     | '__root__'
     | '/'
@@ -105,6 +117,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio'
     | '/api/chat'
     | '/_authenticated/studio/$gameId'
+    | '/_authenticated/studio/$gameId/$threadId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,15 +179,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudioGameIdRouteImport
       parentRoute: typeof AuthenticatedStudioRoute
     }
+    '/_authenticated/studio/$gameId/$threadId': {
+      id: '/_authenticated/studio/$gameId/$threadId'
+      path: '/$threadId'
+      fullPath: '/studio/$gameId/$threadId'
+      preLoaderRoute: typeof AuthenticatedStudioGameIdThreadIdRouteImport
+      parentRoute: typeof AuthenticatedStudioGameIdRoute
+    }
   }
 }
 
+interface AuthenticatedStudioGameIdRouteChildren {
+  AuthenticatedStudioGameIdThreadIdRoute: typeof AuthenticatedStudioGameIdThreadIdRoute
+}
+
+const AuthenticatedStudioGameIdRouteChildren: AuthenticatedStudioGameIdRouteChildren =
+  {
+    AuthenticatedStudioGameIdThreadIdRoute:
+      AuthenticatedStudioGameIdThreadIdRoute,
+  }
+
+const AuthenticatedStudioGameIdRouteWithChildren =
+  AuthenticatedStudioGameIdRoute._addFileChildren(
+    AuthenticatedStudioGameIdRouteChildren,
+  )
+
 interface AuthenticatedStudioRouteChildren {
-  AuthenticatedStudioGameIdRoute: typeof AuthenticatedStudioGameIdRoute
+  AuthenticatedStudioGameIdRoute: typeof AuthenticatedStudioGameIdRouteWithChildren
 }
 
 const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
-  AuthenticatedStudioGameIdRoute: AuthenticatedStudioGameIdRoute,
+  AuthenticatedStudioGameIdRoute: AuthenticatedStudioGameIdRouteWithChildren,
 }
 
 const AuthenticatedStudioRouteWithChildren =
