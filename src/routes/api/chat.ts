@@ -55,7 +55,7 @@ export const Route = createFileRoute("/api/chat")({
           .maybeSingle();
         if (!thread) return new Response("Build session not found", { status: 404 });
 
-        const [gameResult, stageResult, fileResult, checkpointResult, historyResult] =
+        const [gameResult, stageResult, fileResult, checkpointResult, historyResult, memoryResult] =
           await Promise.all([
             db
               .from("games")
@@ -91,6 +91,13 @@ export const Route = createFileRoute("/api/chat")({
               .eq("owner_id", userId)
               .order("created_at")
               .limit(199),
+            db
+              .from("game_memory")
+              .select("category, memory_key, content, importance, updated_at")
+              .eq("game_id", gameId)
+              .eq("owner_id", userId)
+              .order("importance", { ascending: false })
+              .limit(200),
           ]);
         if (gameResult.error)
           return new Response("Project context could not be loaded", { status: 500 });
@@ -147,7 +154,9 @@ export const Route = createFileRoute("/api/chat")({
           system: `You are FableForge, a senior game director, systems designer, gameplay engineer, networking engineer, technical artist, performance engineer, release engineer, and QA lead inside a professional AI game engine. You build serious, expandable commercial-scale projects for PC, mobile, and web—not disposable prototypes. You remember and preserve the project's genre, visual language, characters, mechanics, platform, architecture, dependencies, milestones, files, and prior decisions. Turn even short ideas into coherent production plans, but ask a question only when a missing decision would make the result unsafe or fundamentally ambiguous.
 
 CURRENT PROJECT SOURCE OF TRUTH:
-${JSON.stringify({ game: gameResult.data, stages: stageResult.data ?? [], files: fileResult.data ?? [], recentCheckpoints: checkpointResult.data ?? [] })}
+${JSON.stringify({ game: gameResult.data, structuredMemory: memoryResult.data ?? [], stages: stageResult.data ?? [], files: fileResult.data ?? [], recentCheckpoints: checkpointResult.data ?? [] })}
+
+Structured project memory is authoritative. Preserve its story, characters, mechanics, maps, controls, economy, multiplayer rules, art direction, decisions, and constraints. If a request conflicts with it, explain the conflict and propose a deliberate change rather than silently drifting.
 
 For complex work, first reconcile the request against this source of truth and the complete conversation. Identify affected systems, dependencies, files, data migrations, platform constraints, multiplayer authority boundaries, performance risks, and regression tests. Work through the project's ordered development stages; do not attempt a large game as one unstructured generation. Finish and test foundations before dependent content. Prefer data-driven content registries and reusable systems so the project can scale to many maps, levels, modes, enemies, items, quests, abilities, vehicles, characters, and world regions.
 
