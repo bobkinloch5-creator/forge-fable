@@ -15,6 +15,7 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { ProjectMemoryPanel } from "@/components/project-memory-panel";
+import { PlaytestCenter } from "@/components/playtest-center";
 import { VersionControlPanel } from "@/components/version-control-panel";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
@@ -34,10 +35,13 @@ import {
   FileCode2,
   Folder,
   Gamepad2,
+  History,
   Brain,
   GitBranch,
   Image,
   Maximize2,
+  Monitor,
+  PackageOpen,
   Play,
   Plus,
   RefreshCw,
@@ -71,15 +75,12 @@ type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
 type StudioTab =
-  
   | "memory"
   | "versions"
-  
+  | "tests"
   | "preview"
-  
+  | "models"
   | "code"
-  
-  
   ;
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
