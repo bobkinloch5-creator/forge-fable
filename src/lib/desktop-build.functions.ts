@@ -23,7 +23,8 @@ export const connectDesktopBuildAgent = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const token = `ff_agent_${crypto.randomUUID().replaceAll("-", "")}${crypto.randomUUID().replaceAll("-", "")}`;
-    const { data: agent, error } = await context.supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: agent, error } = await supabaseAdmin
       .from("desktop_build_agents")
       .insert({
         owner_id: context.userId,
