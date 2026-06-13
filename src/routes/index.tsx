@@ -50,12 +50,11 @@ function Index() {
       </nav>
       <section className="relative z-10 mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-7xl flex-col justify-center px-4 py-10 sm:px-6 sm:py-16">
         <GameIdeaLauncher
-          onStart={(idea) =>
-            navigate({
-              to: "/auth",
-              search: { idea },
-            })
-          }
+          onStart={(idea, mode) => {
+            sessionStorage.setItem("fableforge:draft-idea", idea);
+            sessionStorage.setItem("fableforge:draft-mode", mode);
+            navigate({ to: "/auth" });
+          }}
         />
         <div className="mx-auto mt-10 grid w-full max-w-5xl gap-2 sm:grid-cols-3">
           {[
