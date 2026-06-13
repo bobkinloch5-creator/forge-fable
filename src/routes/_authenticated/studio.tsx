@@ -163,20 +163,29 @@ function StudioDashboard() {
               Curated systems, scenes, and control maps.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {templates.slice(0, 4).map((template) => (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {templates.map((template) => (
               <article
                 key={template.name}
-                className="glass-panel group rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:border-neon-violet/40"
+                className="glass-panel group flex flex-col rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:border-neon-violet/40"
               >
                 <div className="panel-grid mb-4 grid aspect-[16/9] place-items-center rounded-lg bg-canvas">
                   <template.icon className="size-10 text-primary" />
                 </div>
                 <h4 className="font-medium">{template.name}</h4>
+                <p className="mt-1 text-[11px] leading-5 text-muted-foreground">{template.systems}</p>
                 <div className="mt-2 flex justify-between text-xs text-muted-foreground">
                   <span>{template.difficulty}</span>
                   <span>{template.credits} credits</span>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 w-full"
+                  onClick={() => launchFromIdea(`Create a ${template.name} with ${template.systems}`, "Start From Template")}
+                >
+                  Use this template
+                </Button>
               </article>
             ))}
           </div>
