@@ -162,6 +162,13 @@ export const createThread = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ThreadInput.parse(input))
   .handler(async ({ data, context }) => {
+    const { data: game, error: gameError } = await context.supabase
+      .from("games")
+      .select("id")
+      .eq("id", data.gameId)
+      .eq("owner_id", context.userId)
+      .maybeSingle();
+    if (gameError || !game) throw new Error("Game project not found");
     const { data: thread, error } = await context.supabase
       .from("chat_threads")
       .insert({
