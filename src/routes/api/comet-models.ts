@@ -15,8 +15,7 @@ export const Route = createFileRoute("/api/comet-models")({
           return Response.json({ error: "Server configuration missing" }, { status: 500 });
         const auth = createClient(url, key, { auth: { persistSession: false } });
         const { data } = await auth.auth.getClaims(authorization.slice(7));
-        if (!data?.claims?.sub)
-          return Response.json({ error: "Invalid session" }, { status: 401 });
+        if (!data?.claims?.sub) return Response.json({ error: "Invalid session" }, { status: 401 });
         try {
           const catalog = await getCometChatModels();
           return Response.json(catalog, {
