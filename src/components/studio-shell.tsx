@@ -16,6 +16,7 @@ import {
   Plus,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 export function StudioShell({
   children,
@@ -35,7 +36,7 @@ export function StudioShell({
     await queryClient.cancelQueries();
     queryClient.clear();
     const { error } = await supabase.auth.signOut();
-    if (error) return;
+    if (error) return toast.error(error.message);
     navigate({ to: "/auth", replace: true });
   }
   return (

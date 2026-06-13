@@ -161,8 +161,12 @@ function AuthPage() {
               variant="link"
               className="w-full text-muted-foreground"
               onClick={() => {
-                setRecovery(false);
-                setMode(mode === "signin" ? "signup" : "signin");
+                if (recovery) {
+                  setRecovery(false);
+                  setMode("signin");
+                } else {
+                  setMode(mode === "signin" ? "signup" : "signin");
+                }
               }}
             >
               {recovery
