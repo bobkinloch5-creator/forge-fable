@@ -89,7 +89,17 @@ type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWork
 type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
-type StudioTab = "planner" | "memory" | "versions" | "tests" | "preview" | "models" | "code" | "console" | "export" | "publish";
+type StudioTab =
+  | "planner"
+  | "memory"
+  | "versions"
+  | "tests"
+  | "preview"
+  | "models"
+  | "code"
+  | "console"
+  | "export"
+  | "publish";
 type ModelTier = "fast" | "balanced" | "pro" | "comet";
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
@@ -632,7 +642,9 @@ function ChatWorkspace({
           </div>
         )}
         {tab === "memory" && <ProjectMemoryPanel gameId={gameId} />}
-        {tab === "versions" && <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />}
+        {tab === "versions" && (
+          <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />
+        )}
         {tab === "tests" && <PlaytestCenter gameId={gameId} />}
         {tab === "preview" && (
           <div
@@ -770,14 +782,16 @@ function ChatWorkspace({
         {tab === "publish" && <WebsitePublishingCenter gameName={workspace.game.name} />}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
-            {["Build Logs", "Errors 1", "Warnings", "Testing", "Performance", "Multiplayer"].map((label, index) => (
-              <span
-                key={label}
-                className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
-              >
-                {label.toUpperCase()}
-              </span>
-            ))}
+            {["Build Logs", "Errors 1", "Warnings", "Testing", "Performance", "Multiplayer"].map(
+              (label, index) => (
+                <span
+                  key={label}
+                  className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
+                >
+                  {label.toUpperCase()}
+                </span>
+              ),
+            )}
             <Button
               size="sm"
               variant="outline"
@@ -812,19 +826,21 @@ function ChatWorkspace({
       <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:flex">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
           <span className="font-mono text-[10px] tracking-wider">GAME INSPECTOR</span>{" "}
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="ml-auto"
-              onClick={() => setTab("models")}
-              aria-label="Open asset generator"
-            >
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="ml-auto"
+            onClick={() => setTab("models")}
+            aria-label="Open asset generator"
+          >
             <Plus />
           </Button>
         </div>
         <div className="flex-1 overflow-auto p-2">
           <div className="mb-2 rounded-xl border border-border bg-panel/70 p-3">
-            <p className="font-mono text-[9px] uppercase tracking-wider text-neon-cyan">Selected scene</p>
+            <p className="font-mono text-[9px] uppercase tracking-wider text-neon-cyan">
+              Selected scene
+            </p>
             <p className="mt-2 text-xs font-medium">Main game world</p>
             <div className="mt-3 grid grid-cols-2 gap-2 text-[10px] text-muted-foreground">
               <span className="rounded-lg bg-canvas/70 p-2">Transform</span>

@@ -4,15 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { workspaceNav } from "@/lib/studio-data";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import {
-  BadgeDollarSign,
-  ChevronLeft,
-  Cloud,
-  Command,
-  LogOut,
-  Menu,
-  Plus,
-} from "lucide-react";
+import { BadgeDollarSign, ChevronLeft, Cloud, Command, LogOut, Menu, Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -81,11 +73,17 @@ export function StudioShell({
           {!compact && (
             <div className="rounded-lg border border-border bg-panel p-3">
               <div className="mb-2 flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">{accountRole === "owner" ? "Platform owner" : "Forge credits"}</span>
-                <span className="font-mono text-primary">{credits === "unlimited" ? "Unlimited" : (credits ?? 250).toLocaleString()}</span>
+                <span className="text-muted-foreground">
+                  {accountRole === "owner" ? "Platform owner" : "Forge credits"}
+                </span>
+                <span className="font-mono text-primary">
+                  {credits === "unlimited" ? "Unlimited" : (credits ?? 250).toLocaleString()}
+                </span>
               </div>
               <div className="h-1 overflow-hidden rounded-full bg-muted">
-                <div className={`h-full bg-primary ${credits === "unlimited" ? "w-full" : "w-2/3"}`} />
+                <div
+                  className={`h-full bg-primary ${credits === "unlimited" ? "w-full" : "w-2/3"}`}
+                />
               </div>
             </div>
           )}

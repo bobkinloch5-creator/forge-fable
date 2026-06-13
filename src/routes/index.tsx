@@ -58,11 +58,26 @@ function Index() {
         />
         <div className="mx-auto mt-10 grid w-full max-w-5xl gap-2 sm:grid-cols-3">
           {[
-            { icon: Gamepad2, title: "Real game projects", text: "Scenes, systems, files, assets, and playable builds." },
-            { icon: ShieldCheck, title: "Safe AI changes", text: "Plans, checkpoints, tests, restore, retry, and branching." },
-            { icon: Cloud, title: "Publish anywhere", text: "Web hosting plus mobile and desktop build pipelines." },
+            {
+              icon: Gamepad2,
+              title: "Real game projects",
+              text: "Scenes, systems, files, assets, and playable builds.",
+            },
+            {
+              icon: ShieldCheck,
+              title: "Safe AI changes",
+              text: "Plans, checkpoints, tests, restore, retry, and branching.",
+            },
+            {
+              icon: Cloud,
+              title: "Publish anywhere",
+              text: "Web hosting plus mobile and desktop build pipelines.",
+            },
           ].map((item) => (
-            <div key={item.title} className="flex gap-3 rounded-2xl border border-border/60 bg-panel/45 p-4">
+            <div
+              key={item.title}
+              className="flex gap-3 rounded-2xl border border-border/60 bg-panel/45 p-4"
+            >
               <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary text-neon-cyan">
                 <item.icon className="size-4" />
               </span>

@@ -244,7 +244,9 @@ export function CreateGameDialog({
       <DialogContent className="glass-panel inset-0 top-0 left-0 h-dvh max-h-dvh w-screen max-w-none translate-x-0 translate-y-0 gap-0 overflow-hidden rounded-none border-border p-0 [grid-template-rows:auto_minmax(0,1fr)_auto] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-[calc(100vw-2rem)] sm:max-w-5xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl">
         <DialogHeader className="border-b border-border bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-4 pr-12 text-left sm:p-6 sm:pr-14">
           <p className="font-mono text-xs text-neon-cyan">STANDALONE GAME WIZARD / 0{step}</p>
-          <DialogTitle className="text-xl leading-tight sm:text-2xl">{titles[step - 1]}</DialogTitle>
+          <DialogTitle className="text-xl leading-tight sm:text-2xl">
+            {titles[step - 1]}
+          </DialogTitle>
           <DialogDescription className="text-xs leading-5 sm:text-sm">
             FableForge will prepare a professional plan first. Nothing is built until you approve
             it.
@@ -516,14 +518,23 @@ export function CreateGameDialog({
           )}
         </div>
         <div className="grid grid-cols-2 items-center gap-2 border-t border-border bg-background/95 p-3 pb-[max(.75rem,env(safe-area-inset-bottom))] sm:grid-cols-[auto_1fr_auto] sm:p-4">
-          <Button className="order-2 sm:order-1" variant="ghost" disabled={step === 1} onClick={() => setStep(step - 1)}>
+          <Button
+            className="order-2 sm:order-1"
+            variant="ghost"
+            disabled={step === 1}
+            onClick={() => setStep(step - 1)}
+          >
             <ArrowLeft /> Back
           </Button>
           <span className="order-1 col-span-2 text-center font-mono text-[9px] text-muted-foreground sm:order-2 sm:col-span-1 sm:text-[10px]">
             STEP {step} OF 6
           </span>
           {step < 6 ? (
-            <Button className="order-3" disabled={step === 2 && !draft.name.trim()} onClick={() => setStep(step + 1)}>
+            <Button
+              className="order-3"
+              disabled={step === 2 && !draft.name.trim()}
+              onClick={() => setStep(step + 1)}
+            >
               Continue <ArrowRight />
             </Button>
           ) : (

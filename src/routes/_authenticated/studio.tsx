@@ -71,7 +71,12 @@ function StudioDashboard() {
     setOpen(true);
   }
   return (
-    <StudioShell title="Project hub" subtitle="Build across web, mobile, and PC" accountRole={isOwner ? "owner" : undefined} credits={isOwner ? "unlimited" : data?.profile?.credits}>
+    <StudioShell
+      title="Project hub"
+      subtitle="Build across web, mobile, and PC"
+      accountRole={isOwner ? "owner" : undefined}
+      credits={isOwner ? "unlimited" : data?.profile?.credits}
+    >
       <main className="mx-auto max-w-[1500px] p-3 pb-24 sm:p-6 sm:pb-24 lg:p-8">
         <section className="mb-8">
           <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-4 sm:p-8 lg:p-10">
@@ -90,7 +95,9 @@ function StudioDashboard() {
               { label: "Build artifacts", value: games.length * 4, icon: Box },
               {
                 label: "Plan",
-                value: isOwner ? "Platform owner" : (data?.profile?.plan ?? "free").replace("_", " "),
+                value: isOwner
+                  ? "Platform owner"
+                  : (data?.profile?.plan ?? "free").replace("_", " "),
                 icon: Layers3,
               },
             ].map((stat) => (
@@ -181,7 +188,9 @@ function StudioDashboard() {
                   <template.icon className="size-10 text-primary" />
                 </div>
                 <h4 className="font-medium">{template.name}</h4>
-                <p className="mt-1 text-[11px] leading-5 text-muted-foreground">{template.systems}</p>
+                <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+                  {template.systems}
+                </p>
                 <div className="mt-2 flex justify-between text-xs text-muted-foreground">
                   <span>{template.difficulty}</span>
                   <span>{template.credits} credits</span>
@@ -190,7 +199,12 @@ function StudioDashboard() {
                   variant="outline"
                   size="sm"
                   className="mt-4 w-full"
-                  onClick={() => launchFromIdea(`Create a ${template.name} with ${template.systems}`, "Start From Template")}
+                  onClick={() =>
+                    launchFromIdea(
+                      `Create a ${template.name} with ${template.systems}`,
+                      "Start From Template",
+                    )
+                  }
                 >
                   Use this template
                 </Button>

@@ -61,12 +61,14 @@ export function GameIdeaLauncher({
         <p className="font-mono text-[10px] uppercase tracking-[.28em] text-neon-cyan sm:text-xs">
           Describe it. Watch it become playable.
         </p>
-        <h1 className={`${compact ? "mt-2 text-3xl sm:text-5xl" : "mt-3 text-4xl sm:text-6xl lg:text-7xl"} text-balance font-semibold tracking-[-.055em]`}>
+        <h1
+          className={`${compact ? "mt-2 text-3xl sm:text-5xl" : "mt-3 text-4xl sm:text-6xl lg:text-7xl"} text-balance font-semibold tracking-[-.055em]`}
+        >
           What game do you want to build?
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-          No code required. FableForge plans the systems, creates the project, tests each build,
-          and prepares a real web, mobile, or desktop release.
+          No code required. FableForge plans the systems, creates the project, tests each build, and
+          prepares a real web, mobile, or desktop release.
         </p>
       </div>
 
