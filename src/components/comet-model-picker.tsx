@@ -8,6 +8,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { supabase } from "@/integrations/supabase/client";
 import { Check, ChevronsUpDown, LoaderCircle, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -38,7 +39,15 @@ export function CometModelPicker({
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/comet-models", { signal: controller.signal })
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!data.session) throw new Error("Sign in required");
+        return fetch("/api/comet-models", {
+          signal: controller.signal,
+          headers: { Authorization: `Bearer ${data.session.access_token}` },
+        });
+      })
       .then(async (response) => {
         if (!response.ok) throw new Error("Catalog unavailable");
         return response.json() as Promise<{ models: AiModelOption[]; total: number }>;
