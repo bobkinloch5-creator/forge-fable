@@ -1,0 +1,19 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { getPlaytestState, queuePlaytest } from "@/lib/playtesting.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { FlaskConical, Play } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+
+const suites = ["movement", "combat", "quests", "menus", "saving", "loading", "multiplayer", "mobile_controls", "performance", "level_transitions", "accessibility"] as const;
+type State = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getPlaytestState>>>>;
+export function PlaytestCenter({ gameId }: { gameId: string }) {
+  const loadState = useServerFn(getPlaytestState); const queue = useServerFn(queuePlaytest);
+  const [state, setState] = useState<State>({ runs: [], results: [] }); const [busy, setBusy] = useState(false);
+  const refresh = useCallback(async () => setState(await loadState({ data: { gameId } })), [gameId, loadState]);
+  useEffect(() => { void refresh().catch((error) => toast.error(error.message)); }, [refresh]);
+  async function start() { setBusy(true); try { await queue({ data: { gameId, targetPlatform: "web", testSuites: [...suites] } }); await refresh(); toast.success("Comprehensive playtest queued for a connected agent"); } catch (error) { toast.error(error instanceof Error ? error.message : "Playtest could not be queued"); } finally { setBusy(false); } }
+  return <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6"><div className="mb-5 flex flex-wrap items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary"><FlaskConical /></span><div className="min-w-0 flex-1"><h2 className="text-xl font-semibold">AI playtesting</h2><p className="mt-1 text-xs text-muted-foreground">Connected agents run real gameplay, system, accessibility, and performance checks.</p></div><Button onClick={start} disabled={busy}><Play />{busy ? "Queueing…" : "Run full test suite"}</Button></div><div className="grid gap-3 lg:grid-cols-2">{state.runs.map((run) => <article key={run.id} className="rounded-xl border border-border bg-panel/60 p-4"><div className="flex items-center justify-between"><Badge variant="outline">{run.status}</Badge><span className="font-mono text-[10px] text-muted-foreground">{run.target_platform}</span></div><Progress value={run.progress_percent} className="mt-4" /><p className="mt-3 text-xs text-muted-foreground">{run.summary || `${run.test_suites.length} suites queued · waiting for a compatible build agent`}</p><div className="mt-3 flex flex-wrap gap-1">{run.test_suites.map((suite) => <Badge key={suite} variant="secondary" className="text-[9px]">{suite.replace("_", " ")}</Badge>)}</div></article>)}{state.runs.length === 0 && <div className="col-span-full rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No playtests yet. Queue the complete test matrix when a connected agent is ready.</div>}</div>{state.results.length > 0 && <section className="mt-6"><h3 className="mb-3 text-sm font-semibold">Evidence and findings</h3><div className="space-y-2">{state.results.map((result) => <div key={result.id} className="rounded-xl border border-border bg-canvas/60 p-3"><div className="flex items-center gap-2"><Badge variant="outline">{result.status}</Badge><Badge variant="outline">{result.severity}</Badge><span className="text-xs font-medium">{result.test_name}</span></div><p className="mt-2 text-xs text-muted-foreground">{result.details}</p></div>)}</div></section>}</div>;
+}
