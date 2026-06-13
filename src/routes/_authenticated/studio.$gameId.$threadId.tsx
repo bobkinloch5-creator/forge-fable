@@ -95,18 +95,17 @@ type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
 
 const buildStates = [
-  "Planning",
-  "Creating project structure",
-  "Generating gameplay systems",
-  "Building maps",
-  "Creating menus",
-  "Connecting controls",
-  "Adding audio",
+  "Understanding request",
+  "Planning changes",
+  "Creating systems",
+  "Generating code",
+  "Adding assets",
+  "Updating the game world",
   "Testing gameplay",
-  "Checking performance",
   "Fixing errors",
-  "Preparing standalone build",
-  "Export complete",
+  "Optimizing performance",
+  "Preparing build",
+  "Completed",
 ];
 
 const quickActions = [
@@ -482,12 +481,12 @@ function ChatWorkspace({
           <div className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain">
             {(
               [
-                { id: "planner", label: "Production Plan", icon: History },
+                { id: "planner", label: "Build Stages", icon: History },
                 { id: "memory", label: "Memory", icon: Brain },
                 { id: "versions", label: "Versions", icon: GitBranch },
                 { id: "tests", label: "Playtests", icon: FlaskConical },
-                { id: "preview", label: "Viewport", icon: Gamepad2 },
-                { id: "models", label: "3D Forge", icon: Cuboid },
+                { id: "preview", label: "Live Game", icon: Gamepad2 },
+                { id: "models", label: "Visual Editor", icon: Cuboid },
                 { id: "code", label: "Code Editor", icon: Code2 },
                 { id: "console", label: "Console", icon: Terminal },
                 { id: "export", label: "Export Center", icon: PackageOpen },
@@ -771,7 +770,7 @@ function ChatWorkspace({
         {tab === "publish" && <WebsitePublishingCenter gameName={workspace.game.name} />}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
-            {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
+            {["Build Logs", "Errors 1", "Warnings", "Testing", "Performance", "Multiplayer"].map((label, index) => (
               <span
                 key={label}
                 className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
