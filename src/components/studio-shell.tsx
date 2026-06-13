@@ -62,7 +62,7 @@ export function StudioShell({
               key={item.label}
               to="/studio"
               title={compact ? item.label : undefined}
-               className={`flex h-10 items-center gap-3 rounded-xl px-3 font-mono text-[11px] transition-all duration-300 ${index === 0 ? "spectrum-border bg-primary/10 text-neon-cyan" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_12%,transparent)]"}`}
+              className={`flex h-10 items-center gap-3 rounded-xl px-3 font-mono text-[11px] transition-all duration-300 ${index === 0 ? "spectrum-border bg-primary/10 text-neon-cyan" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_12%,transparent)]"}`}
             >
               <item.icon className="size-4 shrink-0" />
               {!compact && item.label}
@@ -98,8 +98,8 @@ export function StudioShell({
           onClick={() => setOpen(false)}
         />
       )}
-       <div className="relative z-10 min-w-0 flex-1">
-         <header className="glass-panel sticky top-2 z-30 mx-2 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl px-3 sm:flex sm:px-4">
+      <div className="relative z-10 min-w-0 flex-1">
+        <header className="glass-panel sticky top-2 z-30 mx-2 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl px-3 sm:flex sm:px-4">
           <Button
             variant="ghost"
             size="icon-sm"
@@ -134,7 +134,10 @@ export function StudioShell({
             <Button variant="outline" size="sm" className="hidden md:inline-flex">
               <Eye /> Preview
             </Button>
-             <Button size="sm" className="bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_22px_color-mix(in_oklab,var(--primary)_35%,transparent)] transition-transform hover:scale-[1.03]">
+            <Button
+              size="sm"
+              className="bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_22px_color-mix(in_oklab,var(--primary)_35%,transparent)] transition-transform hover:scale-[1.03]"
+            >
               <Download /> Export
             </Button>
           </div>

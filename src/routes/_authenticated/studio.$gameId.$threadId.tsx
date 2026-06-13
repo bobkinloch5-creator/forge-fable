@@ -255,15 +255,23 @@ function ChatWorkspace({
       <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-3">
         <div className="flex items-center gap-2 border-b border-border/60 bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-3">
           <div className="relative">
-            <div className={`absolute inset-0 rounded-full bg-neon-cyan/30 blur-md ${isBuilding ? "animate-pulse" : ""}`} />
-            <BrandMark className={`relative size-9 shrink-0 ${isBuilding ? "animate-pulse" : ""}`} />
+            <div
+              className={`absolute inset-0 rounded-full bg-neon-cyan/30 blur-md ${isBuilding ? "animate-pulse" : ""}`}
+            />
+            <BrandMark
+              className={`relative size-9 shrink-0 ${isBuilding ? "animate-pulse" : ""}`}
+            />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <p className="font-mono text-[10px] font-semibold tracking-wider">FABLE 5 BUILDER</p>
-              {modelTier === "pro" && <Badge className="border-neon-pink/30 bg-neon-pink/15 text-neon-pink">PRO</Badge>}
+              {modelTier === "pro" && (
+                <Badge className="border-neon-pink/30 bg-neon-pink/15 text-neon-pink">PRO</Badge>
+              )}
             </div>
-            <p className="truncate text-[10px] text-success">ONLINE · Project memory active · Checkpoints on</p>
+            <p className="truncate text-[10px] text-success">
+              ONLINE · Project memory active · Checkpoints on
+            </p>
           </div>
           <Button size="icon-sm" variant="outline" onClick={newThread}>
             <Plus />
@@ -289,17 +297,31 @@ function ChatWorkspace({
           <div className="border-b border-border/60 bg-canvas/60 p-3">
             <div className="mb-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-wider">
               <span className="text-neon-cyan">Live build sequence</span>
-              <span className="text-muted-foreground">{Math.round(((activeBuildStep + 1) / buildStates.length) * 100)}%</span>
+              <span className="text-muted-foreground">
+                {Math.round(((activeBuildStep + 1) / buildStates.length) * 100)}%
+              </span>
             </div>
             <div className="mb-3 h-1 overflow-hidden rounded-full bg-muted">
-              <div className="relative h-full bg-linear-to-r from-neon-cyan via-primary to-neon-pink transition-all duration-700" style={{ width: `${((activeBuildStep + 1) / buildStates.length) * 100}%` }}>
+              <div
+                className="relative h-full bg-linear-to-r from-neon-cyan via-primary to-neon-pink transition-all duration-700"
+                style={{ width: `${((activeBuildStep + 1) / buildStates.length) * 100}%` }}
+              >
                 <span className="build-scan absolute inset-y-0 w-16 bg-linear-to-r from-transparent via-primary-foreground/70 to-transparent" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-1.5">
               {buildStates.map((step, index) => (
-                <div key={step} className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[9px] ${index === activeBuildStep ? "bg-primary/15 text-foreground" : index < activeBuildStep ? "text-success" : "text-muted-foreground"}`}>
-                  {index < activeBuildStep ? <Check className="size-3" /> : <span className={`size-1.5 rounded-full ${index === activeBuildStep ? "animate-pulse bg-neon-cyan shadow-[0_0_8px_var(--neon-cyan)]" : "bg-muted-foreground/30"}`} />}
+                <div
+                  key={step}
+                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[9px] ${index === activeBuildStep ? "bg-primary/15 text-foreground" : index < activeBuildStep ? "text-success" : "text-muted-foreground"}`}
+                >
+                  {index < activeBuildStep ? (
+                    <Check className="size-3" />
+                  ) : (
+                    <span
+                      className={`size-1.5 rounded-full ${index === activeBuildStep ? "animate-pulse bg-neon-cyan shadow-[0_0_8px_var(--neon-cyan)]" : "bg-muted-foreground/30"}`}
+                    />
+                  )}
                   <span className="truncate">{step}</span>
                 </div>
               ))}
@@ -324,15 +346,27 @@ function ChatWorkspace({
                     ) : null,
                   )}
                 </MessageContent>
-                {message.role === "assistant" && messageIndex === messages.length - 1 && status === "ready" && (
-                  <div className="mt-2 flex max-w-full flex-wrap gap-1.5">
-                    {quickActions.map((action) => (
-                      <Button key={action.label} variant="outline" size="sm" className="h-7 rounded-lg border-border/70 bg-panel/60 px-2 text-[9px] hover:border-neon-cyan/40 hover:text-neon-cyan" onClick={() => action.label === "Preview Game" ? setPlaying(true) : toast.info(`${action.label} is ready for your next instruction`)}>
-                        <action.icon className="size-3" /> {action.label}
-                      </Button>
-                    ))}
-                  </div>
-                )}
+                {message.role === "assistant" &&
+                  messageIndex === messages.length - 1 &&
+                  status === "ready" && (
+                    <div className="mt-2 flex max-w-full flex-wrap gap-1.5">
+                      {quickActions.map((action) => (
+                        <Button
+                          key={action.label}
+                          variant="outline"
+                          size="sm"
+                          className="h-7 rounded-lg border-border/70 bg-panel/60 px-2 text-[9px] hover:border-neon-cyan/40 hover:text-neon-cyan"
+                          onClick={() =>
+                            action.label === "Preview Game"
+                              ? setPlaying(true)
+                              : toast.info(`${action.label} is ready for your next instruction`)
+                          }
+                        >
+                          <action.icon className="size-3" /> {action.label}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
               </Message>
             ))}
             {status === "submitted" && (
@@ -346,11 +380,26 @@ function ChatWorkspace({
           <ConversationScrollButton />
         </Conversation>
         <div className="border-t border-border/60 p-3">
-          {queuedInstructions.length > 0 && <div className="mb-2 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-[10px] text-muted-foreground"><History className="size-3 text-primary" /><span className="truncate">{queuedInstructions.length} instruction{queuedInstructions.length > 1 ? "s" : ""} queued</span></div>}
-          <PromptInput onSubmit={submit} className="spectrum-border bg-canvas/90 shadow-[0_0_24px_color-mix(in_oklab,var(--primary)_10%,transparent)]">
+          {queuedInstructions.length > 0 && (
+            <div className="mb-2 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-[10px] text-muted-foreground">
+              <History className="size-3 text-primary" />
+              <span className="truncate">
+                {queuedInstructions.length} instruction{queuedInstructions.length > 1 ? "s" : ""}{" "}
+                queued
+              </span>
+            </div>
+          )}
+          <PromptInput
+            onSubmit={submit}
+            className="spectrum-border bg-canvas/90 shadow-[0_0_24px_color-mix(in_oklab,var(--primary)_10%,transparent)]"
+          >
             <PromptInputTextarea
               ref={textareaRef}
-               placeholder={isBuilding ? "Queue another instruction while Fable builds…" : "Describe a mechanic, scene, level, or fix…"}
+              placeholder={
+                isBuilding
+                  ? "Queue another instruction while Fable builds…"
+                  : "Describe a mechanic, scene, level, or fix…"
+              }
               className="min-h-20"
             />
             <PromptInputFooter>
@@ -419,11 +468,11 @@ function ChatWorkspace({
           </div>
         </div>
         {tab === "preview" && (
-           <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
-             <div className="aurora-orb pointer-events-none absolute -left-28 top-0 size-80 rounded-full bg-neon-violet/12 blur-3xl" />
-             <div className="aurora-orb pointer-events-none absolute -bottom-32 right-0 size-96 rounded-full bg-neon-cyan/10 blur-3xl [animation-delay:-6s]" />
+          <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
+            <div className="aurora-orb pointer-events-none absolute -left-28 top-0 size-80 rounded-full bg-neon-violet/12 blur-3xl" />
+            <div className="aurora-orb pointer-events-none absolute -bottom-32 right-0 size-96 rounded-full bg-neon-cyan/10 blur-3xl [animation-delay:-6s]" />
             <div
-               className={`spectrum-border relative aspect-video w-full max-w-6xl overflow-hidden rounded-2xl bg-panel shadow-2xl transition-all duration-500 ${playing ? "forge-glow scale-[1.005]" : ""}`}
+              className={`spectrum-border relative aspect-video w-full max-w-6xl overflow-hidden rounded-2xl bg-panel shadow-2xl transition-all duration-500 ${playing ? "forge-glow scale-[1.005]" : ""}`}
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_65%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%)]" />
               <div className="absolute left-5 top-5 flex gap-2">
@@ -444,7 +493,10 @@ function ChatWorkspace({
                     {playing ? "Starter scene is running" : "Press play to enter the starter scene"}
                   </p>
                   {!playing && (
-                   <Button className="mt-5 bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_26px_color-mix(in_oklab,var(--primary)_35%,transparent)]" onClick={() => setPlaying(true)}>
+                    <Button
+                      className="mt-5 bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_26px_color-mix(in_oklab,var(--primary)_35%,transparent)]"
+                      onClick={() => setPlaying(true)}
+                    >
                       <Play /> Play game
                     </Button>
                   )}
@@ -539,9 +591,9 @@ function ChatWorkspace({
           ))}
         </div>
         <div className="border-t border-border p-3">
-           <div className="spectrum-border rounded-xl bg-secondary/70 p-3">
+          <div className="spectrum-border rounded-xl bg-secondary/70 p-3">
             <div className="flex items-center gap-2 text-xs font-medium">
-               <ShieldCheck className="size-4 text-neon-cyan" /> AI project scan
+              <ShieldCheck className="size-4 text-neon-cyan" /> AI project scan
             </div>
             <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
               No blocking errors. Starter files are ready for your first build instruction.
