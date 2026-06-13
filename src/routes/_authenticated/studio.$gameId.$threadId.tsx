@@ -127,7 +127,7 @@ function GameWorkspace() {
   const addThread = useServerFn(createThread);
   const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [tab, setTab] = useState<StudioTab>("planner");
+  const [tab, setTab] = useState<StudioTab>("preview");
   const [modelTier, setModelTier] = useState<ModelTier>("balanced");
   const [selectedFile, setSelectedFile] = useState("");
   const [playing, setPlaying] = useState(false);
@@ -300,8 +300,8 @@ function ChatWorkspace({
     });
   }
   return (
-    <div className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-[max(.5rem,env(safe-area-inset-bottom))] md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(360px,1.2fr)_minmax(340px,1fr)] md:overflow-hidden xl:grid-cols-[244px_minmax(480px,1fr)_380px] xl:grid-rows-1">
-      <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-3">
+    <div className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-24 md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(380px,1.15fr)_minmax(360px,1fr)] md:overflow-hidden md:pb-2 xl:grid-cols-[minmax(290px,340px)_minmax(520px,1fr)_280px] xl:grid-rows-1">
+      <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl md:order-2 xl:order-1">
         <div className="flex items-center gap-2 border-b border-border/60 bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-3">
           <div className="relative">
             <div
@@ -477,7 +477,7 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <section className="glass-panel order-1 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-2">
+      <section className="glass-panel order-1 flex min-h-0 flex-col overflow-hidden rounded-2xl md:order-1 xl:order-2">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center border-b border-border/60 bg-panel/80 px-2 py-1">
           <div className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain">
             {(
@@ -806,14 +806,27 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:order-1 xl:flex">
+      <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:flex">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
-          <span className="font-mono text-[10px] tracking-wider">PROJECT / ASSETS</span>{" "}
+          <span className="font-mono text-[10px] tracking-wider">GAME INSPECTOR</span>{" "}
           <Button variant="ghost" size="icon-sm" className="ml-auto">
             <Plus />
           </Button>
         </div>
         <div className="flex-1 overflow-auto p-2">
+          <div className="mb-2 rounded-xl border border-border bg-panel/70 p-3">
+            <p className="font-mono text-[9px] uppercase tracking-wider text-neon-cyan">Selected scene</p>
+            <p className="mt-2 text-xs font-medium">Main game world</p>
+            <div className="mt-3 grid grid-cols-2 gap-2 text-[10px] text-muted-foreground">
+              <span className="rounded-lg bg-canvas/70 p-2">Transform</span>
+              <span className="rounded-lg bg-canvas/70 p-2">Physics</span>
+              <span className="rounded-lg bg-canvas/70 p-2">Visuals</span>
+              <span className="rounded-lg bg-canvas/70 p-2">Behavior</span>
+            </div>
+          </div>
+          <p className="px-2 py-2 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+            Assets, scripts & components
+          </p>
           <div className="mb-1 flex items-center gap-1 px-2 py-1 text-xs">
             <ChevronDown className="size-3" />
             <Folder className="size-4 text-primary" />
