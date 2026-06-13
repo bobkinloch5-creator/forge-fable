@@ -4,6 +4,7 @@ import {
   getGatewayRunId,
   withGatewayRunId,
 } from "@/lib/ai-gateway.server";
+import { getCometChatModels } from "@/lib/comet-models.server";
 import { createClient } from "@supabase/supabase-js";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
@@ -21,7 +22,7 @@ const Body = z.object({
   messages: z.array(TextMessage).min(1).max(200),
   gameId: z.string().uuid(),
   threadId: z.string().uuid(),
-  modelTier: z.enum(["fast", "balanced", "pro", "comet"]).default("balanced"),
+  modelId: z.string().min(1).max(200).default("lovable:balanced"),
 });
 
 export const Route = createFileRoute("/api/chat")({
@@ -45,7 +46,7 @@ export const Route = createFileRoute("/api/chat")({
         if (!userId) return new Response("Invalid session", { status: 401 });
         const parsed = Body.safeParse(await request.json());
         if (!parsed.success) return new Response("Invalid chat request", { status: 400 });
-        const { messages: clientMessages, gameId, threadId, modelTier } = parsed.data;
+        const { messages: clientMessages, gameId, threadId, modelId } = parsed.data;
         const { data: thread } = await db
           .from("chat_threads")
           .select("id, game_id")
@@ -127,8 +128,9 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const isCometModel = !modelId.startsWith("lovable:");
         const creditCost =
-          modelTier === "pro" || modelTier === "comet" ? 8 : modelTier === "balanced" ? 4 : 2;
+          isCometModel || modelId === "lovable:pro" ? 8 : modelId === "lovable:balanced" ? 4 : 2;
         const { error: creditError } = await supabaseAdmin.rpc("consume_creator_credits", {
           _user_id: userId,
           _amount: creditCost,
@@ -138,16 +140,21 @@ export const Route = createFileRoute("/api/chat")({
         const initialRunId = getGatewayRunId(request);
         const gateway = createLovableAiGatewayProvider(aiKey, initialRunId);
         const models = {
-          fast: "google/gemini-3.1-flash-lite-preview",
-          balanced: "google/gemini-3-flash-preview",
-          pro: "openai/gpt-5.4",
+          "lovable:fast": "google/gemini-3.1-flash-lite-preview",
+          "lovable:balanced": "google/gemini-3-flash-preview",
+          "lovable:pro": "openai/gpt-5.4",
         } as const;
-        const model =
-          modelTier === "comet"
-            ? cometKey
-              ? createCometApiProvider(cometKey)("gpt-5.3-codex")
-              : null
-            : gateway(models[modelTier]);
+        const lovableModel = models[modelId as keyof typeof models];
+        if (isCometModel) {
+          const catalog = await getCometChatModels();
+          if (!catalog.models.some((item) => item.id === modelId))
+            return new Response("Selected CometAPI model is unavailable", { status: 400 });
+        }
+        const model = isCometModel
+          ? cometKey
+            ? createCometApiProvider(cometKey)(modelId)
+            : null
+          : gateway(lovableModel);
         if (!model) return new Response("CometAPI is not configured", { status: 503 });
         const result = streamText({
           model,
@@ -219,7 +226,7 @@ For file reports, use bullets prefixed with Created, Updated, Removed, or Backed
               .eq("owner_id", userId);
           },
         });
-        return modelTier === "comet" ? response : withGatewayRunId(response, gateway);
+        return isCometModel ? response : withGatewayRunId(response, gateway);
       },
     },
   },

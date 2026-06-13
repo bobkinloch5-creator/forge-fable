@@ -1,4 +1,5 @@
 import { BrandMark } from "@/components/brand-mark";
+import { CometModelPicker } from "@/components/comet-model-picker";
 import {
   Conversation,
   ConversationContent,
@@ -22,13 +23,6 @@ import { PlaytestCenter } from "@/components/playtest-center";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { createThread, getWorkspace } from "@/lib/studio.functions";
 import { useChat } from "@ai-sdk/react";
@@ -100,7 +94,6 @@ type StudioTab =
   | "console"
   | "export"
   | "publish";
-type ModelTier = "fast" | "balanced" | "pro" | "comet";
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
 
@@ -137,7 +130,7 @@ function GameWorkspace() {
   const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [tab, setTab] = useState<StudioTab>("preview");
-  const [modelTier, setModelTier] = useState<ModelTier>("balanced");
+  const [modelId, setModelId] = useState("lovable:balanced");
   const [selectedFile, setSelectedFile] = useState("");
   const [playing, setPlaying] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>("desktop");
@@ -186,8 +179,8 @@ function GameWorkspace() {
           threadId,
           tab,
           setTab,
-          modelTier,
-          setModelTier,
+          modelId,
+          setModelId,
           selectedFile,
           setSelectedFile,
           playing,
@@ -214,8 +207,8 @@ function ChatWorkspace({
   threadId,
   tab,
   setTab,
-  modelTier,
-  setModelTier,
+  modelId,
+  setModelId,
   selectedFile,
   setSelectedFile,
   playing,
@@ -236,8 +229,8 @@ function ChatWorkspace({
   threadId: string;
   tab: StudioTab;
   setTab: Dispatch<SetStateAction<StudioTab>>;
-  modelTier: ModelTier;
-  setModelTier: Dispatch<SetStateAction<ModelTier>>;
+  modelId: string;
+  setModelId: Dispatch<SetStateAction<string>>;
   selectedFile: string;
   setSelectedFile: Dispatch<SetStateAction<string>>;
   playing: boolean;
@@ -262,9 +255,9 @@ function ChatWorkspace({
           if (data.session) headers.set("Authorization", `Bearer ${data.session.access_token}`);
           return headers;
         },
-        body: { gameId, threadId, modelTier },
+        body: { gameId, threadId, modelId },
       }),
-    [gameId, threadId, modelTier],
+    [gameId, threadId, modelId],
   );
   const { messages, sendMessage, status, stop, error } = useChat({
     id: threadId,
@@ -323,7 +316,7 @@ function ChatWorkspace({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <p className="font-mono text-[10px] font-semibold tracking-wider">FABLE 5 BUILDER</p>
-              {modelTier === "pro" && (
+              {(modelId === "lovable:pro" || !modelId.startsWith("lovable:")) && (
                 <Badge className="border-neon-pink/30 bg-neon-pink/15 text-neon-pink">PRO</Badge>
               )}
             </div>
@@ -463,20 +456,7 @@ function ChatWorkspace({
               className="min-h-20"
             />
             <PromptInputFooter>
-              <Select
-                value={modelTier}
-                onValueChange={(value) => setModelTier(value as typeof modelTier)}
-              >
-                <SelectTrigger className="h-8 w-32 border-0 bg-transparent px-2 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fast">Fable 5 Fast</SelectItem>
-                  <SelectItem value="balanced">Fable 5</SelectItem>
-                  <SelectItem value="pro">Claude Fable 5 Pro</SelectItem>
-                  <SelectItem value="comet">Comet Codex</SelectItem>
-                </SelectContent>
-              </Select>
+              <CometModelPicker value={modelId} onValueChange={setModelId} />
               <PromptInputSubmit status={status} onStop={stop} />
             </PromptInputFooter>
           </PromptInput>
