@@ -87,6 +87,195 @@ export type Database = {
           },
         ]
       }
+      desktop_build_agents: {
+        Row: {
+          created_at: string
+          godot_version: string
+          id: string
+          last_seen_at: string | null
+          name: string
+          owner_id: string
+          status: string
+          supported_platforms: string[]
+          token_hash: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          godot_version?: string
+          id?: string
+          last_seen_at?: string | null
+          name: string
+          owner_id: string
+          status?: string
+          supported_platforms?: string[]
+          token_hash: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          godot_version?: string
+          id?: string
+          last_seen_at?: string | null
+          name?: string
+          owner_id?: string
+          status?: string
+          supported_platforms?: string[]
+          token_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      desktop_build_artifacts: {
+        Row: {
+          artifact_type: string
+          checksum_sha256: string
+          created_at: string
+          file_name: string
+          file_size: number
+          game_id: string
+          id: string
+          installation_instructions: string
+          job_id: string
+          owner_id: string
+          platform: string
+          storage_path: string
+          updated_at: string
+        }
+        Insert: {
+          artifact_type: string
+          checksum_sha256: string
+          created_at?: string
+          file_name: string
+          file_size: number
+          game_id: string
+          id?: string
+          installation_instructions?: string
+          job_id: string
+          owner_id: string
+          platform: string
+          storage_path: string
+          updated_at?: string
+        }
+        Update: {
+          artifact_type?: string
+          checksum_sha256?: string
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          game_id?: string
+          id?: string
+          installation_instructions?: string
+          job_id?: string
+          owner_id?: string
+          platform?: string
+          storage_path?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "desktop_build_artifacts_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "desktop_build_artifacts_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "desktop_build_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      desktop_build_jobs: {
+        Row: {
+          agent_id: string | null
+          claimed_at: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string
+          game_id: string
+          id: string
+          known_issues: string
+          logs: string
+          minimum_requirements: string
+          owner_id: string
+          package_type: string
+          platform: string
+          progress_percent: number
+          progress_stage: string
+          recommended_requirements: string
+          release_notes: string
+          status: string
+          updated_at: string
+          verification_results: Json
+          version: string
+        }
+        Insert: {
+          agent_id?: string | null
+          claimed_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string
+          game_id: string
+          id?: string
+          known_issues?: string
+          logs?: string
+          minimum_requirements?: string
+          owner_id: string
+          package_type: string
+          platform: string
+          progress_percent?: number
+          progress_stage?: string
+          recommended_requirements?: string
+          release_notes?: string
+          status?: string
+          updated_at?: string
+          verification_results?: Json
+          version?: string
+        }
+        Update: {
+          agent_id?: string | null
+          claimed_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string
+          game_id?: string
+          id?: string
+          known_issues?: string
+          logs?: string
+          minimum_requirements?: string
+          owner_id?: string
+          package_type?: string
+          platform?: string
+          progress_percent?: number
+          progress_stage?: string
+          recommended_requirements?: string
+          release_notes?: string
+          status?: string
+          updated_at?: string
+          verification_results?: Json
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "desktop_build_jobs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "desktop_build_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "desktop_build_jobs_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       development_stages: {
         Row: {
           created_at: string
@@ -311,7 +500,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_desktop_build_job: {
+        Args: { _agent_id: string }
+        Returns: {
+          agent_id: string | null
+          claimed_at: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string
+          game_id: string
+          id: string
+          known_issues: string
+          logs: string
+          minimum_requirements: string
+          owner_id: string
+          package_type: string
+          platform: string
+          progress_percent: number
+          progress_stage: string
+          recommended_requirements: string
+          release_notes: string
+          status: string
+          updated_at: string
+          verification_results: Json
+          version: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "desktop_build_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       [_ in never]: never
