@@ -227,18 +227,18 @@ export function CreateGameDialog({
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-panel max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-5xl overflow-hidden border-border p-0 sm:max-h-[92vh]">
-        <DialogHeader className="border-b border-border bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-4 sm:p-6">
+      <DialogContent className="glass-panel inset-0 top-0 left-0 h-dvh max-h-dvh w-screen max-w-none translate-x-0 translate-y-0 gap-0 overflow-hidden rounded-none border-border p-0 [grid-template-rows:auto_minmax(0,1fr)_auto] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-[calc(100vw-2rem)] sm:max-w-5xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl">
+        <DialogHeader className="border-b border-border bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-4 pr-12 text-left sm:p-6 sm:pr-14">
           <p className="font-mono text-xs text-neon-cyan">STANDALONE GAME WIZARD / 0{step}</p>
-          <DialogTitle className="text-2xl">{titles[step - 1]}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl leading-tight sm:text-2xl">{titles[step - 1]}</DialogTitle>
+          <DialogDescription className="text-xs leading-5 sm:text-sm">
             FableForge will prepare a professional plan first. Nothing is built until you approve
             it.
           </DialogDescription>
         </DialogHeader>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:min-h-96 sm:p-6">
+        <div className="min-h-0 overflow-y-auto overscroll-contain p-3 pb-6 sm:min-h-96 sm:p-6">
           {step === 1 && (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:gap-3 lg:grid-cols-3">
               {platforms.map((platform) => (
                 <Button
                   key={platform.label}
@@ -264,7 +264,7 @@ export function CreateGameDialog({
                   className="mt-2 h-11 text-foreground"
                 />
               </label>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:max-w-xl">
                 {(["2D", "3D"] as const).map((dimension) => (
                   <Button
                     key={dimension}
@@ -276,7 +276,7 @@ export function CreateGameDialog({
                   </Button>
                 ))}
               </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                 {gameTypes.map((genre) => (
                   <Button
                     key={genre}
@@ -310,7 +310,7 @@ export function CreateGameDialog({
                   </div>
                   <div>
                     <p className="mb-2 text-xs font-medium">SUPPORTED SCREENS</p>
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-3">
                       {["Mobile", "Tablet", "Desktop"].map((target) => (
                         <Button
                           key={target}
@@ -347,7 +347,7 @@ export function CreateGameDialog({
                     />
                     <div>
                       <p className="mb-2 text-xs font-medium">PLAYER SYSTEMS</p>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
                         {(
                           [
                             ["Cloud progress", "saveProgress"],
@@ -376,7 +376,7 @@ export function CreateGameDialog({
             <div className="space-y-6">
               <div>
                 <p className="mb-3 text-xs font-medium text-muted-foreground">PLAY MODE</p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:grid-cols-3">
                   {modes.map((mode) => (
                     <Button
                       key={mode}
@@ -391,7 +391,7 @@ export function CreateGameDialog({
               </div>
               <div>
                 <p className="mb-3 text-xs font-medium text-muted-foreground">CONTROLS</p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:grid-cols-3">
                   {controls.map((control) => (
                     <Button
                       key={control}
@@ -410,7 +410,7 @@ export function CreateGameDialog({
             </div>
           )}
           {step === 4 && (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {styles.map((style) => (
                 <Button
                   key={style}
@@ -424,7 +424,7 @@ export function CreateGameDialog({
             </div>
           )}
           {step === 5 && (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {systems.map((system) => (
                 <Button
                   key={system}
@@ -501,22 +501,22 @@ export function CreateGameDialog({
             </div>
           )}
         </div>
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 border-t border-border p-3 pb-[max(.75rem,env(safe-area-inset-bottom))] sm:p-4">
-          <Button variant="ghost" disabled={step === 1} onClick={() => setStep(step - 1)}>
+        <div className="grid grid-cols-2 items-center gap-2 border-t border-border bg-background/95 p-3 pb-[max(.75rem,env(safe-area-inset-bottom))] sm:grid-cols-[auto_1fr_auto] sm:p-4">
+          <Button className="order-2 sm:order-1" variant="ghost" disabled={step === 1} onClick={() => setStep(step - 1)}>
             <ArrowLeft /> Back
           </Button>
-          <span className="text-center font-mono text-[9px] text-muted-foreground sm:text-[10px]">
+          <span className="order-1 col-span-2 text-center font-mono text-[9px] text-muted-foreground sm:order-2 sm:col-span-1 sm:text-[10px]">
             STEP {step} OF 6
           </span>
           {step < 6 ? (
-            <Button disabled={step === 2 && !draft.name.trim()} onClick={() => setStep(step + 1)}>
+            <Button className="order-3" disabled={step === 2 && !draft.name.trim()} onClick={() => setStep(step + 1)}>
               Continue <ArrowRight />
             </Button>
           ) : (
             <Button
               disabled={busy}
               onClick={finish}
-              className="bg-linear-to-r from-primary via-neon-violet to-neon-pink"
+              className="order-3 h-auto min-h-10 whitespace-normal bg-linear-to-r from-primary via-neon-violet to-neon-pink px-3 text-xs sm:text-sm"
             >
               {busy ? "Creating checkpoint…" : "Approve plan & create project"}
               <ArrowRight />
