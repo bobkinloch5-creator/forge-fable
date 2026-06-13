@@ -532,6 +532,11 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      consume_creator_credits: { Args: { _amount: number }; Returns: number }
+      refund_creator_credits: {
+        Args: { _amount: number; _user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
