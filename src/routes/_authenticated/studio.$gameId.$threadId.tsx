@@ -78,7 +78,7 @@ export const Route = createFileRoute("/_authenticated/studio/$gameId/$threadId")
 
 type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWorkspace>>>>;
 type ReadyWorkspace = Omit<Workspace, "game"> & { game: NonNullable<Workspace["game"]> };
-type StudioTab = "preview" | "models" | "code" | "console" | "export";
+type StudioTab = "planner" | "preview" | "models" | "code" | "console" | "export";
 type ModelTier = "fast" | "balanced" | "pro" | "comet";
 
 const buildStates = [
@@ -114,7 +114,7 @@ function GameWorkspace() {
   const addThread = useServerFn(createThread);
   const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [tab, setTab] = useState<StudioTab>("preview");
+  const [tab, setTab] = useState<StudioTab>("planner");
   const [modelTier, setModelTier] = useState<ModelTier>("balanced");
   const [selectedFile, setSelectedFile] = useState("");
   const [playing, setPlaying] = useState(false);
@@ -441,6 +441,7 @@ function ChatWorkspace({
           <div className="flex gap-1">
             {(
               [
+                { id: "planner", label: "Production Plan", icon: History },
                 { id: "preview", label: "Viewport", icon: Gamepad2 },
                 { id: "models", label: "3D Forge", icon: Cuboid },
                 { id: "code", label: "Code Editor", icon: Code2 },
@@ -479,6 +480,73 @@ function ChatWorkspace({
             </Button>
           </div>
         </div>
+        {tab === "planner" && (
+          <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[.18em] text-neon-cyan">
+                  Dependency-aware production
+                </p>
+                <h2 className="mt-1 text-xl font-semibold">Advanced project planner</h2>
+                <p className="mt-2 max-w-3xl text-xs leading-5 text-muted-foreground">
+                  The project advances through gated stages so architecture, gameplay, content,
+                  networking, optimization, testing, and export stay connected as the game grows.
+                </p>
+              </div>
+              <Badge variant="outline">
+                {workspace.stages.filter((stage) => stage.status === "complete").length} /{" "}
+                {workspace.stages.length} STAGES COMPLETE
+              </Badge>
+            </div>
+            <div className="grid gap-2 lg:grid-cols-2">
+              {workspace.stages.map((stage) => (
+                <div
+                  key={stage.id}
+                  className={`rounded-xl border p-3 ${stage.status === "ready" || stage.status === "in_progress" ? "spectrum-border bg-primary/8" : "border-border bg-panel/60"}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-secondary font-mono text-[10px] text-neon-cyan">
+                      {String(stage.position).padStart(2, "0")}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-xs font-semibold">{stage.title}</h3>
+                        <Badge variant="outline" className="font-mono text-[8px] uppercase">
+                          {stage.status.replace("_", " ")}
+                        </Badge>
+                      </div>
+                      <p className="mt-1 truncate text-[10px] text-muted-foreground">
+                        Depends on: {stage.dependencies.join(", ") || "No prior stage"}
+                      </p>
+                      <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
+                        {stage.deliverables.join(" · ")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 border-t border-border pt-4">
+              <div className="mb-3 flex items-center gap-2">
+                <ShieldCheck className="size-4 text-neon-cyan" />
+                <h3 className="text-sm font-semibold">Recovery checkpoints</h3>
+                <Badge variant="outline" className="ml-auto">
+                  {workspace.checkpoints.length} SAVED
+                </Badge>
+              </div>
+              <div className="grid gap-2 md:grid-cols-2">
+                {workspace.checkpoints.map((checkpoint) => (
+                  <div key={checkpoint.id} className="rounded-xl border border-border bg-canvas/60 p-3">
+                    <p className="text-xs font-medium">{checkpoint.label}</p>
+                    <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
+                      {checkpoint.summary}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         {tab === "preview" && (
           <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
             <div className="aurora-orb pointer-events-none absolute -left-28 top-0 size-80 rounded-full bg-neon-violet/12 blur-3xl" />
@@ -609,7 +677,8 @@ function ChatWorkspace({
               <ShieldCheck className="size-4 text-neon-cyan" /> AI project scan
             </div>
             <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
-              No blocking errors. Starter files are ready for your first build instruction.
+              Architecture scan tracks {workspace.files.length} files, {workspace.stages.length}
+              production stages, dependencies, and checkpoint history.
             </p>
             <Button variant="outline" size="sm" className="mt-3 w-full">
               Run scan
