@@ -12,7 +12,7 @@ import {
   Smartphone,
   Upload,
 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
 const launchModes = [
   { label: "Website Game", icon: Globe2 },
@@ -41,6 +41,7 @@ export function GameIdeaLauncher({
 }) {
   const [idea, setIdea] = useState("");
   const [mode, setMode] = useState("Cross-Platform");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -88,6 +89,17 @@ export function GameIdeaLauncher({
         onSubmit={submit}
         className="spectrum-border relative mt-4 overflow-hidden rounded-3xl bg-panel/90 p-2 shadow-[0_24px_80px_color-mix(in_oklab,var(--canvas)_70%,transparent)] sm:p-3"
       >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*,.zip,.godot,.unitypackage"
+          className="sr-only"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            setIdea(`Use my uploaded reference “${file.name}” to guide this game project. `);
+          }}
+        />
         <Textarea
           autoFocus={compact}
           value={idea}
@@ -97,10 +109,25 @@ export function GameIdeaLauncher({
         />
         <div className="flex items-center justify-between gap-2 border-t border-border/60 px-2 py-2 sm:px-3">
           <div className="flex min-w-0 gap-1.5 overflow-x-auto">
-            <Button type="button" variant="ghost" size="sm" className="shrink-0 text-muted-foreground">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="shrink-0 text-muted-foreground"
+              onClick={() => fileInputRef.current?.click()}
+            >
               <ImageUp /> Reference
             </Button>
-            <Button type="button" variant="ghost" size="sm" className="shrink-0 text-muted-foreground">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="shrink-0 text-muted-foreground"
+              onClick={() => {
+                setMode("Import Project");
+                fileInputRef.current?.click();
+              }}
+            >
               <Code2 /> Code project
             </Button>
           </div>
