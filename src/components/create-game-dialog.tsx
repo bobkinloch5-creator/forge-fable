@@ -12,13 +12,10 @@ import { createGame } from "@/lib/studio.functions";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  Apple,
   Gamepad2,
   Globe2,
-  Laptop,
   Monitor,
   Smartphone,
-  Sparkles,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -38,13 +35,9 @@ const initial: Draft = {
 };
 
 const platforms = [
-  { label: "PC Game", icon: Gamepad2 },
+  { label: "Website game", icon: Globe2 },
   { label: "Windows PC game", icon: Monitor },
-  { label: "macOS game", icon: Apple },
-  { label: "Linux game", icon: Laptop },
-  { label: "Android mobile game", icon: Smartphone },
-  { label: "iPhone/iPad game", icon: Smartphone },
-  { label: "Web browser game", icon: Globe2 },
+  { label: "Mobile game", icon: Smartphone },
   { label: "Cross-platform game", icon: Gamepad2 },
 ];
 
@@ -66,12 +59,15 @@ export function CreateGameDialog({
 
   useEffect(() => {
     if (!open) return;
-    setDraft((current) => ({
-      ...current,
-      description: initialIdea || current.description,
-      name: initialIdea ? initialIdea.split(/\s+/).slice(0, 5).join(" ") : current.name,
-      platform: initialPlatform,
-    }));
+    const platform = platforms.some((item) => item.label === initialPlatform)
+      ? initialPlatform
+      : "Cross-platform game";
+    setDraft({
+      ...initial,
+      description: initialIdea,
+      name: initialIdea ? initialIdea.split(/\s+/).slice(0, 5).join(" ") : "",
+      platform,
+    });
   }, [initialIdea, initialPlatform, open]);
 
   async function finish() {
@@ -103,7 +99,7 @@ export function CreateGameDialog({
             Configure your project
           </DialogTitle>
           <DialogDescription className="text-xs leading-5 sm:text-sm">
-            FableForge will prepare the foundation. You can add more details in the build chat.
+            This creates a clean workspace. Build every system intentionally through the AI chat.
           </DialogDescription>
         </DialogHeader>
         <div className="min-h-0 space-y-6 overflow-y-auto overscroll-contain p-4 sm:p-8">
@@ -160,6 +156,11 @@ export function CreateGameDialog({
               className="min-h-32 leading-relaxed"
             />
           </div>
+          <div className="rounded-xl border border-border bg-canvas/60 p-4 text-xs leading-5 text-muted-foreground">
+            <strong className="text-foreground">Starts clean:</strong> only essential project
+            configuration, an empty scene, and a starter script are prepared. No gameplay systems,
+            maps, characters, or assets are added until you request and approve them.
+          </div>
         </div>
         <div className="flex items-center justify-between border-t border-border bg-panel/40 p-4 sm:px-8">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
@@ -168,12 +169,7 @@ export function CreateGameDialog({
             disabled={busy || !draft.name || !draft.description}
             className="bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_20px_color-mix(in_oklab,var(--primary)_30%,transparent)]"
           >
-            {busy ? "Creating..." : (
-              <>
-                <Sparkles className="mr-2 size-4" />
-                Initialize Project
-              </>
-            )}
+            {busy ? "Creating workspace…" : "Create project"}
           </Button>
         </div>
       </DialogContent>
