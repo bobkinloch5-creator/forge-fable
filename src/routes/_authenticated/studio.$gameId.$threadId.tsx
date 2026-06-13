@@ -14,12 +14,8 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import { TripoModelLab } from "@/components/tripo-model-lab";
-import { DesktopBuildCenter } from "@/components/desktop-build-center";
-import { WebsitePublishingCenter } from "@/components/website-publishing-center";
 import { ProjectMemoryPanel } from "@/components/project-memory-panel";
 import { VersionControlPanel } from "@/components/version-control-panel";
-import { PlaytestCenter } from "@/components/playtest-center";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,22 +30,14 @@ import {
   Check,
   ChevronDown,
   Code2,
-  Cuboid,
-  Download,
   Eye,
-  FileArchive,
   FileCode2,
   Folder,
   Gamepad2,
-  Globe2,
-  History,
   Brain,
   GitBranch,
-  FlaskConical,
   Image,
   Maximize2,
-  Monitor,
-  PackageOpen,
   Play,
   Plus,
   RefreshCw,
@@ -57,7 +45,6 @@ import {
   ShieldCheck,
   Smartphone,
   Tablet,
-  Terminal,
   Undo2,
   Wand2,
   Wrench,
@@ -545,33 +532,6 @@ function ChatWorkspace({
             </Button>
           </div>
         </div>
-        {tab === "planner" && (
-          <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-            <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <p className="font-mono text-[9px] uppercase tracking-[.18em] text-neon-cyan">
-                  Dependency-aware production
-                </p>
-                <h2 className="mt-1 text-xl font-semibold">Advanced project planner</h2>
-                <p className="mt-2 max-w-3xl text-xs leading-5 text-muted-foreground">
-                  The project advances through gated stages so architecture, gameplay, content,
-                  networking, optimization, testing, and export stay connected as the game grows.
-                </p>
-              </div>
-              <Badge variant="outline">
-                {workspace.stages.filter((stage) => stage.status === "complete").length} /{" "}
-                {workspace.stages.length} STAGES COMPLETE
-              </Badge>
-            </div>
-            <div className="grid gap-2 lg:grid-cols-2">
-              {workspace.stages.map((stage) => (
-                <div
-                  key={stage.id}
-                  className={`rounded-xl border p-3 ${stage.status === "ready" || stage.status === "in_progress" ? "spectrum-border bg-primary/8" : "border-border bg-panel/60"}`}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-secondary font-mono text-[10px] text-neon-cyan">
-                      {String(stage.position).padStart(2, "0")}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
@@ -730,7 +690,6 @@ function ChatWorkspace({
             </div>
           </div>
         )}
-        {tab === "models" && <TripoModelLab />}
         {tab === "code" && (
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex h-10 items-center gap-2 border-b border-border bg-panel px-4 text-xs">
@@ -745,15 +704,6 @@ function ChatWorkspace({
             </pre>
           </div>
         )}
-        {tab === "console" && (
-          <div className="flex-1 overflow-auto p-5 font-mono text-xs leading-7">
-            <p className="text-muted-foreground">[forge] project manifest loaded</p>
-            <p className="text-success">[build] 4 files compiled successfully</p>
-            <p className="text-muted-foreground">[preview] waiting for play command</p>
-          </div>
-        )}
-        {tab === "export" && <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />}
-        {tab === "publish" && <WebsitePublishingCenter gameName={workspace.game.name} />}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
             {["Build Logs", "Errors 1", "Warnings", "Testing", "Performance", "Multiplayer"].map(
