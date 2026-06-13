@@ -22,7 +22,7 @@ import {
   Smartphone,
   Sparkles,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type Draft = {
@@ -160,15 +160,29 @@ const systems = [
 export function CreateGameDialog({
   open,
   onOpenChange,
+  initialIdea = "",
+  initialPlatform = "Cross-platform game",
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialIdea?: string;
+  initialPlatform?: string;
 }) {
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState(initial);
   const [busy, setBusy] = useState(false);
   const create = useServerFn(createGame);
   const navigate = useNavigate();
+  useEffect(() => {
+    if (!open || (!initialIdea && initialPlatform === "Cross-platform game")) return;
+    setStep(initialIdea ? 2 : 1);
+    setDraft((current) => ({
+      ...current,
+      description: initialIdea || current.description,
+      name: initialIdea ? initialIdea.split(/\s+/).slice(0, 5).join(" ") : current.name,
+      platform: initialPlatform,
+    }));
+  }, [initialIdea, initialPlatform, open]);
   async function finish() {
     setBusy(true);
     try {
