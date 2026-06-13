@@ -1,4 +1,5 @@
 import { CreateGameDialog } from "@/components/create-game-dialog";
+import { GameIdeaLauncher } from "@/components/game-idea-launcher";
 import { NewProjectButton, StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,8 @@ export const Route = createFileRoute("/_authenticated/studio")({
 
 function StudioDashboard() {
   const [open, setOpen] = useState(false);
+  const [initialIdea, setInitialIdea] = useState("");
+  const [initialPlatform, setInitialPlatform] = useState("Cross-platform game");
   const [data, setData] = useState<{
     profile: { display_name: string; plan: string; credits: number } | null;
     games: Tables<"games">[];
@@ -44,37 +47,44 @@ function StudioDashboard() {
   useEffect(() => {
     getOverview().then(setData);
   }, [getOverview]);
+  useEffect(() => {
+    const savedIdea = sessionStorage.getItem("fableforge:draft-idea");
+    const savedMode = sessionStorage.getItem("fableforge:draft-mode");
+    if (!savedIdea) return;
+    sessionStorage.removeItem("fableforge:draft-idea");
+    sessionStorage.removeItem("fableforge:draft-mode");
+    launchFromIdea(savedIdea, savedMode ?? "Cross-Platform");
+  }, []);
   const games = data?.games ?? [];
   const isOwner = data?.roles.some((item) => item.role === "owner") ?? false;
+  function launchFromIdea(idea: string, mode: string) {
+    const platform =
+      mode === "Website Game"
+        ? "Web browser game"
+        : mode === "Mobile Game"
+          ? "Android mobile game"
+          : mode === "PC Game"
+            ? "Windows PC game"
+            : "Cross-platform game";
+    setInitialIdea(idea);
+    setInitialPlatform(platform);
+    setOpen(true);
+  }
   return (
-    <StudioShell title="Project hub" subtitle="Build across web, mobile, and PC" accountRole={isOwner ? "owner" : undefined} credits={isOwner ? "unlimited" : data?.profile?.credits}>
+    <StudioShell
+      title="Project hub"
+      subtitle="Build across web, mobile, and PC"
+      accountRole={isOwner ? "owner" : undefined}
+      credits={isOwner ? "unlimited" : data?.profile?.credits}
+    >
       <main className="mx-auto max-w-[1500px] p-3 pb-24 sm:p-6 sm:pb-24 lg:p-8">
-        <section className="mb-8 grid gap-4 xl:grid-cols-[1.5fr_1fr]">
-          <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-5 sm:p-9">
+        <section className="mb-8">
+          <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-4 sm:p-8 lg:p-10">
             <div className="panel-grid absolute inset-0 opacity-20" />
             <div className="aurora-orb absolute -right-24 -top-32 size-80 rounded-full bg-neon-violet/20 blur-3xl" />
-            <div className="relative max-w-2xl">
-              <Badge variant="outline" className="mb-5 border-primary/40 text-primary">
-                <Zap className="mr-1 size-3" /> AI GAME ENGINE
-              </Badge>
-              <h2 className="text-balance text-3xl font-semibold tracking-[-.035em] sm:text-5xl sm:tracking-[-.045em]">
-                Build the world.
-                <br />
-                <span className="bg-linear-to-r from-neon-cyan via-primary to-neon-pink bg-clip-text text-transparent">
-                  Keep creative control.
-                </span>
-              </h2>
-              <p className="mt-5 max-w-xl text-sm leading-6 text-muted-foreground">
-                Start from a concept or template. FableForge plans the systems, writes the files,
-                and keeps every major change reviewable.
-              </p>
-              <div className="mt-7 grid gap-3 sm:flex">
-                <NewProjectButton onClick={() => setOpen(true)} />
-                <Button variant="outline">Browse templates</Button>
-              </div>
-            </div>
+            <GameIdeaLauncher compact onStart={launchFromIdea} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[
               { label: "Active projects", value: games.length, icon: Gamepad2 },
               {
@@ -85,7 +95,9 @@ function StudioDashboard() {
               { label: "Build artifacts", value: games.length * 4, icon: Box },
               {
                 label: "Plan",
-                value: isOwner ? "Platform owner" : (data?.profile?.plan ?? "free").replace("_", " "),
+                value: isOwner
+                  ? "Platform owner"
+                  : (data?.profile?.plan ?? "free").replace("_", " "),
                 icon: Layers3,
               },
             ].map((stat) => (
@@ -166,26 +178,47 @@ function StudioDashboard() {
               Curated systems, scenes, and control maps.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {templates.slice(0, 4).map((template) => (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {templates.map((template) => (
               <article
                 key={template.name}
-                className="glass-panel group rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:border-neon-violet/40"
+                className="glass-panel group flex flex-col rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:border-neon-violet/40"
               >
                 <div className="panel-grid mb-4 grid aspect-[16/9] place-items-center rounded-lg bg-canvas">
                   <template.icon className="size-10 text-primary" />
                 </div>
                 <h4 className="font-medium">{template.name}</h4>
+                <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+                  {template.systems}
+                </p>
                 <div className="mt-2 flex justify-between text-xs text-muted-foreground">
                   <span>{template.difficulty}</span>
                   <span>{template.credits} credits</span>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 w-full"
+                  onClick={() =>
+                    launchFromIdea(
+                      `Create a ${template.name} with ${template.systems}`,
+                      "Start From Template",
+                    )
+                  }
+                >
+                  Use this template
+                </Button>
               </article>
             ))}
           </div>
         </section>
       </main>
-      <CreateGameDialog open={open} onOpenChange={setOpen} />
+      <CreateGameDialog
+        open={open}
+        onOpenChange={setOpen}
+        initialIdea={initialIdea}
+        initialPlatform={initialPlatform}
+      />
     </StudioShell>
   );
 }

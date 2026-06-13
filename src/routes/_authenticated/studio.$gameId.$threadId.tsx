@@ -89,24 +89,33 @@ type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWork
 type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
-type StudioTab = "planner" | "memory" | "versions" | "tests" | "preview" | "models" | "code" | "console" | "export" | "publish";
+type StudioTab =
+  | "planner"
+  | "memory"
+  | "versions"
+  | "tests"
+  | "preview"
+  | "models"
+  | "code"
+  | "console"
+  | "export"
+  | "publish";
 type ModelTier = "fast" | "balanced" | "pro" | "comet";
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
 
 const buildStates = [
-  "Planning",
-  "Creating project structure",
-  "Generating gameplay systems",
-  "Building maps",
-  "Creating menus",
-  "Connecting controls",
-  "Adding audio",
+  "Understanding request",
+  "Planning changes",
+  "Creating systems",
+  "Generating code",
+  "Adding assets",
+  "Updating the game world",
   "Testing gameplay",
-  "Checking performance",
   "Fixing errors",
-  "Preparing standalone build",
-  "Export complete",
+  "Optimizing performance",
+  "Preparing build",
+  "Completed",
 ];
 
 const quickActions = [
@@ -127,7 +136,7 @@ function GameWorkspace() {
   const addThread = useServerFn(createThread);
   const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [tab, setTab] = useState<StudioTab>("planner");
+  const [tab, setTab] = useState<StudioTab>("preview");
   const [modelTier, setModelTier] = useState<ModelTier>("balanced");
   const [selectedFile, setSelectedFile] = useState("");
   const [playing, setPlaying] = useState(false);
@@ -300,8 +309,8 @@ function ChatWorkspace({
     });
   }
   return (
-    <div className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-[max(.5rem,env(safe-area-inset-bottom))] md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(360px,1.2fr)_minmax(340px,1fr)] md:overflow-hidden xl:grid-cols-[244px_minmax(480px,1fr)_380px] xl:grid-rows-1">
-      <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-3">
+    <div className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-24 md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(380px,1.15fr)_minmax(360px,1fr)] md:overflow-hidden md:pb-2 xl:grid-cols-[minmax(290px,340px)_minmax(520px,1fr)_280px] xl:grid-rows-1">
+      <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl md:order-2 xl:order-1">
         <div className="flex items-center gap-2 border-b border-border/60 bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-3">
           <div className="relative">
             <div
@@ -477,17 +486,17 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <section className="glass-panel order-1 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-2">
+      <section className="glass-panel order-1 flex min-h-0 flex-col overflow-hidden rounded-2xl md:order-1 xl:order-2">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center border-b border-border/60 bg-panel/80 px-2 py-1">
           <div className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain">
             {(
               [
-                { id: "planner", label: "Production Plan", icon: History },
+                { id: "planner", label: "Build Stages", icon: History },
                 { id: "memory", label: "Memory", icon: Brain },
                 { id: "versions", label: "Versions", icon: GitBranch },
                 { id: "tests", label: "Playtests", icon: FlaskConical },
-                { id: "preview", label: "Viewport", icon: Gamepad2 },
-                { id: "models", label: "3D Forge", icon: Cuboid },
+                { id: "preview", label: "Live Game", icon: Gamepad2 },
+                { id: "models", label: "Visual Editor", icon: Cuboid },
                 { id: "code", label: "Code Editor", icon: Code2 },
                 { id: "console", label: "Console", icon: Terminal },
                 { id: "export", label: "Export Center", icon: PackageOpen },
@@ -633,7 +642,9 @@ function ChatWorkspace({
           </div>
         )}
         {tab === "memory" && <ProjectMemoryPanel gameId={gameId} />}
-        {tab === "versions" && <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />}
+        {tab === "versions" && (
+          <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />
+        )}
         {tab === "tests" && <PlaytestCenter gameId={gameId} />}
         {tab === "preview" && (
           <div
@@ -771,18 +782,24 @@ function ChatWorkspace({
         {tab === "publish" && <WebsitePublishingCenter gameName={workspace.game.name} />}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
-            {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
-              <span
-                key={label}
-                className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
-              >
-                {label.toUpperCase()}
-              </span>
-            ))}
+            {["Build Logs", "Errors 1", "Warnings", "Testing", "Performance", "Multiplayer"].map(
+              (label, index) => (
+                <span
+                  key={label}
+                  className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
+                >
+                  {label.toUpperCase()}
+                </span>
+              ),
+            )}
             <Button
               size="sm"
               variant="outline"
               className="ml-auto h-7 shrink-0 font-mono text-[9px]"
+              onClick={() => {
+                setTab("tests");
+                toast.info("Playtest diagnostics opened. Ask Fable to repair any reported issue.");
+              }}
             >
               <Wand2 /> <span className="hidden sm:inline">Fix Responsive Design with AI</span>
               <span className="sm:hidden">AI Fix</span>
@@ -806,14 +823,35 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:order-1 xl:flex">
+      <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:flex">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
-          <span className="font-mono text-[10px] tracking-wider">PROJECT / ASSETS</span>{" "}
-          <Button variant="ghost" size="icon-sm" className="ml-auto">
+          <span className="font-mono text-[10px] tracking-wider">GAME INSPECTOR</span>{" "}
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="ml-auto"
+            onClick={() => setTab("models")}
+            aria-label="Open asset generator"
+          >
             <Plus />
           </Button>
         </div>
         <div className="flex-1 overflow-auto p-2">
+          <div className="mb-2 rounded-xl border border-border bg-panel/70 p-3">
+            <p className="font-mono text-[9px] uppercase tracking-wider text-neon-cyan">
+              Selected scene
+            </p>
+            <p className="mt-2 text-xs font-medium">Main game world</p>
+            <div className="mt-3 grid grid-cols-2 gap-2 text-[10px] text-muted-foreground">
+              <span className="rounded-lg bg-canvas/70 p-2">Transform</span>
+              <span className="rounded-lg bg-canvas/70 p-2">Physics</span>
+              <span className="rounded-lg bg-canvas/70 p-2">Visuals</span>
+              <span className="rounded-lg bg-canvas/70 p-2">Behavior</span>
+            </div>
+          </div>
+          <p className="px-2 py-2 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+            Assets, scripts & components
+          </p>
           <div className="mb-1 flex items-center gap-1 px-2 py-1 text-xs">
             <ChevronDown className="size-3" />
             <Folder className="size-4 text-primary" />
@@ -842,7 +880,12 @@ function ChatWorkspace({
               Architecture scan tracks {workspace.files.length} files, {workspace.stages.length}
               production stages, dependencies, and checkpoint history.
             </p>
-            <Button variant="outline" size="sm" className="mt-3 w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 w-full"
+              onClick={() => setTab("tests")}
+            >
               Run scan
             </Button>
           </div>
