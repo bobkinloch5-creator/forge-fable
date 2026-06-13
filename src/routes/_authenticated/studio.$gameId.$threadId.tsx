@@ -536,7 +536,10 @@ function ChatWorkspace({
               </div>
               <div className="grid gap-2 md:grid-cols-2">
                 {workspace.checkpoints.map((checkpoint) => (
-                  <div key={checkpoint.id} className="rounded-xl border border-border bg-canvas/60 p-3">
+                  <div
+                    key={checkpoint.id}
+                    className="rounded-xl border border-border bg-canvas/60 p-3"
+                  >
                     <p className="text-xs font-medium">{checkpoint.label}</p>
                     <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
                       {checkpoint.summary}

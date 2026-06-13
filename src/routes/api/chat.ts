@@ -48,12 +48,34 @@ export const Route = createFileRoute("/api/chat")({
         if (!thread) return new Response("Build session not found", { status: 404 });
 
         const [gameResult, stageResult, fileResult, checkpointResult] = await Promise.all([
-          db.from("games").select("name, platform, genre, art_style, player_mode, description, status").eq("id", gameId).eq("owner_id", userId).single(),
-          db.from("development_stages").select("stage_key, title, position, status, dependencies, deliverables, test_summary").eq("game_id", gameId).eq("owner_id", userId).order("position"),
-          db.from("project_files").select("path, language, version").eq("game_id", gameId).eq("owner_id", userId).order("path"),
-          db.from("project_checkpoints").select("label, summary, stage_key, created_at").eq("game_id", gameId).eq("owner_id", userId).order("created_at", { ascending: false }).limit(5),
+          db
+            .from("games")
+            .select("name, platform, genre, art_style, player_mode, description, status")
+            .eq("id", gameId)
+            .eq("owner_id", userId)
+            .single(),
+          db
+            .from("development_stages")
+            .select("stage_key, title, position, status, dependencies, deliverables, test_summary")
+            .eq("game_id", gameId)
+            .eq("owner_id", userId)
+            .order("position"),
+          db
+            .from("project_files")
+            .select("path, language, version")
+            .eq("game_id", gameId)
+            .eq("owner_id", userId)
+            .order("path"),
+          db
+            .from("project_checkpoints")
+            .select("label, summary, stage_key, created_at")
+            .eq("game_id", gameId)
+            .eq("owner_id", userId)
+            .order("created_at", { ascending: false })
+            .limit(5),
         ]);
-        if (gameResult.error) return new Response("Project context could not be loaded", { status: 500 });
+        if (gameResult.error)
+          return new Response("Project context could not be loaded", { status: 500 });
 
         const latestUser = [...messages].reverse().find((message) => message.role === "user");
         if (latestUser) {

@@ -137,7 +137,14 @@ export const createGame = createServerFn({ method: "POST" })
       })),
     );
     if (stagesError) throw new Error(stagesError.message);
-    const fileManifest = [...fileSeed, designDocument, technicalDocument, architectureDocument, milestoneDocument, exportConfig].map((file) => ({ path: file.path, version: 1 }));
+    const fileManifest = [
+      ...fileSeed,
+      designDocument,
+      technicalDocument,
+      architectureDocument,
+      milestoneDocument,
+      exportConfig,
+    ].map((file) => ({ path: file.path, version: 1 }));
     const { error: checkpointError } = await context.supabase.from("project_checkpoints").insert({
       game_id: game.id,
       owner_id: context.userId,
