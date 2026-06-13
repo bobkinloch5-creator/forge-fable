@@ -34,12 +34,14 @@ export function StudioShell({
     navigate({ to: "/auth" });
   }
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="relative flex min-h-screen overflow-hidden bg-background text-foreground">
+      <div className="aurora-orb pointer-events-none fixed -left-40 -top-40 z-0 size-[34rem] rounded-full bg-neon-violet/10 blur-[120px]" />
+      <div className="aurora-orb pointer-events-none fixed -bottom-48 -right-32 z-0 size-[38rem] rounded-full bg-neon-cyan/10 blur-[130px] [animation-delay:-5s]" />
       <aside
-        className={`${open ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 z-50 flex w-64 flex-col border-r border-sidebar-border bg-sidebar transition-transform lg:static lg:translate-x-0 ${compact ? "lg:w-16" : "lg:w-64"}`}
+        className={`${open ? "translate-x-0" : "-translate-x-full"} glass-panel fixed inset-y-0 z-50 m-2 flex w-64 flex-col rounded-2xl transition-transform duration-300 lg:static lg:translate-x-0 ${compact ? "lg:w-16" : "lg:w-64"}`}
       >
         <div className="flex h-14 items-center gap-3 border-b border-sidebar-border px-3">
-          <BrandMark className="size-8 shrink-0" />
+          <BrandMark className="size-8 shrink-0 drop-shadow-[0_0_12px_var(--neon-cyan)]" />
           {!compact && (
             <span className="font-bold tracking-tight">
               FableForge <span className="text-primary">AI</span>
@@ -60,7 +62,7 @@ export function StudioShell({
               key={item.label}
               to="/studio"
               title={compact ? item.label : undefined}
-              className={`flex h-9 items-center gap-3 rounded-md px-3 font-mono text-[11px] transition-colors ${index === 0 ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-[inset_2px_0_0_var(--primary)]" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`}
+               className={`flex h-10 items-center gap-3 rounded-xl px-3 font-mono text-[11px] transition-all duration-300 ${index === 0 ? "spectrum-border bg-primary/10 text-neon-cyan" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_12%,transparent)]"}`}
             >
               <item.icon className="size-4 shrink-0" />
               {!compact && item.label}
@@ -96,8 +98,8 @@ export function StudioShell({
           onClick={() => setOpen(false)}
         />
       )}
-      <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-30 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-panel px-3 backdrop-blur-xl sm:flex sm:px-4">
+       <div className="relative z-10 min-w-0 flex-1">
+         <header className="glass-panel sticky top-2 z-30 mx-2 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl px-3 sm:flex sm:px-4">
           <Button
             variant="ghost"
             size="icon-sm"
@@ -132,7 +134,7 @@ export function StudioShell({
             <Button variant="outline" size="sm" className="hidden md:inline-flex">
               <Eye /> Preview
             </Button>
-            <Button size="sm">
+             <Button size="sm" className="bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_22px_color-mix(in_oklab,var(--primary)_35%,transparent)] transition-transform hover:scale-[1.03]">
               <Download /> Export
             </Button>
           </div>
