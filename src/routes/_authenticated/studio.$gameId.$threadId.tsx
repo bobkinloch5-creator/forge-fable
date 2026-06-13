@@ -471,16 +471,10 @@ function ChatWorkspace({
           <div className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain">
             {(
               [
-                { id: "planner", label: "Build Stages", icon: History },
                 { id: "memory", label: "Memory", icon: Brain },
                 { id: "versions", label: "Versions", icon: GitBranch },
-                { id: "tests", label: "Playtests", icon: FlaskConical },
                 { id: "preview", label: "Live Game", icon: Gamepad2 },
-                { id: "models", label: "Visual Editor", icon: Cuboid },
                 { id: "code", label: "Code Editor", icon: Code2 },
-                { id: "console", label: "Console", icon: Terminal },
-                { id: "export", label: "Export Center", icon: PackageOpen },
-                { id: "publish", label: "Website Publishing", icon: Globe2 },
               ] as const
             ).map((item) => (
               <Button
