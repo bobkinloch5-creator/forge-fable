@@ -14,7 +14,201 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          ai_message_id: string | null
+          created_at: string
+          id: string
+          owner_id: string
+          parts: Json
+          role: string
+          thread_id: string
+        }
+        Insert: {
+          ai_message_id?: string | null
+          created_at?: string
+          id?: string
+          owner_id: string
+          parts?: Json
+          role: string
+          thread_id: string
+        }
+        Update: {
+          ai_message_id?: string | null
+          created_at?: string
+          id?: string
+          owner_id?: string
+          parts?: Json
+          role?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          owner_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          owner_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          owner_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_threads_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      games: {
+        Row: {
+          art_style: string
+          created_at: string
+          description: string
+          genre: string
+          id: string
+          monetization: string
+          name: string
+          owner_id: string
+          platform: string
+          player_mode: string
+          status: string
+          thumbnail_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          art_style: string
+          created_at?: string
+          description?: string
+          genre: string
+          id?: string
+          monetization?: string
+          name: string
+          owner_id: string
+          platform: string
+          player_mode: string
+          status?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          art_style?: string
+          created_at?: string
+          description?: string
+          genre?: string
+          id?: string
+          monetization?: string
+          name?: string
+          owner_id?: string
+          platform?: string
+          player_mode?: string
+          status?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          credits: number
+          display_name: string
+          id: string
+          plan: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          credits?: number
+          display_name?: string
+          id: string
+          plan?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          credits?: number
+          display_name?: string
+          id?: string
+          plan?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_files: {
+        Row: {
+          content: string
+          created_at: string
+          game_id: string
+          id: string
+          language: string
+          owner_id: string
+          path: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          game_id: string
+          id?: string
+          language?: string
+          owner_id: string
+          path: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          game_id?: string
+          id?: string
+          language?: string
+          owner_id?: string
+          path?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_files_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
