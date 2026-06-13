@@ -265,15 +265,15 @@ export const MessageBranchPage = ({ className, ...props }: MessageBranchPageProp
 };
 
 export type MessageResponseProps = ComponentProps<typeof Markdown> & {
+  className?: string;
   isAnimating?: boolean;
 };
 
 export const MessageResponse = memo(
   ({ className, isAnimating: _isAnimating, ...props }: MessageResponseProps) => (
-    <Markdown
-      className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}
-      {...props}
-    />
+    <div className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}>
+      <Markdown {...props} />
+    </div>
   ),
   (prevProps, nextProps) =>
     prevProps.children === nextProps.children && nextProps.isAnimating === prevProps.isAnimating,
