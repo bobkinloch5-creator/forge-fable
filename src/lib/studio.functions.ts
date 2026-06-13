@@ -55,7 +55,9 @@ export const createGame = createServerFn({ method: "POST" })
           `Dimension: ${data.dimension}`,
           `Controls: ${data.controls.join(", ")}`,
           `Systems: ${data.systems.join(", ")}`,
-        ].filter(Boolean).join("\n\n"),
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
         status: "plan_approved",
       })
       .select()
@@ -82,7 +84,15 @@ export const createGame = createServerFn({ method: "POST" })
     const exportConfig = {
       path: "config/export-targets.json",
       language: "json",
-      content: JSON.stringify({ targets: [data.platform], status: "configuration_ready", signing: "required_for_store_or_installer_builds" }, null, 2),
+      content: JSON.stringify(
+        {
+          targets: [data.platform],
+          status: "configuration_ready",
+          signing: "required_for_store_or_installer_builds",
+        },
+        null,
+        2,
+      ),
     };
     const { error: filesError } = await context.supabase.from("project_files").insert(
       [...fileSeed, designDocument, exportConfig].map((file) => ({
