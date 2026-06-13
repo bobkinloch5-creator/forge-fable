@@ -1,5 +1,5 @@
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { fileSeed } from "@/lib/studio-data";
+import { developmentStageBlueprint, fileSeed } from "@/lib/studio-data";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -94,14 +94,59 @@ export const createGame = createServerFn({ method: "POST" })
         2,
       ),
     };
+    const technicalDocument = {
+      path: "docs/technical-design-document.md",
+      language: "markdown",
+      content: `# ${data.name} — Technical Design\n\n## Architecture principles\n- Modular, reusable systems with explicit interfaces\n- Dependency-aware features with one authoritative implementation per concern\n- Versioned data and save migrations\n- Platform-specific input, performance budgets, and export pipelines\n- Client/server separation and server authority when networking is enabled\n\n## Planned systems\n${data.systems.map((system) => `- ${system}`).join("\n")}\n\n## Quality gates\nEvery stage requires dependency checks, tests, performance review, and a checkpoint before high-risk changes.`,
+    };
+    const architectureDocument = {
+      path: "docs/system-architecture.md",
+      language: "markdown",
+      content: `# System Architecture\n\n## Layers\n1. Platform and runtime services\n2. Data, saves, content registries, and networking\n3. Reusable gameplay systems\n4. World, encounters, quests, and authored content\n5. UI, audio, VFX, accessibility, and telemetry\n\n## Dependency rule\nHigher layers consume stable interfaces from lower layers. Systems may communicate through typed events and services, never duplicate ownership of the same state.\n\n## Scale targets\nMultiple maps and game modes, streamed worlds, data-driven enemies/items/quests/abilities, pooled entities, asynchronous asset loading, and measurable CPU/GPU/memory/network budgets.`,
+    };
+    const milestoneDocument = {
+      path: "docs/development-roadmap.md",
+      language: "markdown",
+      content: `# Development Roadmap\n\n${developmentStageBlueprint.map((stage, index) => `## ${index + 1}. ${stage.title}\nDependencies: ${stage.dependencies.join(", ") || "None"}\nDeliverables: ${stage.deliverables.join(", ")}\n`).join("\n")}\n## Change policy\nCreate a checkpoint before major refactors, exports, dependency upgrades, world migrations, or changes spanning multiple systems.`,
+    };
     const { error: filesError } = await context.supabase.from("project_files").insert(
-      [...fileSeed, designDocument, exportConfig].map((file) => ({
+      [
+        ...fileSeed,
+        designDocument,
+        technicalDocument,
+        architectureDocument,
+        milestoneDocument,
+        exportConfig,
+      ].map((file) => ({
         ...file,
         game_id: game.id,
         owner_id: context.userId,
       })),
     );
     if (filesError) throw new Error(filesError.message);
+    const { error: stagesError } = await context.supabase.from("development_stages").insert(
+      developmentStageBlueprint.map((stage, index) => ({
+        game_id: game.id,
+        owner_id: context.userId,
+        stage_key: stage.key,
+        title: stage.title,
+        position: index + 1,
+        status: index === 0 ? "ready" : "planned",
+        dependencies: [...stage.dependencies],
+        deliverables: [...stage.deliverables],
+      })),
+    );
+    if (stagesError) throw new Error(stagesError.message);
+    const fileManifest = [...fileSeed, designDocument, technicalDocument, architectureDocument, milestoneDocument, exportConfig].map((file) => ({ path: file.path, version: 1 }));
+    const { error: checkpointError } = await context.supabase.from("project_checkpoints").insert({
+      game_id: game.id,
+      owner_id: context.userId,
+      label: "Approved foundation",
+      summary: "Initial game, technical architecture, roadmap, and export requirements approved.",
+      stage_key: "game-planning",
+      file_manifest: fileManifest,
+    });
+    if (checkpointError) throw new Error(checkpointError.message);
     return { gameId: game.id, threadId: thread.id };
   });
 
@@ -128,7 +173,7 @@ export const getWorkspace = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => WorkspaceInput.parse(input))
   .handler(async ({ data, context }) => {
-    const [game, threads, messages, files] = await Promise.all([
+    const [game, threads, messages, files, stages, checkpoints] = await Promise.all([
       context.supabase
         .from("games")
         .select("*")
@@ -153,13 +198,27 @@ export const getWorkspace = createServerFn({ method: "POST" })
         .eq("game_id", data.gameId)
         .eq("owner_id", context.userId)
         .order("path"),
+      context.supabase
+        .from("development_stages")
+        .select("id, stage_key, title, position, status, dependencies, deliverables, test_summary")
+        .eq("game_id", data.gameId)
+        .eq("owner_id", context.userId)
+        .order("position"),
+      context.supabase
+        .from("project_checkpoints")
+        .select("id, label, summary, stage_key, created_at")
+        .eq("game_id", data.gameId)
+        .eq("owner_id", context.userId)
+        .order("created_at", { ascending: false }),
     ]);
-    for (const result of [game, threads, messages, files])
+    for (const result of [game, threads, messages, files, stages, checkpoints])
       if (result.error) throw new Error(result.error.message);
     return {
       game: game.data,
       threads: threads.data ?? [],
       messages: messages.data ?? [],
       files: files.data ?? [],
+      stages: stages.data ?? [],
+      checkpoints: checkpoints.data ?? [],
     };
   });
