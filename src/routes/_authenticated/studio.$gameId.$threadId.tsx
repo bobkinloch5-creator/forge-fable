@@ -1,5 +1,6 @@
 import { BrandMark } from "@/components/brand-mark";
 import { CometModelPicker } from "@/components/comet-model-picker";
+import { GuidedTour } from "@/components/guided-tour";
 import {
   Conversation,
   ConversationContent,
@@ -10,17 +11,16 @@ import { Message, MessageContent, MessageResponse } from "@/components/ai-elemen
 import {
   PromptInput,
   PromptInputFooter,
+  PromptInputProvider,
   PromptInputSubmit,
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import { ProjectMemoryPanel } from "@/components/project-memory-panel";
-import { PlaytestCenter } from "@/components/playtest-center";
-import { VersionControlPanel } from "@/components/version-control-panel";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { publicFeatures } from "@/lib/features";
 import { createThread, getWorkspace } from "@/lib/studio.functions";
 import { useChat } from "@ai-sdk/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -51,9 +51,9 @@ import {
   Tablet,
   Undo2,
   Wand2,
-  Wrench,
+  FlaskConical,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 
@@ -74,24 +74,43 @@ type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWork
 type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
-type StudioTab = "memory" | "versions" | "tests" | "preview" | "models" | "code";
+type StudioTab =
+  | "memory"
+  | "versions"
+  | "tests"
+  | "preview"
+  | "models"
+  | "code"
+  | "builds"
+  | "publish";
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
 
-const buildStates = [
-  "Understanding request",
-  "Planning changes",
-  "Creating systems",
-  "Generating code",
-  "Adding assets",
-  "Updating the game world",
-  "Testing gameplay",
-  "Fixing errors",
-  "Optimizing performance",
-  "Preparing build",
-  "Completed",
-];
-
+const DesktopBuildCenter = lazy(() =>
+  import("@/components/desktop-build-center").then((module) => ({
+    default: module.DesktopBuildCenter,
+  })),
+);
+const ProjectMemoryPanel = lazy(() =>
+  import("@/components/project-memory-panel").then((module) => ({
+    default: module.ProjectMemoryPanel,
+  })),
+);
+const PlaytestCenter = lazy(() =>
+  import("@/components/playtest-center").then((module) => ({
+    default: module.PlaytestCenter,
+  })),
+);
+const VersionControlPanel = lazy(() =>
+  import("@/components/version-control-panel").then((module) => ({
+    default: module.VersionControlPanel,
+  })),
+);
+const TripoModelLab = lazy(() =>
+  import("@/components/tripo-model-lab").then((module) => ({
+    default: module.TripoModelLab,
+  })),
+);
 const quickActions = [
   { label: "Apply Changes", icon: Check },
   { label: "Preview Game", icon: Play },
@@ -110,6 +129,7 @@ function GameWorkspace() {
   const addThread = useServerFn(createThread);
   const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [workspaceError, setWorkspaceError] = useState("");
   const [tab, setTab] = useState<StudioTab>("preview");
   const [modelId, setModelId] = useState("lovable:balanced");
   const [selectedFile, setSelectedFile] = useState("");
@@ -118,14 +138,56 @@ function GameWorkspace() {
   const [previewOrientation, setPreviewOrientation] = useState<PreviewOrientation>("landscape");
   const [previewFullscreen, setPreviewFullscreen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  useEffect(() => {
-    fetchWorkspace({ data: { gameId, threadId } })
+  const loadWorkspace = useCallback(() => {
+    setWorkspaceError("");
+    return fetchWorkspace({ data: { gameId, threadId } })
       .then((data) => {
         setWorkspace(data);
         setSelectedFile(data.files[0]?.path ?? "");
       })
-      .catch((error) => toast.error(error.message));
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : "Workspace could not be loaded";
+        setWorkspaceError(message);
+        toast.error(message);
+      });
   }, [fetchWorkspace, gameId, threadId]);
+  useEffect(() => {
+    void loadWorkspace();
+  }, [loadWorkspace]);
+  useEffect(() => {
+    const savedTab = localStorage.getItem("fableforge:workspace-tab") as StudioTab | null;
+    const savedModel = localStorage.getItem("fableforge:ai-model");
+    const savedDevice = localStorage.getItem("fableforge:preview-device") as PreviewDevice | null;
+    const savedOrientation = localStorage.getItem(
+      "fableforge:preview-orientation",
+    ) as PreviewOrientation | null;
+    const availableTabs: StudioTab[] = [
+      "memory",
+      "versions",
+      "preview",
+      "code",
+      "builds",
+      ...(publicFeatures.tripoModels ? (["models"] as const) : []),
+      ...(publicFeatures.playtesting ? (["tests"] as const) : []),
+      ...(publicFeatures.websitePublishing ? (["publish"] as const) : []),
+    ];
+    if (savedTab && availableTabs.includes(savedTab)) setTab(savedTab);
+    if (savedModel) setModelId(savedModel);
+    if (savedDevice && ["mobile", "tablet", "desktop"].includes(savedDevice))
+      setPreviewDevice(savedDevice);
+    if (savedOrientation && ["portrait", "landscape"].includes(savedOrientation))
+      setPreviewOrientation(savedOrientation);
+  }, []);
+  useEffect(() => localStorage.setItem("fableforge:workspace-tab", tab), [tab]);
+  useEffect(() => localStorage.setItem("fableforge:ai-model", modelId), [modelId]);
+  useEffect(
+    () => localStorage.setItem("fableforge:preview-device", previewDevice),
+    [previewDevice],
+  );
+  useEffect(
+    () => localStorage.setItem("fableforge:preview-orientation", previewOrientation),
+    [previewOrientation],
+  );
   const initialMessages = useMemo<UIMessage[]>(
     () =>
       (workspace?.messages ?? []).map((message, index) => ({
@@ -139,7 +201,20 @@ function GameWorkspace() {
     return (
       <StudioShell title="Loading workspace…" compact>
         <div className="grid h-[calc(100vh-4rem)] place-items-center">
-          <Shimmer>Warming the forge…</Shimmer>
+          {workspaceError ? (
+            <div className="max-w-md px-6 text-center">
+              <h2 className="text-lg font-semibold">Workspace could not be loaded</h2>
+              <p className="mt-2 text-sm text-muted-foreground">{workspaceError}</p>
+              <div className="mt-5 flex justify-center gap-2">
+                <Button onClick={() => void loadWorkspace()}>Try again</Button>
+                <Button variant="outline" onClick={() => navigate({ to: "/studio" })}>
+                  Back to projects
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Shimmer>Warming the forge…</Shimmer>
+          )}
         </div>
       </StudioShell>
     );
@@ -149,7 +224,9 @@ function GameWorkspace() {
       subtitle={`${workspace.game.platform} / ${workspace.game.genre}`}
       compact
       accountRole={workspace.roles.some((item) => item.role === "owner") ? "owner" : undefined}
-      credits={workspace.roles.some((item) => item.role === "owner") ? "unlimited" : undefined}
+      credits={
+        workspace.roles.some((item) => item.role === "owner") ? "unlimited" : workspace.credits
+      }
     >
       <ChatWorkspace
         key={threadId}
@@ -240,7 +317,7 @@ function ChatWorkspace({
       }),
     [gameId, threadId, modelId],
   );
-  const { messages, sendMessage, status, stop, error } = useChat({
+  const { messages, sendMessage, regenerate, clearError, status, stop, error } = useChat({
     id: threadId,
     messages: initialMessages,
     transport,
@@ -254,36 +331,82 @@ function ChatWorkspace({
             : cause.message,
       ),
   });
-  const [queuedInstructions, setQueuedInstructions] = useState<string[]>([]);
+  const draftKey = `fableforge:chat-draft:${threadId}`;
+  const queueKey = `fableforge:chat-queue:${threadId}`;
+  const [initialDraft] = useState(() => localStorage.getItem(draftKey) ?? "");
+  const [queuedInstructions, setQueuedInstructions] = useState<string[]>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(queueKey) ?? "[]");
+      return Array.isArray(saved)
+        ? saved.filter((item): item is string => typeof item === "string").slice(0, 20)
+        : [];
+    } catch {
+      return [];
+    }
+  });
+  const [creatingThread, setCreatingThread] = useState(false);
+  const queueSendingRef = useRef(false);
   const isBuilding = status === "submitted" || status === "streaming";
-  const activeBuildStep = isBuilding
-    ? Math.min(buildStates.length - 2, Math.max(0, messages.length % (buildStates.length - 1)))
-    : -1;
   useEffect(() => {
     textareaRef.current?.focus();
   }, [threadId, textareaRef]);
+  useEffect(() => {
+    localStorage.setItem(queueKey, JSON.stringify(queuedInstructions));
+  }, [queueKey, queuedInstructions]);
+  useEffect(() => {
+    if (status !== "ready" || queuedInstructions.length === 0 || queueSendingRef.current) {
+      return;
+    }
+    const [nextInstruction, ...remaining] = queuedInstructions;
+    queueSendingRef.current = true;
+    setQueuedInstructions(remaining);
+    void sendMessage({ text: nextInstruction })
+      .catch((cause: unknown) => {
+        setQueuedInstructions((current) => [nextInstruction, ...current]);
+        toast.error(
+          cause instanceof Error ? cause.message : "Queued instruction could not be sent",
+        );
+      })
+      .finally(() => {
+        queueSendingRef.current = false;
+        setQueuedInstructions((current) => (current.length > 0 ? [...current] : current));
+      });
+  }, [queuedInstructions, sendMessage, status]);
   const activeFile =
     workspace.files.find((file) => file.path === selectedFile) ?? workspace.files[0];
   async function submit(message: { text: string }) {
     if (!message.text.trim()) return;
     if (isBuilding) {
-      setQueuedInstructions((current) => [...current, message.text.trim()]);
+      setQueuedInstructions((current) => [...current, message.text.trim()].slice(-20));
+      localStorage.removeItem(draftKey);
       toast.success("Instruction queued for this build");
       textareaRef.current?.focus();
       return;
     }
     await sendMessage({ text: message.text.trim() });
+    localStorage.removeItem(draftKey);
     textareaRef.current?.focus();
   }
   async function newThread() {
-    const thread = await addThread({ data: { gameId } });
-    navigate({
-      to: "/studio/$gameId/$threadId",
-      params: { gameId, threadId: thread.id },
-    });
+    if (creatingThread) return;
+    setCreatingThread(true);
+    try {
+      const thread = await addThread({ data: { gameId } });
+      navigate({
+        to: "/studio/$gameId/$threadId",
+        params: { gameId, threadId: thread.id },
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Build session could not be created");
+    } finally {
+      setCreatingThread(false);
+    }
   }
   return (
-    <div className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-24 md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(380px,1.15fr)_minmax(360px,1fr)] md:overflow-hidden md:pb-2 xl:grid-cols-[420px_1fr] xl:grid-rows-1">
+    <main
+      id="main-content"
+      className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-24 md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(380px,1.15fr)_minmax(360px,1fr)] md:overflow-hidden md:pb-2 xl:grid-cols-[420px_1fr] xl:grid-rows-1"
+    >
       <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl md:order-2 xl:order-1">
         <div className="flex items-center gap-2 border-b border-border/60 bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-3">
           <div className="relative">
@@ -302,10 +425,16 @@ function ChatWorkspace({
               )}
             </div>
             <p className="truncate text-[10px] text-success">
-              ONLINE · Project memory active · Checkpoints on
+              Project memory active · Checkpoints enabled
             </p>
           </div>
-          <Button size="icon-sm" variant="outline" onClick={newThread}>
+          <Button
+            size="icon-sm"
+            variant="outline"
+            onClick={newThread}
+            disabled={creatingThread}
+            aria-label="Create build session"
+          >
             <Plus />
           </Button>
         </div>
@@ -327,49 +456,43 @@ function ChatWorkspace({
         </div>
         {isBuilding && (
           <div className="border-b border-border/60 bg-canvas/60 p-3">
-            <div className="mb-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-wider">
-              <span className="text-neon-cyan">Live build sequence</span>
-              <span className="text-muted-foreground">
-                {Math.round(((activeBuildStep + 1) / buildStates.length) * 100)}%
+            <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider">
+              <span className="size-2 animate-pulse rounded-full bg-neon-cyan" />
+              <span className="text-neon-cyan">
+                {status === "submitted" ? "Starting AI request" : "Streaming AI response"}
               </span>
-            </div>
-            <div className="mb-3 h-1 overflow-hidden rounded-full bg-muted">
-              <div
-                className="relative h-full bg-linear-to-r from-neon-cyan via-primary to-neon-pink transition-all duration-700"
-                style={{
-                  width: `${((activeBuildStep + 1) / buildStates.length) * 100}%`,
-                }}
-              >
-                <span className="build-scan absolute inset-y-0 w-16 bg-linear-to-r from-transparent via-primary-foreground/70 to-transparent" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {buildStates.map((step, index) => (
-                <div
-                  key={step}
-                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[9px] ${index === activeBuildStep ? "bg-primary/15 text-foreground" : index < activeBuildStep ? "text-success" : "text-muted-foreground"}`}
-                >
-                  {index < activeBuildStep ? (
-                    <Check className="size-3" />
-                  ) : (
-                    <span
-                      className={`size-1.5 rounded-full ${index === activeBuildStep ? "animate-pulse bg-neon-cyan shadow-[0_0_8px_var(--neon-cyan)]" : "bg-muted-foreground/30"}`}
-                    />
-                  )}
-                  <span className="truncate">{step}</span>
-                </div>
-              ))}
+              <span className="ml-auto text-muted-foreground">
+                You can stop or queue instructions
+              </span>
             </div>
           </div>
         )}
         <Conversation className="min-h-0">
           <ConversationContent className="gap-5 p-4">
             {messages.length === 0 && (
-              <ConversationEmptyState
-                icon={<BrandMark className="size-20" />}
-                title="What do you want to build today?"
-                description="Build a 3D fantasy RPG, add mobile controls, create a boss fight, fix the UI, or prepare an export."
-              />
+              <>
+                <ConversationEmptyState
+                  icon={<BrandMark className="size-20" />}
+                  title="What do you want to build today?"
+                  description="Start with a goal, a feature, or a problem. Fable will use the current project memory and history."
+                />
+                <div className="mx-auto flex max-w-xl flex-wrap justify-center gap-2">
+                  {[
+                    "Plan my first playable milestone",
+                    "Review the project architecture",
+                    "Add accessible mobile controls",
+                  ].map((example) => (
+                    <Button
+                      key={example}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void submit({ text: example })}
+                    >
+                      {example}
+                    </Button>
+                  ))}
+                </div>
+              </>
             )}
             {messages.map((message, messageIndex) => (
               <Message key={message.id} from={message.role} className="animate-fade-in">
@@ -390,11 +513,23 @@ function ChatWorkspace({
                           variant="outline"
                           size="sm"
                           className="h-7 rounded-lg border-border/70 bg-panel/60 px-2 text-[9px] hover:border-neon-cyan/40 hover:text-neon-cyan"
-                          onClick={() =>
-                            action.label === "Preview Game"
-                              ? setPlaying(true)
-                              : toast.info(`${action.label} is ready for your next instruction`)
-                          }
+                          disabled={isBuilding}
+                          onClick={() => {
+                            if (action.label === "Preview Game") {
+                              setTab("preview");
+                              setPlaying(true);
+                            } else if (action.label === "View Files") {
+                              setTab("code");
+                            } else if (action.label === "Undo") {
+                              setTab("versions");
+                            } else if (action.label === "Export") {
+                              setTab("builds");
+                            } else {
+                              void submit({
+                                text: `${action.label} for the current project. Review existing systems first, make only safe scoped changes, and report verification evidence.`,
+                              });
+                            }
+                          }}
                         >
                           <action.icon className="size-3" /> {action.label}
                         </Button>
@@ -406,10 +541,28 @@ function ChatWorkspace({
             {status === "submitted" && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Bot className="size-4 text-accent" />
-                <Shimmer>{`${buildStates[activeBuildStep] ?? "Thinking"}…`}</Shimmer>
+                <Shimmer>Starting generation…</Shimmer>
               </div>
             )}
-            {error && <p className="text-xs text-destructive">{error.message}</p>}
+            {error && (
+              <div
+                role="alert"
+                className="rounded-lg border border-destructive/30 bg-destructive/10 p-3"
+              >
+                <p className="text-xs text-destructive">{error.message}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => {
+                    clearError();
+                    void regenerate();
+                  }}
+                >
+                  <RefreshCw /> Retry generation
+                </Button>
+              </div>
+            )}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
@@ -423,24 +576,27 @@ function ChatWorkspace({
               </span>
             </div>
           )}
-          <PromptInput
-            onSubmit={submit}
-            className="spectrum-border bg-canvas/90 shadow-[0_0_24px_color-mix(in_oklab,var(--primary)_10%,transparent)]"
-          >
-            <PromptInputTextarea
-              ref={textareaRef}
-              placeholder={
-                isBuilding
-                  ? "Queue another instruction while Fable builds…"
-                  : "Describe a mechanic, scene, level, or fix…"
-              }
-              className="min-h-20"
-            />
-            <PromptInputFooter>
-              <CometModelPicker value={modelId} onValueChange={setModelId} />
-              <PromptInputSubmit status={status} onStop={stop} />
-            </PromptInputFooter>
-          </PromptInput>
+          <PromptInputProvider initialInput={initialDraft}>
+            <PromptInput
+              onSubmit={submit}
+              className="spectrum-border bg-canvas/90 shadow-[0_0_24px_color-mix(in_oklab,var(--primary)_10%,transparent)]"
+            >
+              <PromptInputTextarea
+                ref={textareaRef}
+                onChange={(event) => localStorage.setItem(draftKey, event.currentTarget.value)}
+                placeholder={
+                  isBuilding
+                    ? "Queue another instruction while Fable builds…"
+                    : "Describe a mechanic, scene, level, or fix…"
+                }
+                className="min-h-20"
+              />
+              <PromptInputFooter>
+                <CometModelPicker value={modelId} onValueChange={setModelId} />
+                <PromptInputSubmit status={status} onStop={stop} />
+              </PromptInputFooter>
+            </PromptInput>
+          </PromptInputProvider>
           <p className="mt-2 text-center font-mono text-[9px] text-muted-foreground">
             MAJOR CHANGES REQUIRE YOUR APPROVAL
           </p>
@@ -450,19 +606,24 @@ function ChatWorkspace({
       <section className="glass-panel order-1 flex min-h-0 flex-col overflow-hidden rounded-2xl md:order-1 xl:order-2">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center border-b border-border/60 bg-panel/80 px-2 py-1">
           <div className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain">
-            {(
-              [
-                { id: "memory", label: "Memory", icon: Brain },
-                { id: "versions", label: "Versions", icon: GitBranch },
-                { id: "preview", label: "Live Game", icon: Gamepad2 },
-                { id: "code", label: "Code Editor", icon: Code2 },
-              ] as const
-            ).map((item) => (
+            {[
+              { id: "memory", label: "Memory", icon: Brain },
+              { id: "versions", label: "Versions", icon: GitBranch },
+              { id: "preview", label: "Live Game", icon: Gamepad2 },
+              { id: "code", label: "Code Editor", icon: Code2 },
+              { id: "builds", label: "Builds", icon: PackageOpen },
+              ...(publicFeatures.tripoModels
+                ? ([{ id: "models", label: "3D Models", icon: Image }] as const)
+                : []),
+              ...(publicFeatures.playtesting
+                ? ([{ id: "tests", label: "Tests", icon: FlaskConical }] as const)
+                : []),
+            ].map((item) => (
               <Button
                 key={item.id}
                 variant={tab === item.id ? "secondary" : "ghost"}
                 size="sm"
-                onClick={() => setTab(item.id)}
+                onClick={() => setTab(item.id as StudioTab)}
               >
                 <item.icon />
                 {item.label}
@@ -526,11 +687,31 @@ function ChatWorkspace({
             </Button>
           </div>
         </div>
-        {tab === "memory" && <ProjectMemoryPanel gameId={gameId} />}
-        {tab === "versions" && (
-          <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />
+        {tab === "memory" && (
+          <Suspense fallback={<ToolPanelLoading label="Loading project memory…" />}>
+            <ProjectMemoryPanel gameId={gameId} />
+          </Suspense>
         )}
-        {tab === "tests" && <PlaytestCenter gameId={gameId} />}
+        {tab === "versions" && (
+          <Suspense fallback={<ToolPanelLoading label="Loading version history…" />}>
+            <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />
+          </Suspense>
+        )}
+        {tab === "tests" && (
+          <Suspense fallback={<ToolPanelLoading label="Loading playtest center…" />}>
+            <PlaytestCenter gameId={gameId} />
+          </Suspense>
+        )}
+        {tab === "models" && (
+          <Suspense fallback={<ToolPanelLoading label="Loading 3D model tools…" />}>
+            <TripoModelLab />
+          </Suspense>
+        )}
+        {tab === "builds" && (
+          <Suspense fallback={<ToolPanelLoading label="Loading desktop build tools…" />}>
+            <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />
+          </Suspense>
+        )}
         {tab === "preview" && (
           <div
             className={`panel-grid relative flex flex-1 flex-col items-center justify-center overflow-auto p-3 sm:p-5 ${previewFullscreen ? "fixed inset-0 z-[80] bg-background" : ""}`}
@@ -725,6 +906,15 @@ function ChatWorkspace({
           </div>
         </div>
       </aside>
+      <GuidedTour variant="workspace" />
+    </main>
+  );
+}
+
+function ToolPanelLoading({ label }: { label: string }) {
+  return (
+    <div className="grid min-h-64 flex-1 place-items-center">
+      <Shimmer>{label}</Shimmer>
     </div>
   );
 }

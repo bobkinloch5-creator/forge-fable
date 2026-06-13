@@ -2,7 +2,7 @@ import { ModelViewer } from "@/components/model-viewer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Box, Download, LoaderCircle, Map, Rotate3D, Wand2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type GenerationStatus = "idle" | "queued" | "running" | "success" | "failed";
@@ -31,9 +31,19 @@ export function TripoModelLab() {
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
+  const generationId = useRef(0);
+
+  useEffect(
+    () => () => {
+      generationId.current += 1;
+    },
+    [],
+  );
 
   async function generate() {
     if (!prompt.trim() || status === "queued" || status === "running") return;
+    const currentGeneration = generationId.current + 1;
+    generationId.current = currentGeneration;
     setStatus("queued");
     setProgress(0);
     setModelUrl(null);
@@ -42,12 +52,17 @@ export function TripoModelLab() {
       const created = await fetch("/api/tripo", {
         method: "POST",
         headers,
-        body: JSON.stringify({ action: "create", prompt: prompt.trim() }),
+        body: JSON.stringify({
+          action: "create",
+          prompt: prompt.trim(),
+          requestId: crypto.randomUUID(),
+        }),
       });
       if (!created.ok) throw new Error(await created.text());
       const { taskId } = (await created.json()) as { taskId: string };
       for (let attempt = 0; attempt < 120; attempt += 1) {
         await new Promise((resolve) => window.setTimeout(resolve, 3000));
+        if (generationId.current !== currentGeneration) return;
         const response = await fetch("/api/tripo", {
           method: "POST",
           headers,
@@ -70,6 +85,7 @@ export function TripoModelLab() {
       }
       throw new Error("Generation timed out. Please try again.");
     } catch (error) {
+      if (generationId.current !== currentGeneration) return;
       setStatus("failed");
       toast.error(error instanceof Error ? error.message : "3D generation failed");
     }

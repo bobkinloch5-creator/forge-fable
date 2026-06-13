@@ -9,21 +9,9 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
+import { builtInAiModels, getAiModelCreditCost, type AiModelOption } from "@/lib/ai-models";
 import { Check, ChevronsUpDown, LoaderCircle, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-
-export type AiModelOption = {
-  id: string;
-  name: string;
-  provider: string;
-  description?: string;
-};
-
-const builtInModels: AiModelOption[] = [
-  { id: "lovable:fast", name: "Fable 5 Fast", provider: "FableForge" },
-  { id: "lovable:balanced", name: "Fable 5", provider: "FableForge" },
-  { id: "lovable:pro", name: "Fable 5 Pro", provider: "FableForge" },
-];
 
 export function CometModelPicker({
   value,
@@ -64,8 +52,8 @@ export function CometModelPicker({
     return () => controller.abort();
   }, []);
 
-  const allModels = useMemo(() => [...builtInModels, ...cometModels], [cometModels]);
-  const selected = allModels.find((model) => model.id === value) ?? builtInModels[1];
+  const allModels = useMemo(() => [...builtInAiModels, ...cometModels], [cometModels]);
+  const selected = allModels.find((model) => model.id === value) ?? builtInAiModels[1];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -75,10 +63,13 @@ export function CometModelPicker({
           size="sm"
           role="combobox"
           aria-expanded={open}
+          aria-label={`AI model: ${selected.name}, ${getAiModelCreditCost(selected.id)} credits`}
           className="h-8 max-w-52 justify-between gap-2 px-2 text-xs"
         >
           {loading ? <LoaderCircle className="animate-spin" /> : <Sparkles />}
-          <span className="truncate">{selected.name}</span>
+          <span className="truncate">
+            {selected.name} · {getAiModelCreditCost(selected.id)} cr
+          </span>
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -88,7 +79,7 @@ export function CometModelPicker({
           <CommandList className="max-h-[min(60vh,420px)]">
             <CommandEmpty>No matching model found.</CommandEmpty>
             <CommandGroup heading="FableForge recommended">
-              {builtInModels.map((model) => (
+              {builtInAiModels.map((model) => (
                 <CommandItem
                   key={model.id}
                   value={`${model.name} ${model.provider}`}
@@ -98,7 +89,15 @@ export function CometModelPicker({
                   }}
                 >
                   <Check className={value === model.id ? "opacity-100" : "opacity-0"} />
-                  <span>{model.name}</span>
+                  <span className="min-w-0">
+                    <span className="block">{model.name}</span>
+                    <span className="block text-[10px] text-muted-foreground">
+                      {model.creditCost} credits · {model.speed} · {model.access}
+                    </span>
+                    <span className="block text-[10px] text-muted-foreground">
+                      {model.description}
+                    </span>
+                  </span>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -121,7 +120,7 @@ export function CometModelPicker({
                   <span className="min-w-0">
                     <span className="block truncate">{model.name}</span>
                     <span className="block truncate text-[10px] text-muted-foreground">
-                      {model.provider} · {model.id}
+                      8 credits · Pro · {model.provider} · {model.id}
                     </span>
                   </span>
                 </CommandItem>

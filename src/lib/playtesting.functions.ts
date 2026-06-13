@@ -28,11 +28,13 @@ const CreateRunInput = z.object({
 
 export const getPlaytestState = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => GameIdInput.parse(input))
+  .validator((input: unknown) => GameIdInput.parse(input))
   .handler(async ({ data, context }) => {
     const { data: runs, error } = await context.supabase
       .from("playtest_runs")
-      .select("id, status, target_platform, test_suites, progress_percent, summary, created_at, completed_at")
+      .select(
+        "id, status, target_platform, test_suites, progress_percent, summary, created_at, completed_at",
+      )
       .eq("game_id", data.gameId)
       .eq("owner_id", context.userId)
       .order("created_at", { ascending: false })
@@ -42,7 +44,9 @@ export const getPlaytestState = createServerFn({ method: "POST" })
     if (runIds.length === 0) return { runs: [], results: [] };
     const { data: results, error: resultsError } = await context.supabase
       .from("playtest_results")
-      .select("id, run_id, suite, test_name, status, severity, duration_ms, details, reproduction_steps, evidence, safe_fix_available, created_at")
+      .select(
+        "id, run_id, suite, test_name, status, severity, duration_ms, details, reproduction_steps, evidence, safe_fix_available, created_at",
+      )
       .in("run_id", runIds)
       .order("created_at", { ascending: false });
     if (resultsError) throw new Error(resultsError.message);
@@ -51,7 +55,7 @@ export const getPlaytestState = createServerFn({ method: "POST" })
 
 export const queuePlaytest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => CreateRunInput.parse(input))
+  .validator((input: unknown) => CreateRunInput.parse(input))
   .handler(async ({ data, context }) => {
     const { data: game } = await context.supabase
       .from("games")

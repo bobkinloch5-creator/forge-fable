@@ -9,12 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTripoRouteImport } from './routes/api/tripo'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiCometModelsRouteImport } from './routes/api/comet-models'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
@@ -22,6 +26,16 @@ import { Route as ApiPublicDesktopBuildAgentRouteImport } from './routes/api/pub
 import { Route as AuthenticatedStudioGameIdRouteImport } from './routes/_authenticated/studio.$gameId'
 import { Route as AuthenticatedStudioGameIdThreadIdRouteImport } from './routes/_authenticated/studio.$gameId.$threadId'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -30,6 +44,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -49,6 +68,11 @@ const IndexRoute = IndexRouteImport.update({
 const ApiTripoRoute = ApiTripoRouteImport.update({
   id: '/api/tripo',
   path: '/api/tripo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCometModelsRoute = ApiCometModelsRouteImport.update({
@@ -88,11 +112,15 @@ const AuthenticatedStudioGameIdThreadIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/api/comet-models': typeof ApiCometModelsRoute
+  '/api/health': typeof ApiHealthRoute
   '/api/tripo': typeof ApiTripoRoute
   '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
@@ -101,11 +129,15 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/api/comet-models': typeof ApiCometModelsRoute
+  '/api/health': typeof ApiHealthRoute
   '/api/tripo': typeof ApiTripoRoute
   '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
@@ -116,11 +148,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/api/comet-models': typeof ApiCometModelsRoute
+  '/api/health': typeof ApiHealthRoute
   '/api/tripo': typeof ApiTripoRoute
   '/_authenticated/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
@@ -131,11 +167,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/support'
+    | '/terms'
     | '/studio'
     | '/api/chat'
     | '/api/comet-models'
+    | '/api/health'
     | '/api/tripo'
     | '/studio/$gameId'
     | '/api/public/desktop-build-agent'
@@ -144,11 +184,15 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/support'
+    | '/terms'
     | '/studio'
     | '/api/chat'
     | '/api/comet-models'
+    | '/api/health'
     | '/api/tripo'
     | '/studio/$gameId'
     | '/api/public/desktop-build-agent'
@@ -158,11 +202,15 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/support'
+    | '/terms'
     | '/_authenticated/studio'
     | '/api/chat'
     | '/api/comet-models'
+    | '/api/health'
     | '/api/tripo'
     | '/_authenticated/studio/$gameId'
     | '/api/public/desktop-build-agent'
@@ -173,16 +221,34 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SupportRoute: typeof SupportRoute
+  TermsRoute: typeof TermsRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiCometModelsRoute: typeof ApiCometModelsRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   ApiTripoRoute: typeof ApiTripoRoute
   ApiPublicDesktopBuildAgentRoute: typeof ApiPublicDesktopBuildAgentRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -195,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -223,6 +296,13 @@ declare module '@tanstack/react-router' {
       path: '/api/tripo'
       fullPath: '/api/tripo'
       preLoaderRoute: typeof ApiTripoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/comet-models': {
@@ -311,13 +391,27 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SupportRoute: SupportRoute,
+  TermsRoute: TermsRoute,
   ApiChatRoute: ApiChatRoute,
   ApiCometModelsRoute: ApiCometModelsRoute,
+  ApiHealthRoute: ApiHealthRoute,
   ApiTripoRoute: ApiTripoRoute,
   ApiPublicDesktopBuildAgentRoute: ApiPublicDesktopBuildAgentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

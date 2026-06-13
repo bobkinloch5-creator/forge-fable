@@ -1,10 +1,9 @@
-import mark from "@/assets/fableforge-engine-mark.png.asset.json";
 import { cn } from "@/lib/utils";
 
 export function BrandMark({ className }: { className?: string }) {
   return (
     <img
-      src={mark.url}
+      src="/icon-512.png"
       alt="FableForge AI"
       width={1024}
       height={1024}

@@ -1,18 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const BASE_URL = "";
-
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
+        const baseUrl = new URL(request.url).origin;
         const entries = [
           { path: "/", priority: "1.0" },
           { path: "/auth", priority: "0.2" },
+          { path: "/terms", priority: "0.2" },
+          { path: "/privacy", priority: "0.2" },
+          { path: "/support", priority: "0.2" },
         ];
         const urls = entries.map(
           (entry) =>
-            `  <url>\n    <loc>${BASE_URL}${entry.path}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>${entry.priority}</priority>\n  </url>`,
+            `  <url>\n    <loc>${baseUrl}${entry.path}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>${entry.priority}</priority>\n  </url>`,
         );
         return new Response(
           [

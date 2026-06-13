@@ -82,6 +82,17 @@ export const Route = createFileRoute("/api/public/desktop-build-agent")({
             .eq("game_id", job.game_id)
             .order("path"),
         ]);
+        if (game.error || files.error || !game.data) {
+          await supabaseAdmin
+            .from("desktop_build_jobs")
+            .update({
+              status: "failed",
+              error_message: "Project source could not be prepared for the build agent.",
+            })
+            .eq("id", job.id)
+            .eq("agent_id", agent.id);
+          return new Response("Could not prepare project source", { status: 500 });
+        }
         return Response.json({
           protocolVersion: 1,
           engine: "Godot 4",
@@ -107,7 +118,13 @@ export const Route = createFileRoute("/api/public/desktop-build-agent")({
       POST: async ({ request }) => {
         const agent = await authenticate(request);
         if (!agent) return new Response("Invalid build-agent token", { status: 401 });
-        const parsed = Report.safeParse(await request.json());
+        let requestBody: unknown;
+        try {
+          requestBody = await request.json();
+        } catch {
+          return new Response("Invalid JSON request", { status: 400 });
+        }
+        const parsed = Report.safeParse(requestBody);
         if (!parsed.success) return new Response("Invalid agent report", { status: 400 });
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const report = parsed.data;
@@ -117,6 +134,13 @@ export const Route = createFileRoute("/api/public/desktop-build-agent")({
           .eq("id", report.jobId)
           .eq("agent_id", agent.id)
           .eq("owner_id", agent.owner_id)
+          .in("status", [
+            "claimed",
+            "building",
+            "testing",
+            "packaging",
+            "additional_tools_required",
+          ])
           .maybeSingle();
         if (!job) return new Response("Build job not assigned to this agent", { status: 403 });
 

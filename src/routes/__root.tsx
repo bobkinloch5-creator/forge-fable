@@ -91,11 +91,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Build games for web, mobile, and PC with AI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "FableForge AI" },
       { name: "twitter:description", content: "Build games for web, mobile, and PC with AI." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/dcf06e71-6b6e-4d13-b5df-3b1dacacf90c" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/dcf06e71-6b6e-4d13-b5df-3b1dacacf90c" },
     ],
     links: [
       {
@@ -126,6 +123,12 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <a
+          href="#main-content"
+          className="sr-only z-[100] rounded-md bg-background px-4 py-2 text-foreground focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
+        >
+          Skip to main content
+        </a>
         {children}
         <Scripts />
       </body>
