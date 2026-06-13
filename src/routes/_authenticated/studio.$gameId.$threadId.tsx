@@ -231,7 +231,7 @@ function ChatWorkspace({
                   params: { gameId, threadId: thread.id },
                 })
               }
-               className={`min-w-32 rounded-md px-3 py-1.5 text-left font-mono text-[10px] ${thread.id === threadId ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-muted"}`}
+              className={`min-w-32 rounded-md px-3 py-1.5 text-left font-mono text-[10px] ${thread.id === threadId ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-muted"}`}
             >
               <span className="block truncate">{thread.title}</span>
             </button>
@@ -302,8 +302,8 @@ function ChatWorkspace({
           <div className="flex gap-1">
             {(
               [
-                 { id: "preview", label: "Viewport", icon: Gamepad2 },
-                 { id: "code", label: "Code Editor", icon: Code2 },
+                { id: "preview", label: "Viewport", icon: Gamepad2 },
+                { id: "code", label: "Code Editor", icon: Code2 },
                 { id: "console", label: "Console", icon: Terminal },
               ] as const
             ).map((item) => (
@@ -319,7 +319,11 @@ function ChatWorkspace({
             ))}
           </div>
           <div className="ml-auto flex gap-1">
-            <Button variant={playing ? "secondary" : "ghost"} size="sm" onClick={() => setPlaying(!playing)}>
+            <Button
+              variant={playing ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setPlaying(!playing)}
+            >
               {playing ? <RefreshCw /> : <Play />}
               <span className="hidden sm:inline">{playing ? "Restart" : "Play"}</span>
             </Button>
@@ -335,9 +339,9 @@ function ChatWorkspace({
           </div>
         </div>
         {tab === "preview" && (
-           <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
+          <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
             <div
-               className={`relative aspect-video w-full max-w-6xl overflow-hidden rounded-md border border-primary/25 bg-panel shadow-2xl ${playing ? "forge-glow" : ""}`}
+              className={`relative aspect-video w-full max-w-6xl overflow-hidden rounded-md border border-primary/25 bg-panel shadow-2xl ${playing ? "forge-glow" : ""}`}
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_65%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%)]" />
               <div className="absolute left-5 top-5 flex gap-2">
@@ -351,7 +355,9 @@ function ChatWorkspace({
                   <BrandMark
                     className={`mx-auto size-32 ${playing ? "animate-pulse" : "opacity-40 grayscale"}`}
                   />
-                   <h3 className="mt-3 font-mono text-2xl font-semibold uppercase tracking-[.14em]">{workspace.game.name}</h3>
+                  <h3 className="mt-3 font-mono text-2xl font-semibold uppercase tracking-[.14em]">
+                    {workspace.game.name}
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {playing ? "Starter scene is running" : "Press play to enter the starter scene"}
                   </p>
@@ -392,15 +398,33 @@ function ChatWorkspace({
         )}
         <div className="h-32 shrink-0 border-t border-border bg-background/90">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
-            {['Build Logs', 'Errors 1', 'Console', 'AI Fixes', 'Tasks'].map((label, index) => (
-              <span key={label} className={`px-2 font-mono text-[9px] ${index === 1 ? 'text-destructive' : index === 0 ? 'text-foreground' : 'text-muted-foreground'}`}>{label.toUpperCase()}</span>
-            ))}
-            <Button size="sm" variant="outline" className="ml-auto h-6 font-mono text-[9px]"><Wand2 /> Fix with AI</Button>
+            {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map(
+              (label, index) => (
+                <span
+                  key={label}
+                  className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
+                >
+                  {label.toUpperCase()}
+                </span>
+              ),
+            )}
+            <Button size="sm" variant="outline" className="ml-auto h-6 font-mono text-[9px]">
+              <Wand2 /> Fix with AI
+            </Button>
           </div>
           <div className="space-y-1 p-3 font-mono text-[10px]">
-            <p><span className="text-muted-foreground">14:20:04</span> <span className="text-success">BUILD</span> Starter scene compiled · 18 files · 42 assets</p>
-            <p><span className="text-muted-foreground">14:20:12</span> <span className="text-destructive">ERROR</span> Mobile input map needs a touch control binding</p>
-            <p className="text-muted-foreground">Fable 5 can repair this without changing your game logic.</p>
+            <p>
+              <span className="text-muted-foreground">14:20:04</span>{" "}
+              <span className="text-success">BUILD</span> Starter scene compiled · 18 files · 42 assets
+            </p>
+            <p>
+              <span className="text-muted-foreground">14:20:12</span>{" "}
+              <span className="text-destructive">ERROR</span> Mobile input map needs a touch control
+              binding
+            </p>
+            <p className="text-muted-foreground">
+              Fable 5 can repair this without changing your game logic.
+            </p>
           </div>
         </div>
       </section>
