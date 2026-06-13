@@ -42,6 +42,7 @@ import {
   FileCode2,
   Folder,
   Gamepad2,
+  Globe2,
   History,
   Image,
   Maximize2,
