@@ -14,12 +14,9 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import { TripoModelLab } from "@/components/tripo-model-lab";
-import { DesktopBuildCenter } from "@/components/desktop-build-center";
-import { WebsitePublishingCenter } from "@/components/website-publishing-center";
 import { ProjectMemoryPanel } from "@/components/project-memory-panel";
-import { VersionControlPanel } from "@/components/version-control-panel";
 import { PlaytestCenter } from "@/components/playtest-center";
+import { VersionControlPanel } from "@/components/version-control-panel";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,18 +31,13 @@ import {
   Check,
   ChevronDown,
   Code2,
-  Cuboid,
-  Download,
   Eye,
-  FileArchive,
   FileCode2,
   Folder,
   Gamepad2,
-  Globe2,
   History,
   Brain,
   GitBranch,
-  FlaskConical,
   Image,
   Maximize2,
   Monitor,
@@ -57,7 +49,6 @@ import {
   ShieldCheck,
   Smartphone,
   Tablet,
-  Terminal,
   Undo2,
   Wand2,
   Wrench,
@@ -83,17 +74,7 @@ type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWork
 type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
-type StudioTab =
-  | "planner"
-  | "memory"
-  | "versions"
-  | "tests"
-  | "preview"
-  | "models"
-  | "code"
-  | "console"
-  | "export"
-  | "publish";
+type StudioTab = "memory" | "versions" | "tests" | "preview" | "models" | "code";
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
 
@@ -302,7 +283,7 @@ function ChatWorkspace({
     });
   }
   return (
-    <div className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-24 md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(380px,1.15fr)_minmax(360px,1fr)] md:overflow-hidden md:pb-2 xl:grid-cols-[minmax(290px,340px)_minmax(520px,1fr)_280px] xl:grid-rows-1">
+    <div className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-24 md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(380px,1.15fr)_minmax(360px,1fr)] md:overflow-hidden md:pb-2 xl:grid-cols-[420px_1fr] xl:grid-rows-1">
       <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl md:order-2 xl:order-1">
         <div className="flex items-center gap-2 border-b border-border/60 bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-3">
           <div className="relative">
@@ -471,16 +452,10 @@ function ChatWorkspace({
           <div className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain">
             {(
               [
-                { id: "planner", label: "Build Stages", icon: History },
                 { id: "memory", label: "Memory", icon: Brain },
                 { id: "versions", label: "Versions", icon: GitBranch },
-                { id: "tests", label: "Playtests", icon: FlaskConical },
                 { id: "preview", label: "Live Game", icon: Gamepad2 },
-                { id: "models", label: "Visual Editor", icon: Cuboid },
                 { id: "code", label: "Code Editor", icon: Code2 },
-                { id: "console", label: "Console", icon: Terminal },
-                { id: "export", label: "Export Center", icon: PackageOpen },
-                { id: "publish", label: "Website Publishing", icon: Globe2 },
               ] as const
             ).map((item) => (
               <Button
@@ -551,76 +526,6 @@ function ChatWorkspace({
             </Button>
           </div>
         </div>
-        {tab === "planner" && (
-          <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-            <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <p className="font-mono text-[9px] uppercase tracking-[.18em] text-neon-cyan">
-                  Dependency-aware production
-                </p>
-                <h2 className="mt-1 text-xl font-semibold">Advanced project planner</h2>
-                <p className="mt-2 max-w-3xl text-xs leading-5 text-muted-foreground">
-                  The project advances through gated stages so architecture, gameplay, content,
-                  networking, optimization, testing, and export stay connected as the game grows.
-                </p>
-              </div>
-              <Badge variant="outline">
-                {workspace.stages.filter((stage) => stage.status === "complete").length} /{" "}
-                {workspace.stages.length} STAGES COMPLETE
-              </Badge>
-            </div>
-            <div className="grid gap-2 lg:grid-cols-2">
-              {workspace.stages.map((stage) => (
-                <div
-                  key={stage.id}
-                  className={`rounded-xl border p-3 ${stage.status === "ready" || stage.status === "in_progress" ? "spectrum-border bg-primary/8" : "border-border bg-panel/60"}`}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-secondary font-mono text-[10px] text-neon-cyan">
-                      {String(stage.position).padStart(2, "0")}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-xs font-semibold">{stage.title}</h3>
-                        <Badge variant="outline" className="font-mono text-[8px] uppercase">
-                          {stage.status.replace("_", " ")}
-                        </Badge>
-                      </div>
-                      <p className="mt-1 truncate text-[10px] text-muted-foreground">
-                        Depends on: {stage.dependencies.join(", ") || "No prior stage"}
-                      </p>
-                      <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
-                        {stage.deliverables.join(" · ")}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 border-t border-border pt-4">
-              <div className="mb-3 flex items-center gap-2">
-                <ShieldCheck className="size-4 text-neon-cyan" />
-                <h3 className="text-sm font-semibold">Recovery checkpoints</h3>
-                <Badge variant="outline" className="ml-auto">
-                  {workspace.checkpoints.length} SAVED
-                </Badge>
-              </div>
-              <div className="grid gap-2 md:grid-cols-2">
-                {workspace.checkpoints.map((checkpoint) => (
-                  <div
-                    key={checkpoint.id}
-                    className="rounded-xl border border-border bg-canvas/60 p-3"
-                  >
-                    <p className="text-xs font-medium">{checkpoint.label}</p>
-                    <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
-                      {checkpoint.summary}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
         {tab === "memory" && <ProjectMemoryPanel gameId={gameId} />}
         {tab === "versions" && (
           <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />
@@ -736,7 +641,6 @@ function ChatWorkspace({
             </div>
           </div>
         )}
-        {tab === "models" && <TripoModelLab />}
         {tab === "code" && (
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex h-10 items-center gap-2 border-b border-border bg-panel px-4 text-xs">
@@ -751,59 +655,9 @@ function ChatWorkspace({
             </pre>
           </div>
         )}
-        {tab === "console" && (
-          <div className="flex-1 overflow-auto p-5 font-mono text-xs leading-7">
-            <p className="text-muted-foreground">[forge] project manifest loaded</p>
-            <p className="text-success">[build] 4 files compiled successfully</p>
-            <p className="text-muted-foreground">[preview] waiting for play command</p>
-          </div>
-        )}
-        {tab === "export" && <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />}
-        {tab === "publish" && <WebsitePublishingCenter gameName={workspace.game.name} />}
-        <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
-          <div className="flex h-8 items-center gap-1 border-b border-border px-2">
-            {["Build Logs", "Errors 1", "Warnings", "Testing", "Performance", "Multiplayer"].map(
-              (label, index) => (
-                <span
-                  key={label}
-                  className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
-                >
-                  {label.toUpperCase()}
-                </span>
-              ),
-            )}
-            <Button
-              size="sm"
-              variant="outline"
-              className="ml-auto h-7 shrink-0 font-mono text-[9px]"
-              onClick={() => {
-                setTab("tests");
-                toast.info("Playtest diagnostics opened. Ask Fable to repair any reported issue.");
-              }}
-            >
-              <Wand2 /> <span className="hidden sm:inline">Fix Responsive Design with AI</span>
-              <span className="sm:hidden">AI Fix</span>
-            </Button>
-          </div>
-          <div className="space-y-1 p-3 font-mono text-[10px]">
-            <p>
-              <span className="text-muted-foreground">14:20:04</span>{" "}
-              <span className="text-success">BUILD</span> Starter scene compiled · 18 files · 42
-              assets
-            </p>
-            <p>
-              <span className="text-muted-foreground">14:20:12</span>{" "}
-              <span className="text-destructive">ERROR</span> Mobile input map needs a touch control
-              binding
-            </p>
-            <p className="text-muted-foreground">
-              Fable 5 can repair this without changing your game logic.
-            </p>
-          </div>
-        </div>
       </section>
 
-      <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:flex">
+      <aside className="hidden">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
           <span className="font-mono text-[10px] tracking-wider">GAME INSPECTOR</span>{" "}
           <Button
