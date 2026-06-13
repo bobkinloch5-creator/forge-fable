@@ -32,7 +32,6 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import {
   Bot,
   ChevronDown,
-  ChevronRight,
   Code2,
   FileCode2,
   Folder,
@@ -45,7 +44,6 @@ import {
   Smartphone,
   Terminal,
   Wand2,
-  Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -211,18 +209,19 @@ function ChatWorkspace({
     navigate({ to: "/studio/$gameId/$threadId", params: { gameId, threadId: thread.id } });
   }
   return (
-    <div className="grid h-[calc(100vh-4rem)] min-h-[640px] grid-cols-1 grid-rows-[minmax(300px,45vh)_1fr] overflow-hidden xl:grid-cols-[360px_1fr_280px] xl:grid-rows-1">
-      <section className="flex min-h-0 flex-col border-b border-border bg-panel xl:border-b-0 xl:border-r">
+    <div className="grid h-[calc(100vh-3.5rem)] min-h-[640px] grid-cols-1 grid-rows-[minmax(320px,48vh)_1fr] overflow-hidden xl:grid-cols-[260px_minmax(500px,1fr)_360px] xl:grid-rows-1">
+      <section className="order-2 flex min-h-0 flex-col border-b border-border bg-panel xl:order-3 xl:border-b-0 xl:border-l">
         <div className="flex items-center gap-2 border-b border-border p-3">
-          <div className="flex-1">
-            <p className="text-xs font-semibold">AI BUILD SESSIONS</p>
-            <p className="text-[11px] text-muted-foreground">Project threads persist in Cloud</p>
+          <BrandMark className="size-8 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="font-mono text-[10px] font-semibold tracking-wider">FABLE 5 BUILDER</p>
+            <p className="truncate text-[10px] text-success">ONLINE · Project memory active</p>
           </div>
           <Button size="icon-sm" variant="outline" onClick={newThread}>
             <Plus />
           </Button>
         </div>
-        <div className="flex gap-1 overflow-x-auto border-b border-border p-2 xl:block xl:space-y-1">
+        <div className="flex gap-1 overflow-x-auto border-b border-border p-2">
           {workspace.threads.map((thread) => (
             <button
               key={thread.id}
@@ -232,7 +231,7 @@ function ChatWorkspace({
                   params: { gameId, threadId: thread.id },
                 })
               }
-              className={`min-w-40 rounded-md px-3 py-2 text-left text-xs xl:w-full ${thread.id === threadId ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-muted"}`}
+              className={`min-w-32 rounded-md px-3 py-1.5 text-left font-mono text-[10px] ${thread.id === threadId ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-muted"}`}
             >
               <span className="block truncate">{thread.title}</span>
             </button>
@@ -243,8 +242,8 @@ function ChatWorkspace({
             {messages.length === 0 && (
               <ConversationEmptyState
                 icon={<BrandMark className="size-20" />}
-                title="Describe your next build"
-                description="Ask for systems, UI, controls, gameplay loops, or a full implementation plan."
+                title="What do you want to build today?"
+                description="Build a 3D fantasy RPG, add mobile controls, create a boss fight, fix the UI, or prepare an export."
               />
             )}
             {messages.map((message) => (
@@ -269,10 +268,10 @@ function ChatWorkspace({
           <ConversationScrollButton />
         </Conversation>
         <div className="border-t border-border p-3">
-          <PromptInput onSubmit={submit} className="border-border bg-background">
+          <PromptInput onSubmit={submit} className="border-border bg-canvas">
             <PromptInputTextarea
               ref={textareaRef}
-              placeholder="Build or change something…"
+              placeholder="Describe a mechanic, scene, or fix…"
               className="min-h-20"
             />
             <PromptInputFooter>
@@ -284,9 +283,9 @@ function ChatWorkspace({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fast">Fast forge</SelectItem>
-                  <SelectItem value="balanced">Balanced</SelectItem>
-                  <SelectItem value="pro">Pro build</SelectItem>
+                  <SelectItem value="fast">Fable 5 Fast</SelectItem>
+                  <SelectItem value="balanced">Fable 5</SelectItem>
+                  <SelectItem value="pro">Fable 5 Pro</SelectItem>
                 </SelectContent>
               </Select>
               <PromptInputSubmit status={status} onStop={stop} />
@@ -298,13 +297,13 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <section className="flex min-h-0 flex-col bg-canvas">
+      <section className="order-1 flex min-h-0 flex-col bg-canvas xl:order-2">
         <div className="flex h-11 items-center border-b border-border bg-panel px-2">
           <div className="flex gap-1">
             {(
               [
-                { id: "preview", label: "Game", icon: Gamepad2 },
-                { id: "code", label: "Code", icon: Code2 },
+                { id: "preview", label: "Viewport", icon: Gamepad2 },
+                { id: "code", label: "Code Editor", icon: Code2 },
                 { id: "console", label: "Console", icon: Terminal },
               ] as const
             ).map((item) => (
@@ -320,8 +319,13 @@ function ChatWorkspace({
             ))}
           </div>
           <div className="ml-auto flex gap-1">
-            <Button variant="ghost" size="icon-sm" onClick={() => setPlaying(!playing)}>
+            <Button
+              variant={playing ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setPlaying(!playing)}
+            >
               {playing ? <RefreshCw /> : <Play />}
+              <span className="hidden sm:inline">{playing ? "Restart" : "Play"}</span>
             </Button>
             <Button variant="ghost" size="icon-sm">
               <Smartphone />
@@ -335,9 +339,9 @@ function ChatWorkspace({
           </div>
         </div>
         {tab === "preview" && (
-          <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-6">
+          <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
             <div
-              className={`relative aspect-video w-full max-w-5xl overflow-hidden rounded-lg border border-border bg-panel shadow-2xl ${playing ? "forge-glow" : ""}`}
+              className={`relative aspect-video w-full max-w-6xl overflow-hidden rounded-md border border-primary/25 bg-panel shadow-2xl ${playing ? "forge-glow" : ""}`}
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_65%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%)]" />
               <div className="absolute left-5 top-5 flex gap-2">
@@ -351,7 +355,9 @@ function ChatWorkspace({
                   <BrandMark
                     className={`mx-auto size-32 ${playing ? "animate-pulse" : "opacity-40 grayscale"}`}
                   />
-                  <h3 className="mt-3 text-2xl font-semibold">{workspace.game.name}</h3>
+                  <h3 className="mt-3 font-mono text-2xl font-semibold uppercase tracking-[.14em]">
+                    {workspace.game.name}
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {playing ? "Starter scene is running" : "Press play to enter the starter scene"}
                   </p>
@@ -390,11 +396,41 @@ function ChatWorkspace({
             <p className="text-muted-foreground">[preview] waiting for play command</p>
           </div>
         )}
+        <div className="h-32 shrink-0 border-t border-border bg-background/90">
+          <div className="flex h-8 items-center gap-1 border-b border-border px-2">
+            {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
+              <span
+                key={label}
+                className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
+              >
+                {label.toUpperCase()}
+              </span>
+            ))}
+            <Button size="sm" variant="outline" className="ml-auto h-6 font-mono text-[9px]">
+              <Wand2 /> Fix with AI
+            </Button>
+          </div>
+          <div className="space-y-1 p-3 font-mono text-[10px]">
+            <p>
+              <span className="text-muted-foreground">14:20:04</span>{" "}
+              <span className="text-success">BUILD</span> Starter scene compiled · 18 files · 42
+              assets
+            </p>
+            <p>
+              <span className="text-muted-foreground">14:20:12</span>{" "}
+              <span className="text-destructive">ERROR</span> Mobile input map needs a touch control
+              binding
+            </p>
+            <p className="text-muted-foreground">
+              Fable 5 can repair this without changing your game logic.
+            </p>
+          </div>
+        </div>
       </section>
 
-      <aside className="hidden min-h-0 flex-col border-l border-border bg-panel xl:flex">
+      <aside className="order-3 hidden min-h-0 flex-col border-r border-border bg-panel xl:order-1 xl:flex">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
-          PROJECT FILES{" "}
+          <span className="font-mono text-[10px] tracking-wider">PROJECT / ASSETS</span>{" "}
           <Button variant="ghost" size="icon-sm" className="ml-auto">
             <Plus />
           </Button>
