@@ -31,7 +31,9 @@ export const Route = createFileRoute("/api/tripo")({
         if (!parsed.success) return new Response("Invalid 3D generation request", { status: 400 });
 
         const endpoint =
-          parsed.data.action === "create" ? `${TRIPO_API}/task` : `${TRIPO_API}/task/${parsed.data.taskId}`;
+          parsed.data.action === "create"
+            ? `${TRIPO_API}/task`
+            : `${TRIPO_API}/task/${parsed.data.taskId}`;
         const upstream = await fetch(endpoint, {
           method: parsed.data.action === "create" ? "POST" : "GET",
           headers: {
@@ -55,10 +57,13 @@ export const Route = createFileRoute("/api/tripo")({
         };
         if (!upstream.ok || payload.code !== 0) {
           console.error("Tripo API error", upstream.status, payload.message);
-          return new Response(payload.message || "Tripo request failed", { status: upstream.status || 502 });
+          return new Response(payload.message || "Tripo request failed", {
+            status: upstream.status || 502,
+          });
         }
         if (parsed.data.action === "create") {
-          if (!payload.data?.task_id) return new Response("Tripo did not return a task", { status: 502 });
+          if (!payload.data?.task_id)
+            return new Response("Tripo did not return a task", { status: 502 });
           return Response.json({ taskId: payload.data.task_id });
         }
         const status = payload.data?.status ?? "running";

@@ -9,7 +9,10 @@ type GenerationStatus = "idle" | "queued" | "running" | "success" | "failed";
 
 const presets = [
   { label: "Character", prompt: "A game-ready fantasy hero character, full body, neutral pose" },
-  { label: "Environment", prompt: "A modular low-poly fantasy village map tile with paths and buildings" },
+  {
+    label: "Environment",
+    prompt: "A modular low-poly fantasy village map tile with paths and buildings",
+  },
   { label: "Building", prompt: "A game-ready medieval blacksmith building with clean topology" },
   { label: "Prop", prompt: "A stylized enchanted treasure chest game prop" },
 ];
