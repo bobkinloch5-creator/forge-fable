@@ -75,6 +75,12 @@ export const Route = createFileRoute("/api/chat")({
         });
         const response = result.toUIMessageStreamResponse({
           originalMessages: messages,
+      onError: (error) => {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message.includes("402")) return "AI credits are exhausted. Add workspace AI balance to continue.";
+        if (message.includes("429")) return "The forge is busy. Try again in a moment.";
+        return "The AI build failed. Your prompt is still here—please retry.";
+      },
           onFinish: async ({ responseMessage, isAborted }) => {
             if (isAborted) return;
             const { error } = await db.from("chat_messages").upsert(

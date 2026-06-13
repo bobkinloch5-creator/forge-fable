@@ -60,8 +60,12 @@ export async function withGatewayRunId(
     async start(controller) {
       try {
         const first = await firstChunk;
-        if (!first.done) controller.enqueue(first.value);
-        while (!first.done) {
+        if (first.done) {
+          controller.close();
+          return;
+        }
+        controller.enqueue(first.value);
+        while (true) {
           const chunk = await reader.read();
           if (chunk.done) break;
           controller.enqueue(chunk.value);
