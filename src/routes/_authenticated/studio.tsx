@@ -48,8 +48,9 @@ function StudioDashboard() {
     <StudioShell title="Project hub" subtitle="Build across web, mobile, and PC">
       <main className="mx-auto max-w-[1500px] p-4 sm:p-6 lg:p-8">
         <section className="mb-8 grid gap-4 xl:grid-cols-[1.5fr_1fr]">
-          <div className="relative overflow-hidden rounded-xl border border-border bg-panel-strong p-7 sm:p-9">
+          <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-7 sm:p-9">
             <div className="panel-grid absolute inset-0 opacity-20" />
+            <div className="aurora-orb absolute -right-24 -top-32 size-80 rounded-full bg-neon-violet/20 blur-3xl" />
             <div className="relative max-w-2xl">
               <Badge variant="outline" className="mb-5 border-primary/40 text-primary">
                 <Zap className="mr-1 size-3" /> AI GAME ENGINE
@@ -57,7 +58,9 @@ function StudioDashboard() {
               <h2 className="text-balance text-4xl font-semibold tracking-[-.045em] sm:text-5xl">
                 Build the world.
                 <br />
-                <span className="text-muted-foreground">Keep creative control.</span>
+                <span className="bg-linear-to-r from-neon-cyan via-primary to-neon-pink bg-clip-text text-transparent">
+                  Keep creative control.
+                </span>
               </h2>
               <p className="mt-5 max-w-xl text-sm leading-6 text-muted-foreground">
                 Start from a concept or template. FableForge plans the systems, writes the files,
@@ -80,7 +83,10 @@ function StudioDashboard() {
                 icon: Layers3,
               },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-xl border border-border bg-panel p-4">
+              <div
+                key={stat.label}
+                className="glass-panel rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50"
+              >
                 <stat.icon className="mb-6 size-4 text-primary" />
                 <div className="text-2xl font-semibold capitalize">{stat.value}</div>
                 <div className="mt-1 text-xs text-muted-foreground">{stat.label}</div>
@@ -123,7 +129,7 @@ function StudioDashboard() {
                     key={game.id}
                     to="/studio/$gameId"
                     params={{ gameId: game.id }}
-                    className="group rounded-xl border border-border bg-panel p-5 transition-all hover:-translate-y-0.5 hover:border-primary/60"
+                    className="glass-panel group rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-neon-cyan/50 hover:shadow-[0_18px_50px_color-mix(in_oklab,var(--primary)_16%,transparent)]"
                   >
                     <div className="mb-7 flex items-start justify-between">
                       <span className="grid size-10 place-items-center rounded-lg bg-secondary">
@@ -155,7 +161,10 @@ function StudioDashboard() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {templates.slice(0, 4).map((template) => (
-              <article key={template.name} className="rounded-xl border border-border bg-panel p-4">
+              <article
+                key={template.name}
+                className="glass-panel group rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:border-neon-violet/40"
+              >
                 <div className="panel-grid mb-4 grid aspect-[16/9] place-items-center rounded-lg bg-canvas">
                   <template.icon className="size-10 text-primary" />
                 </div>

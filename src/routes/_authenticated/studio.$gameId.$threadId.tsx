@@ -32,19 +32,27 @@ import { useServerFn } from "@tanstack/react-start";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import {
   Bot,
+  Check,
   ChevronDown,
   Code2,
   Cuboid,
+  Eye,
   FileCode2,
   Folder,
   Gamepad2,
+  History,
+  Image,
   Maximize2,
   Monitor,
+  PackageOpen,
   Play,
   Plus,
   RefreshCw,
+  Rocket,
+  ShieldCheck,
   Smartphone,
   Terminal,
+  Undo2,
   Wand2,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -68,6 +76,29 @@ type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWork
 type ReadyWorkspace = Omit<Workspace, "game"> & { game: NonNullable<Workspace["game"]> };
 type StudioTab = "preview" | "models" | "code" | "console";
 type ModelTier = "fast" | "balanced" | "pro";
+
+const buildStates = [
+  "Understanding your request",
+  "Planning the game systems",
+  "Generating code",
+  "Creating the UI",
+  "Preparing assets",
+  "Testing gameplay",
+  "Checking for bugs",
+  "Applying improvements",
+];
+
+const quickActions = [
+  { label: "Apply Changes", icon: Check },
+  { label: "Preview Game", icon: Play },
+  { label: "Fix Errors", icon: Wand2 },
+  { label: "Improve Graphics", icon: Image },
+  { label: "Add Features", icon: Plus },
+  { label: "Optimize", icon: Rocket },
+  { label: "Undo", icon: Undo2 },
+  { label: "View Files", icon: Eye },
+  { label: "Export", icon: PackageOpen },
+];
 
 function GameWorkspace() {
   const { gameId, threadId } = Route.useParams();
@@ -196,6 +227,9 @@ function ChatWorkspace({
             : cause.message,
       ),
   });
+  const [queuedInstructions, setQueuedInstructions] = useState<string[]>([]);
+  const isBuilding = status === "submitted" || status === "streaming";
+  const activeBuildStep = isBuilding ? Math.min(7, Math.max(0, messages.length % 8)) : -1;
   useEffect(() => {
     textareaRef.current?.focus();
   }, [threadId, textareaRef]);
@@ -203,6 +237,12 @@ function ChatWorkspace({
     workspace.files.find((file) => file.path === selectedFile) ?? workspace.files[0];
   async function submit(message: { text: string }) {
     if (!message.text.trim()) return;
+    if (isBuilding) {
+      setQueuedInstructions((current) => [...current, message.text.trim()]);
+      toast.success("Instruction queued for this build");
+      textareaRef.current?.focus();
+      return;
+    }
     await sendMessage({ text: message.text.trim() });
     textareaRef.current?.focus();
   }
@@ -211,13 +251,27 @@ function ChatWorkspace({
     navigate({ to: "/studio/$gameId/$threadId", params: { gameId, threadId: thread.id } });
   }
   return (
-    <div className="grid h-[calc(100vh-3.5rem)] min-h-[640px] grid-cols-1 grid-rows-[minmax(320px,48vh)_1fr] overflow-hidden xl:grid-cols-[260px_minmax(500px,1fr)_360px] xl:grid-rows-1">
-      <section className="order-2 flex min-h-0 flex-col border-b border-border bg-panel xl:order-3 xl:border-b-0 xl:border-l">
-        <div className="flex items-center gap-2 border-b border-border p-3">
-          <BrandMark className="size-8 shrink-0" />
+    <div className="grid h-[calc(100vh-4.5rem)] min-h-[640px] grid-cols-1 grid-rows-[minmax(340px,50vh)_1fr] gap-2 overflow-hidden p-2 xl:grid-cols-[244px_minmax(480px,1fr)_380px] xl:grid-rows-1">
+      <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-3">
+        <div className="flex items-center gap-2 border-b border-border/60 bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-3">
+          <div className="relative">
+            <div
+              className={`absolute inset-0 rounded-full bg-neon-cyan/30 blur-md ${isBuilding ? "animate-pulse" : ""}`}
+            />
+            <BrandMark
+              className={`relative size-9 shrink-0 ${isBuilding ? "animate-pulse" : ""}`}
+            />
+          </div>
           <div className="min-w-0 flex-1">
-            <p className="font-mono text-[10px] font-semibold tracking-wider">FABLE 5 BUILDER</p>
-            <p className="truncate text-[10px] text-success">ONLINE · Project memory active</p>
+            <div className="flex items-center gap-2">
+              <p className="font-mono text-[10px] font-semibold tracking-wider">FABLE 5 BUILDER</p>
+              {modelTier === "pro" && (
+                <Badge className="border-neon-pink/30 bg-neon-pink/15 text-neon-pink">PRO</Badge>
+              )}
+            </div>
+            <p className="truncate text-[10px] text-success">
+              ONLINE · Project memory active · Checkpoints on
+            </p>
           </div>
           <Button size="icon-sm" variant="outline" onClick={newThread}>
             <Plus />
@@ -239,6 +293,41 @@ function ChatWorkspace({
             </button>
           ))}
         </div>
+        {isBuilding && (
+          <div className="border-b border-border/60 bg-canvas/60 p-3">
+            <div className="mb-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-wider">
+              <span className="text-neon-cyan">Live build sequence</span>
+              <span className="text-muted-foreground">
+                {Math.round(((activeBuildStep + 1) / buildStates.length) * 100)}%
+              </span>
+            </div>
+            <div className="mb-3 h-1 overflow-hidden rounded-full bg-muted">
+              <div
+                className="relative h-full bg-linear-to-r from-neon-cyan via-primary to-neon-pink transition-all duration-700"
+                style={{ width: `${((activeBuildStep + 1) / buildStates.length) * 100}%` }}
+              >
+                <span className="build-scan absolute inset-y-0 w-16 bg-linear-to-r from-transparent via-primary-foreground/70 to-transparent" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {buildStates.map((step, index) => (
+                <div
+                  key={step}
+                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[9px] ${index === activeBuildStep ? "bg-primary/15 text-foreground" : index < activeBuildStep ? "text-success" : "text-muted-foreground"}`}
+                >
+                  {index < activeBuildStep ? (
+                    <Check className="size-3" />
+                  ) : (
+                    <span
+                      className={`size-1.5 rounded-full ${index === activeBuildStep ? "animate-pulse bg-neon-cyan shadow-[0_0_8px_var(--neon-cyan)]" : "bg-muted-foreground/30"}`}
+                    />
+                  )}
+                  <span className="truncate">{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <Conversation className="min-h-0">
           <ConversationContent className="gap-5 p-4">
             {messages.length === 0 && (
@@ -248,8 +337,8 @@ function ChatWorkspace({
                 description="Build a 3D fantasy RPG, add mobile controls, create a boss fight, fix the UI, or prepare an export."
               />
             )}
-            {messages.map((message) => (
-              <Message key={message.id} from={message.role}>
+            {messages.map((message, messageIndex) => (
+              <Message key={message.id} from={message.role} className="animate-fade-in">
                 <MessageContent>
                   {message.parts.map((part, index) =>
                     part.type === "text" ? (
@@ -257,23 +346,60 @@ function ChatWorkspace({
                     ) : null,
                   )}
                 </MessageContent>
+                {message.role === "assistant" &&
+                  messageIndex === messages.length - 1 &&
+                  status === "ready" && (
+                    <div className="mt-2 flex max-w-full flex-wrap gap-1.5">
+                      {quickActions.map((action) => (
+                        <Button
+                          key={action.label}
+                          variant="outline"
+                          size="sm"
+                          className="h-7 rounded-lg border-border/70 bg-panel/60 px-2 text-[9px] hover:border-neon-cyan/40 hover:text-neon-cyan"
+                          onClick={() =>
+                            action.label === "Preview Game"
+                              ? setPlaying(true)
+                              : toast.info(`${action.label} is ready for your next instruction`)
+                          }
+                        >
+                          <action.icon className="size-3" /> {action.label}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
               </Message>
             ))}
             {status === "submitted" && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Bot className="size-4 text-accent" />
-                <Shimmer>Planning the build…</Shimmer>
+                <Shimmer>{`${buildStates[activeBuildStep] ?? "Thinking"}…`}</Shimmer>
               </div>
             )}
             {error && <p className="text-xs text-destructive">{error.message}</p>}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
-        <div className="border-t border-border p-3">
-          <PromptInput onSubmit={submit} className="border-border bg-canvas">
+        <div className="border-t border-border/60 p-3">
+          {queuedInstructions.length > 0 && (
+            <div className="mb-2 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-[10px] text-muted-foreground">
+              <History className="size-3 text-primary" />
+              <span className="truncate">
+                {queuedInstructions.length} instruction{queuedInstructions.length > 1 ? "s" : ""}{" "}
+                queued
+              </span>
+            </div>
+          )}
+          <PromptInput
+            onSubmit={submit}
+            className="spectrum-border bg-canvas/90 shadow-[0_0_24px_color-mix(in_oklab,var(--primary)_10%,transparent)]"
+          >
             <PromptInputTextarea
               ref={textareaRef}
-              placeholder="Describe a mechanic, scene, or fix…"
+              placeholder={
+                isBuilding
+                  ? "Queue another instruction while Fable builds…"
+                  : "Describe a mechanic, scene, level, or fix…"
+              }
               className="min-h-20"
             />
             <PromptInputFooter>
@@ -287,7 +413,7 @@ function ChatWorkspace({
                 <SelectContent>
                   <SelectItem value="fast">Fable 5 Fast</SelectItem>
                   <SelectItem value="balanced">Fable 5</SelectItem>
-                  <SelectItem value="pro">Fable 5 Pro</SelectItem>
+                  <SelectItem value="pro">Claude Fable 5 Pro</SelectItem>
                 </SelectContent>
               </Select>
               <PromptInputSubmit status={status} onStop={stop} />
@@ -299,8 +425,8 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <section className="order-1 flex min-h-0 flex-col bg-canvas xl:order-2">
-        <div className="flex h-11 items-center border-b border-border bg-panel px-2">
+      <section className="glass-panel order-1 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-2">
+        <div className="flex h-12 items-center border-b border-border/60 bg-panel/80 px-2">
           <div className="flex gap-1">
             {(
               [
@@ -343,8 +469,10 @@ function ChatWorkspace({
         </div>
         {tab === "preview" && (
           <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
+            <div className="aurora-orb pointer-events-none absolute -left-28 top-0 size-80 rounded-full bg-neon-violet/12 blur-3xl" />
+            <div className="aurora-orb pointer-events-none absolute -bottom-32 right-0 size-96 rounded-full bg-neon-cyan/10 blur-3xl [animation-delay:-6s]" />
             <div
-              className={`relative aspect-video w-full max-w-6xl overflow-hidden rounded-md border border-primary/25 bg-panel shadow-2xl ${playing ? "forge-glow" : ""}`}
+              className={`spectrum-border relative aspect-video w-full max-w-6xl overflow-hidden rounded-2xl bg-panel shadow-2xl transition-all duration-500 ${playing ? "forge-glow scale-[1.005]" : ""}`}
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_65%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%)]" />
               <div className="absolute left-5 top-5 flex gap-2">
@@ -365,7 +493,10 @@ function ChatWorkspace({
                     {playing ? "Starter scene is running" : "Press play to enter the starter scene"}
                   </p>
                   {!playing && (
-                    <Button className="mt-5" onClick={() => setPlaying(true)}>
+                    <Button
+                      className="mt-5 bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_26px_color-mix(in_oklab,var(--primary)_35%,transparent)]"
+                      onClick={() => setPlaying(true)}
+                    >
                       <Play /> Play game
                     </Button>
                   )}
@@ -400,7 +531,7 @@ function ChatWorkspace({
             <p className="text-muted-foreground">[preview] waiting for play command</p>
           </div>
         )}
-        <div className="h-32 shrink-0 border-t border-border bg-background/90">
+        <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
             {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
               <span
@@ -432,7 +563,7 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <aside className="order-3 hidden min-h-0 flex-col border-r border-border bg-panel xl:order-1 xl:flex">
+      <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:order-1 xl:flex">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
           <span className="font-mono text-[10px] tracking-wider">PROJECT / ASSETS</span>{" "}
           <Button variant="ghost" size="icon-sm" className="ml-auto">
@@ -460,9 +591,9 @@ function ChatWorkspace({
           ))}
         </div>
         <div className="border-t border-border p-3">
-          <div className="rounded-lg bg-secondary p-3">
+          <div className="spectrum-border rounded-xl bg-secondary/70 p-3">
             <div className="flex items-center gap-2 text-xs font-medium">
-              <Wand2 className="size-4 text-primary" /> AI project scan
+              <ShieldCheck className="size-4 text-neon-cyan" /> AI project scan
             </div>
             <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
               No blocking errors. Starter files are ready for your first build instruction.
