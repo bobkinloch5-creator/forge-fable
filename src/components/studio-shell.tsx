@@ -9,8 +9,6 @@ import {
   ChevronLeft,
   Cloud,
   Command,
-  Download,
-  Eye,
   LogOut,
   Menu,
   Plus,
@@ -141,15 +139,6 @@ export function StudioShell({
             <span className="hidden items-center gap-1 rounded-md border border-border bg-background/50 px-2 py-1 font-mono text-[10px] text-muted-foreground lg:flex">
               <BadgeDollarSign className="size-3 text-accent" /> 2,400
             </span>
-            <Button variant="outline" size="sm" className="hidden md:inline-flex">
-              <Eye /> Preview
-            </Button>
-            <Button
-              size="sm"
-              className="hidden bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_22px_color-mix(in_oklab,var(--primary)_35%,transparent)] transition-transform hover:scale-[1.03] sm:inline-flex"
-            >
-              <Download /> Export
-            </Button>
           </div>
         </header>
         {children}
