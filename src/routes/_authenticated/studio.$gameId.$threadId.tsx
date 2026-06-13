@@ -84,16 +84,16 @@ type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
 type StudioTab =
-  | "planner"
+  
   | "memory"
   | "versions"
-  | "tests"
+  
   | "preview"
-  | "models"
+  
   | "code"
-  | "console"
-  | "export"
-  | "publish";
+  
+  
+  ;
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
 
