@@ -236,7 +236,9 @@ function ChatWorkspace({
   });
   const [queuedInstructions, setQueuedInstructions] = useState<string[]>([]);
   const isBuilding = status === "submitted" || status === "streaming";
-  const activeBuildStep = isBuilding ? Math.min(7, Math.max(0, messages.length % 8)) : -1;
+  const activeBuildStep = isBuilding
+    ? Math.min(buildStates.length - 2, Math.max(0, messages.length % (buildStates.length - 1)))
+    : -1;
   useEffect(() => {
     textareaRef.current?.focus();
   }, [threadId, textareaRef]);
@@ -441,6 +443,7 @@ function ChatWorkspace({
                 { id: "models", label: "3D Forge", icon: Cuboid },
                 { id: "code", label: "Code Editor", icon: Code2 },
                 { id: "console", label: "Console", icon: Terminal },
+                 { id: "export", label: "Export Center", icon: PackageOpen },
               ] as const
             ).map((item) => (
               <Button
@@ -538,6 +541,7 @@ function ChatWorkspace({
             <p className="text-muted-foreground">[preview] waiting for play command</p>
           </div>
         )}
+        {tab === "export" && <ExportCenter platform={workspace.game.platform} />}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
             {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
