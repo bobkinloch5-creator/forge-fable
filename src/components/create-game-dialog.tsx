@@ -105,21 +105,32 @@ const controls = [
   "Custom keybinds",
 ];
 const systems = [
+  "Large streamed world",
+  "Multiple maps and game modes",
   "Character creation",
+  "Classes and skill trees",
   "Combat",
+  "Abilities and combos",
   "Enemies and bosses",
+  "Intelligent enemy AI",
   "Levels and experience",
   "Inventory",
+  "Equipment and loot",
   "Weapons",
   "Shops",
+  "Deep economy",
   "Quests",
+  "Dialogue and story choices",
+  "Factions and reputation",
   "Dungeons",
+  "Procedural generation",
   "Crafting",
   "Pets",
   "Vehicles",
   "Achievements",
   "Saving and loading",
   "Multiplayer lobbies",
+  "Authoritative networking",
   "Leaderboards",
   "Settings",
   "Tutorial",
@@ -371,6 +382,14 @@ export function CreateGameDialog({
                 <GddItem title="Supported platform" value={draft.platform} />
                 <GddItem title="Recommended technology" value={gdd.engine} />
                 <GddItem title="Estimated complexity" value={gdd.complexity} />
+                <GddItem
+                  title="Production architecture"
+                  value="Dependency-aware modular systems, data-driven content, versioned saves, stage gates, automatic checkpoints, and isolated client/server layers for multiplayer."
+                />
+                <GddItem
+                  title="Development roadmap"
+                  value="17 ordered stages from game planning and technical architecture through systems, content, optimization, regression testing, and validated export."
+                />
               </div>
               <div className="rounded-xl border border-warning/30 bg-warning/10 p-4 text-xs leading-5 text-muted-foreground">
                 <strong className="text-foreground">Approval checkpoint:</strong> creating the

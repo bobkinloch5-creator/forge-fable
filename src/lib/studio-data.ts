@@ -134,3 +134,108 @@ export const workspaceNav = [
   { label: "Assets", icon: Box },
   { label: "AI Models", icon: Bot },
 ];
+
+export const developmentStageBlueprint = [
+  {
+    key: "game-planning",
+    title: "Game planning",
+    dependencies: [],
+    deliverables: ["Game design document", "Scope and risk register"],
+  },
+  {
+    key: "project-architecture",
+    title: "Project architecture",
+    dependencies: ["game-planning"],
+    deliverables: ["Technical design document", "System architecture", "Folder and data structure"],
+  },
+  {
+    key: "core-gameplay",
+    title: "Core gameplay systems",
+    dependencies: ["project-architecture"],
+    deliverables: ["Core loop", "Reusable system contracts"],
+  },
+  {
+    key: "character-movement",
+    title: "Character and movement",
+    dependencies: ["core-gameplay"],
+    deliverables: ["Character controllers", "Input and camera systems"],
+  },
+  {
+    key: "combat-abilities",
+    title: "Combat and abilities",
+    dependencies: ["character-movement"],
+    deliverables: ["Combat framework", "Abilities and status effects"],
+  },
+  {
+    key: "world-levels",
+    title: "World and level creation",
+    dependencies: ["core-gameplay"],
+    deliverables: ["Level plan", "Streaming and world partition strategy"],
+  },
+  {
+    key: "enemy-ai",
+    title: "Enemies and boss AI",
+    dependencies: ["combat-abilities", "world-levels"],
+    deliverables: ["AI behaviors", "Encounter and boss framework"],
+  },
+  {
+    key: "quests-story",
+    title: "Quests and story",
+    dependencies: ["world-levels"],
+    deliverables: ["Quest graph", "Dialogue, factions, and choice state"],
+  },
+  {
+    key: "inventory-crafting",
+    title: "Inventory, equipment, and crafting",
+    dependencies: ["core-gameplay"],
+    deliverables: ["Item database", "Inventory and crafting pipelines"],
+  },
+  {
+    key: "economy-shops",
+    title: "Economy and shops",
+    dependencies: ["inventory-crafting"],
+    deliverables: ["Economy model", "Vendor and reward balancing"],
+  },
+  {
+    key: "multiplayer-networking",
+    title: "Multiplayer and networking",
+    dependencies: ["project-architecture", "core-gameplay"],
+    deliverables: ["Client/server authority model", "Replication and session plan"],
+  },
+  {
+    key: "ui-menus",
+    title: "User interface and menus",
+    dependencies: ["core-gameplay"],
+    deliverables: ["UI architecture", "Menus, HUD, and accessibility"],
+  },
+  {
+    key: "saving-loading",
+    title: "Saving and loading",
+    dependencies: ["project-architecture"],
+    deliverables: ["Versioned save schema", "Migration and recovery flow"],
+  },
+  {
+    key: "audio-vfx",
+    title: "Audio and visual effects",
+    dependencies: ["world-levels", "combat-abilities"],
+    deliverables: ["Audio plan", "VFX and feedback pass"],
+  },
+  {
+    key: "optimization",
+    title: "Optimization",
+    dependencies: ["enemy-ai", "ui-menus"],
+    deliverables: ["Performance budgets", "Memory, rendering, loading, and network profiling"],
+  },
+  {
+    key: "testing-debugging",
+    title: "Testing and debugging",
+    dependencies: ["optimization", "saving-loading"],
+    deliverables: ["Automated test matrix", "Regression and platform checklist"],
+  },
+  {
+    key: "final-export",
+    title: "Final export",
+    dependencies: ["testing-debugging"],
+    deliverables: ["Export requirements", "Signed and validated release artifacts"],
+  },
+] as const;

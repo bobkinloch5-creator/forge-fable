@@ -87,6 +87,59 @@ export type Database = {
           },
         ]
       }
+      development_stages: {
+        Row: {
+          created_at: string
+          deliverables: string[]
+          dependencies: string[]
+          game_id: string
+          id: string
+          owner_id: string
+          position: number
+          stage_key: string
+          status: string
+          test_summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deliverables?: string[]
+          dependencies?: string[]
+          game_id: string
+          id?: string
+          owner_id: string
+          position: number
+          stage_key: string
+          status?: string
+          test_summary?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deliverables?: string[]
+          dependencies?: string[]
+          game_id?: string
+          id?: string
+          owner_id?: string
+          position?: number
+          stage_key?: string
+          status?: string
+          test_summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "development_stages_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           art_style: string
@@ -164,6 +217,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      project_checkpoints: {
+        Row: {
+          created_at: string
+          file_manifest: Json
+          game_id: string
+          id: string
+          label: string
+          owner_id: string
+          stage_key: string
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          file_manifest?: Json
+          game_id: string
+          id?: string
+          label: string
+          owner_id: string
+          stage_key?: string
+          summary?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          file_manifest?: Json
+          game_id?: string
+          id?: string
+          label?: string
+          owner_id?: string
+          stage_key?: string
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_checkpoints_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_files: {
         Row: {
