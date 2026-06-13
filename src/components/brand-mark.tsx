@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export function BrandMark({ className }: { className?: string }) {
   return (
     <img
-      src={mark}
+      src={mark.url}
       alt="FableForge AI"
       width={1024}
       height={1024}
