@@ -7,20 +7,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { createGame } from "@/lib/studio.functions";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  Apple,
   ArrowLeft,
   ArrowRight,
-  Check,
   Gamepad2,
   Globe2,
-  Laptop,
   Monitor,
   Smartphone,
-  Sparkles,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -29,132 +26,20 @@ type Draft = {
   name: string;
   platform: string;
   dimension: "2D" | "3D";
-  genre: string;
-  artStyle: string;
-  playerMode: string;
-  controls: string[];
-  systems: string[];
-  monetization: string;
   description: string;
-  responsiveTargets: string[];
-  accountMode: string;
-  saveProgress: boolean;
-  leaderboards: boolean;
-  achievements: boolean;
-  revenueModel: string;
-  domainChoice: string;
-  publicLandingPage: boolean;
 };
 const initial: Draft = {
   name: "",
   platform: "Cross-platform game",
   dimension: "3D",
-  genre: "RPG",
-  artStyle: "Low-poly",
-  playerMode: "Single-player",
-  controls: ["Keyboard and mouse", "Game controller"],
-  systems: ["Main menu", "Settings", "Saving and loading", "Tutorial"],
-  monetization: "free",
   description: "",
-  responsiveTargets: ["Mobile", "Tablet", "Desktop"],
-  accountMode: "Accounts and guest play",
-  saveProgress: true,
-  leaderboards: true,
-  achievements: true,
-  revenueModel: "None",
-  domainChoice: "Free project domain",
-  publicLandingPage: true,
 };
 
 const platforms = [
-  { label: "PC Game", icon: Gamepad2 },
+  { label: "Website game", icon: Globe2 },
   { label: "Windows PC game", icon: Monitor },
-  { label: "Windows only", icon: Monitor },
-  { label: "macOS game", icon: Apple },
-  { label: "Linux game", icon: Laptop },
-  { label: "Cross-platform desktop release", icon: Laptop },
-  { label: "Android mobile game", icon: Smartphone },
-  { label: "iPhone/iPad game", icon: Smartphone },
-  { label: "Web browser game", icon: Globe2 },
+  { label: "Mobile game", icon: Smartphone },
   { label: "Cross-platform game", icon: Gamepad2 },
-];
-const gameTypes = [
-  "RPG",
-  "Simulator",
-  "Horror",
-  "Survival",
-  "Platformer",
-  "Racing",
-  "Shooter",
-  "Farming game",
-  "Tycoon",
-  "Idle game",
-  "Dungeon crawler",
-  "Tower defense",
-  "Multiplayer arena",
-  "Story game",
-  "Custom game",
-];
-const modes = [
-  "Single-player",
-  "Online multiplayer",
-  "Local multiplayer",
-  "Co-op",
-  "Competitive",
-  "Offline mode",
-];
-const styles = [
-  "Realistic",
-  "Cartoon",
-  "Anime",
-  "Pixel art",
-  "Low-poly",
-  "Fantasy",
-  "Sci-fi",
-  "Retro",
-  "Dark horror",
-  "Colorful and family-friendly",
-];
-const controls = [
-  "Keyboard and mouse",
-  "Game controller",
-  "Mobile touch controls",
-  "On-screen joystick",
-  "Tap-to-move",
-  "Custom keybinds",
-];
-const systems = [
-  "Large streamed world",
-  "Multiple maps and game modes",
-  "Character creation",
-  "Classes and skill trees",
-  "Combat",
-  "Abilities and combos",
-  "Enemies and bosses",
-  "Intelligent enemy AI",
-  "Levels and experience",
-  "Inventory",
-  "Equipment and loot",
-  "Weapons",
-  "Shops",
-  "Deep economy",
-  "Quests",
-  "Dialogue and story choices",
-  "Factions and reputation",
-  "Dungeons",
-  "Procedural generation",
-  "Crafting",
-  "Pets",
-  "Vehicles",
-  "Achievements",
-  "Saving and loading",
-  "Multiplayer lobbies",
-  "Authoritative networking",
-  "Leaderboards",
-  "Settings",
-  "Tutorial",
-  "Main menu",
-  "Pause menu",
 ];
 
 export function CreateGameDialog({
