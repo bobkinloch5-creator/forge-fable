@@ -41,14 +41,10 @@ const verificationChecks: Array<{
 
 export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
   const [domain, setDomain] = useState("");
-  const [domainMode, setDomainMode] = useState<"free" | "existing" | "buy">(
-    "free",
-  );
+  const [domainMode, setDomainMode] = useState<"free" | "existing" | "buy">("free");
 
   function requiresConnectedDomain(action: string) {
-    toast.info(
-      `${action} becomes available after DNS and HTTPS verification succeeds.`,
-    );
+    toast.info(`${action} becomes available after DNS and HTTPS verification succeeds.`);
   }
 
   return (
@@ -60,19 +56,13 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
               <p className="font-mono text-[10px] uppercase tracking-[.18em] text-neon-cyan">
                 Secure website delivery
               </p>
-              <h2 className="mt-1 text-xl font-semibold">
-                Website Publishing & Domain Center
-              </h2>
+              <h2 className="mt-1 text-xl font-semibold">Website Publishing & Domain Center</h2>
               <p className="mt-2 max-w-3xl text-xs leading-5 text-muted-foreground">
-                Publish {gameName} to a free project address or connect a
-                verified custom domain. A domain is never marked connected until
-                both DNS and HTTPS checks pass.
+                Publish {gameName} to a free project address or connect a verified custom domain. A
+                domain is never marked connected until both DNS and HTTPS checks pass.
               </p>
             </div>
-            <Badge
-              variant="outline"
-              className="w-fit border-warning/40 text-warning"
-            >
+            <Badge variant="outline" className="w-fit border-warning/40 text-warning">
               NOT PUBLISHED
             </Badge>
           </div>
@@ -80,21 +70,9 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
           <div className="grid gap-2 sm:grid-cols-3">
             {(
               [
-                [
-                  "free",
-                  "Free project domain",
-                  "Launch first, connect a custom name later.",
-                ],
-                [
-                  "existing",
-                  "Use existing domain",
-                  "Connect a root domain or subdomain you own.",
-                ],
-                [
-                  "buy",
-                  "Buy a domain",
-                  "Open the guided domain purchase workflow.",
-                ],
+                ["free", "Free project domain", "Launch first, connect a custom name later."],
+                ["existing", "Use existing domain", "Connect a root domain or subdomain you own."],
+                ["buy", "Buy a domain", "Open the guided domain purchase workflow."],
               ] as const
             ).map(([value, label, detail]) => (
               <Button
@@ -105,9 +83,7 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
               >
                 <Globe2 className="mt-0.5 size-4 text-neon-cyan" />
                 <span>
-                  <strong className="block text-xs text-foreground">
-                    {label}
-                  </strong>
+                  <strong className="block text-xs text-foreground">{label}</strong>
                   <span className="mt-1 block text-[10px] leading-4 text-muted-foreground">
                     {detail}
                   </span>
@@ -131,9 +107,7 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
               />
               <Button
                 variant="outline"
-                onClick={() =>
-                  toast.info("DNS instructions prepared for review.")
-                }
+                onClick={() => toast.info("DNS instructions prepared for review.")}
               >
                 <Settings2 /> DNS instructions
               </Button>
@@ -150,17 +124,10 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
             </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-3">
               {verificationChecks.map(({ label, status, icon: Icon }) => (
-                <div
-                  key={label}
-                  className="rounded-xl border border-border bg-canvas/60 p-3"
-                >
+                <div key={label} className="rounded-xl border border-border bg-canvas/60 p-3">
                   <Icon className="size-4 text-muted-foreground" />
-                  <p className="mt-2 text-[10px] text-muted-foreground">
-                    {label}
-                  </p>
-                  <p className="mt-1 text-xs font-medium text-warning">
-                    {status}
-                  </p>
+                  <p className="mt-2 text-[10px] text-muted-foreground">{label}</p>
+                  <p className="mt-1 text-xs font-medium text-warning">{status}</p>
                 </div>
               ))}
             </div>
@@ -178,26 +145,17 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
             </Button>
             <Button
               variant="outline"
-              onClick={() =>
-                toast.info("The latest verified build will be republished.")
-              }
+              onClick={() => toast.info("The latest verified build will be republished.")}
             >
               <RefreshCw /> Republish website
             </Button>
             <Button
               variant="outline"
-              onClick={() =>
-                toast.info(
-                  "Deployment logs will appear after the first deployment.",
-                )
-              }
+              onClick={() => toast.info("Deployment logs will appear after the first deployment.")}
             >
               <History /> Deployment logs
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => requiresConnectedDomain("Set primary domain")}
-            >
+            <Button variant="outline" onClick={() => requiresConnectedDomain("Set primary domain")}>
               <CheckCircle2 /> Set primary domain
             </Button>
             <Button
@@ -227,17 +185,14 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
                   key={feature}
                   className="flex items-start gap-2 text-[11px] leading-5 text-muted-foreground"
                 >
-                  <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-success" />{" "}
-                  {feature}
+                  <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-success" /> {feature}
                 </div>
               ))}
             </div>
             <Button
               variant="outline"
               className="mt-4 w-full"
-              onClick={() =>
-                toast.info("Opening website metadata and branding settings.")
-              }
+              onClick={() => toast.info("Opening website metadata and branding settings.")}
             >
               <ExternalLink /> Website settings
             </Button>
@@ -247,8 +202,8 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
               <Trash2 className="size-4 text-destructive" /> Remove domain
             </div>
             <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
-              Domain removal is disabled until a verified custom domain exists,
-              preventing accidental disruption.
+              Domain removal is disabled until a verified custom domain exists, preventing
+              accidental disruption.
             </p>
             <Button variant="destructive" className="mt-3 w-full" disabled>
               Remove domain

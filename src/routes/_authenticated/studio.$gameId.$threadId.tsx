@@ -5,11 +5,7 @@ import {
   ConversationEmptyState,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import {
-  Message,
-  MessageContent,
-  MessageResponse,
-} from "@/components/ai-elements/message";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
   PromptInput,
   PromptInputFooter,
@@ -70,36 +66,24 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 
-export const Route = createFileRoute(
-  "/_authenticated/studio/$gameId/$threadId",
-)({
+export const Route = createFileRoute("/_authenticated/studio/$gameId/$threadId")({
   component: GameWorkspace,
   head: () => ({
     meta: [
       { title: "Game Workspace | FableForge AI" },
       {
         name: "description",
-        content:
-          "AI-assisted game design, code editing, live preview, and export workspace.",
+        content: "AI-assisted game design, code editing, live preview, and export workspace.",
       },
     ],
   }),
 });
 
-type Workspace = Awaited<
-  ReturnType<ReturnType<typeof useServerFn<typeof getWorkspace>>>
->;
+type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWorkspace>>>>;
 type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
-type StudioTab =
-  | "planner"
-  | "preview"
-  | "models"
-  | "code"
-  | "console"
-  | "export"
-  | "publish";
+type StudioTab = "planner" | "preview" | "models" | "code" | "console" | "export" | "publish";
 type ModelTier = "fast" | "balanced" | "pro" | "comet";
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
@@ -142,8 +126,7 @@ function GameWorkspace() {
   const [selectedFile, setSelectedFile] = useState("");
   const [playing, setPlaying] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>("desktop");
-  const [previewOrientation, setPreviewOrientation] =
-    useState<PreviewOrientation>("landscape");
+  const [previewOrientation, setPreviewOrientation] = useState<PreviewOrientation>("landscape");
   const [previewFullscreen, setPreviewFullscreen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => {
@@ -259,8 +242,7 @@ function ChatWorkspace({
         headers: async () => {
           const { data } = await supabase.auth.getSession();
           const headers = new Headers();
-          if (data.session)
-            headers.set("Authorization", `Bearer ${data.session.access_token}`);
+          if (data.session) headers.set("Authorization", `Bearer ${data.session.access_token}`);
           return headers;
         },
         body: { gameId, threadId, modelTier },
@@ -284,17 +266,13 @@ function ChatWorkspace({
   const [queuedInstructions, setQueuedInstructions] = useState<string[]>([]);
   const isBuilding = status === "submitted" || status === "streaming";
   const activeBuildStep = isBuilding
-    ? Math.min(
-        buildStates.length - 2,
-        Math.max(0, messages.length % (buildStates.length - 1)),
-      )
+    ? Math.min(buildStates.length - 2, Math.max(0, messages.length % (buildStates.length - 1)))
     : -1;
   useEffect(() => {
     textareaRef.current?.focus();
   }, [threadId, textareaRef]);
   const activeFile =
-    workspace.files.find((file) => file.path === selectedFile) ??
-    workspace.files[0];
+    workspace.files.find((file) => file.path === selectedFile) ?? workspace.files[0];
   async function submit(message: { text: string }) {
     if (!message.text.trim()) return;
     if (isBuilding) {
@@ -327,13 +305,9 @@ function ChatWorkspace({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <p className="font-mono text-[10px] font-semibold tracking-wider">
-                FABLE 5 BUILDER
-              </p>
+              <p className="font-mono text-[10px] font-semibold tracking-wider">FABLE 5 BUILDER</p>
               {modelTier === "pro" && (
-                <Badge className="border-neon-pink/30 bg-neon-pink/15 text-neon-pink">
-                  PRO
-                </Badge>
+                <Badge className="border-neon-pink/30 bg-neon-pink/15 text-neon-pink">PRO</Badge>
               )}
             </div>
             <p className="truncate text-[10px] text-success">
@@ -365,8 +339,7 @@ function ChatWorkspace({
             <div className="mb-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-wider">
               <span className="text-neon-cyan">Live build sequence</span>
               <span className="text-muted-foreground">
-                {Math.round(((activeBuildStep + 1) / buildStates.length) * 100)}
-                %
+                {Math.round(((activeBuildStep + 1) / buildStates.length) * 100)}%
               </span>
             </div>
             <div className="mb-3 h-1 overflow-hidden rounded-full bg-muted">
@@ -408,11 +381,7 @@ function ChatWorkspace({
               />
             )}
             {messages.map((message, messageIndex) => (
-              <Message
-                key={message.id}
-                from={message.role}
-                className="animate-fade-in"
-              >
+              <Message key={message.id} from={message.role} className="animate-fade-in">
                 <MessageContent>
                   {message.parts.map((part, index) =>
                     part.type === "text" ? (
@@ -433,9 +402,7 @@ function ChatWorkspace({
                           onClick={() =>
                             action.label === "Preview Game"
                               ? setPlaying(true)
-                              : toast.info(
-                                  `${action.label} is ready for your next instruction`,
-                                )
+                              : toast.info(`${action.label} is ready for your next instruction`)
                           }
                         >
                           <action.icon className="size-3" /> {action.label}
@@ -451,9 +418,7 @@ function ChatWorkspace({
                 <Shimmer>{`${buildStates[activeBuildStep] ?? "Thinking"}…`}</Shimmer>
               </div>
             )}
-            {error && (
-              <p className="text-xs text-destructive">{error.message}</p>
-            )}
+            {error && <p className="text-xs text-destructive">{error.message}</p>}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
@@ -483,9 +448,7 @@ function ChatWorkspace({
             <PromptInputFooter>
               <Select
                 value={modelTier}
-                onValueChange={(value) =>
-                  setModelTier(value as typeof modelTier)
-                }
+                onValueChange={(value) => setModelTier(value as typeof modelTier)}
               >
                 <SelectTrigger className="h-8 w-32 border-0 bg-transparent px-2 text-xs">
                   <SelectValue />
@@ -538,9 +501,7 @@ function ChatWorkspace({
               onClick={() => setPlaying(!playing)}
             >
               {playing ? <RefreshCw /> : <Play />}
-              <span className="hidden sm:inline">
-                {playing ? "Restart" : "Play"}
-              </span>
+              <span className="hidden sm:inline">{playing ? "Restart" : "Play"}</span>
             </Button>
             <Button
               variant={previewDevice === "mobile" ? "secondary" : "ghost"}
@@ -597,22 +558,15 @@ function ChatWorkspace({
                 <p className="font-mono text-[9px] uppercase tracking-[.18em] text-neon-cyan">
                   Dependency-aware production
                 </p>
-                <h2 className="mt-1 text-xl font-semibold">
-                  Advanced project planner
-                </h2>
+                <h2 className="mt-1 text-xl font-semibold">Advanced project planner</h2>
                 <p className="mt-2 max-w-3xl text-xs leading-5 text-muted-foreground">
-                  The project advances through gated stages so architecture,
-                  gameplay, content, networking, optimization, testing, and
-                  export stay connected as the game grows.
+                  The project advances through gated stages so architecture, gameplay, content,
+                  networking, optimization, testing, and export stay connected as the game grows.
                 </p>
               </div>
               <Badge variant="outline">
-                {
-                  workspace.stages.filter(
-                    (stage) => stage.status === "complete",
-                  ).length
-                }{" "}
-                / {workspace.stages.length} STAGES COMPLETE
+                {workspace.stages.filter((stage) => stage.status === "complete").length} /{" "}
+                {workspace.stages.length} STAGES COMPLETE
               </Badge>
             </div>
             <div className="grid gap-2 lg:grid-cols-2">
@@ -628,16 +582,12 @@ function ChatWorkspace({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <h3 className="text-xs font-semibold">{stage.title}</h3>
-                        <Badge
-                          variant="outline"
-                          className="font-mono text-[8px] uppercase"
-                        >
+                        <Badge variant="outline" className="font-mono text-[8px] uppercase">
                           {stage.status.replace("_", " ")}
                         </Badge>
                       </div>
                       <p className="mt-1 truncate text-[10px] text-muted-foreground">
-                        Depends on:{" "}
-                        {stage.dependencies.join(", ") || "No prior stage"}
+                        Depends on: {stage.dependencies.join(", ") || "No prior stage"}
                       </p>
                       <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
                         {stage.deliverables.join(" · ")}
@@ -708,11 +658,7 @@ function ChatWorkspace({
                 <RefreshCw /> {previewOrientation}
               </Button>
               {previewFullscreen && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setPreviewFullscreen(false)}
-                >
+                <Button size="sm" variant="outline" onClick={() => setPreviewFullscreen(false)}>
                   Exit fullscreen
                 </Button>
               )}
@@ -722,9 +668,7 @@ function ChatWorkspace({
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_65%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%)]" />
               <div className="absolute left-5 top-5 flex gap-2">
-                <Badge className="font-mono text-[9px]">
-                  {playing ? "RUNNING" : "READY"}
-                </Badge>
+                <Badge className="font-mono text-[9px]">{playing ? "RUNNING" : "READY"}</Badge>
                 <Badge variant="outline" className="font-mono text-[9px]">
                   60 FPS
                 </Badge>
@@ -738,9 +682,7 @@ function ChatWorkspace({
                     {workspace.game.name}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {playing
-                      ? "Starter scene is running"
-                      : "Press play to enter the starter scene"}
+                    {playing ? "Starter scene is running" : "Press play to enter the starter scene"}
                   </p>
                   {!playing && (
                     <Button
@@ -753,9 +695,7 @@ function ChatWorkspace({
                 </div>
               </div>
               <div className="absolute bottom-5 left-5 right-5 flex justify-between font-mono text-[9px] text-muted-foreground">
-                <span>
-                  {previewDevice === "desktop" ? "WASD · MOVE" : "TOUCH · MOVE"}
-                </span>
+                <span>{previewDevice === "desktop" ? "WASD · MOVE" : "TOUCH · MOVE"}</span>
                 <span>BUILD 0.1.0</span>
               </div>
               {playing && previewDevice !== "desktop" && (
@@ -808,57 +748,42 @@ function ChatWorkspace({
         )}
         {tab === "console" && (
           <div className="flex-1 overflow-auto p-5 font-mono text-xs leading-7">
-            <p className="text-muted-foreground">
-              [forge] project manifest loaded
-            </p>
-            <p className="text-success">
-              [build] 4 files compiled successfully
-            </p>
-            <p className="text-muted-foreground">
-              [preview] waiting for play command
-            </p>
+            <p className="text-muted-foreground">[forge] project manifest loaded</p>
+            <p className="text-success">[build] 4 files compiled successfully</p>
+            <p className="text-muted-foreground">[preview] waiting for play command</p>
           </div>
         )}
-        {tab === "export" && (
-          <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />
-        )}
-        {tab === "publish" && (
-          <WebsitePublishingCenter gameName={workspace.game.name} />
-        )}
+        {tab === "export" && <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />}
+        {tab === "publish" && <WebsitePublishingCenter gameName={workspace.game.name} />}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
-            {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map(
-              (label, index) => (
-                <span
-                  key={label}
-                  className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
-                >
-                  {label.toUpperCase()}
-                </span>
-              ),
-            )}
+            {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
+              <span
+                key={label}
+                className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
+              >
+                {label.toUpperCase()}
+              </span>
+            ))}
             <Button
               size="sm"
               variant="outline"
               className="ml-auto h-7 shrink-0 font-mono text-[9px]"
             >
-              <Wand2 />{" "}
-              <span className="hidden sm:inline">
-                Fix Responsive Design with AI
-              </span>
+              <Wand2 /> <span className="hidden sm:inline">Fix Responsive Design with AI</span>
               <span className="sm:hidden">AI Fix</span>
             </Button>
           </div>
           <div className="space-y-1 p-3 font-mono text-[10px]">
             <p>
               <span className="text-muted-foreground">14:20:04</span>{" "}
-              <span className="text-success">BUILD</span> Starter scene compiled
-              · 18 files · 42 assets
+              <span className="text-success">BUILD</span> Starter scene compiled · 18 files · 42
+              assets
             </p>
             <p>
               <span className="text-muted-foreground">14:20:12</span>{" "}
-              <span className="text-destructive">ERROR</span> Mobile input map
-              needs a touch control binding
+              <span className="text-destructive">ERROR</span> Mobile input map needs a touch control
+              binding
             </p>
             <p className="text-muted-foreground">
               Fable 5 can repair this without changing your game logic.
@@ -869,9 +794,7 @@ function ChatWorkspace({
 
       <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:order-1 xl:flex">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
-          <span className="font-mono text-[10px] tracking-wider">
-            PROJECT / ASSETS
-          </span>{" "}
+          <span className="font-mono text-[10px] tracking-wider">PROJECT / ASSETS</span>{" "}
           <Button variant="ghost" size="icon-sm" className="ml-auto">
             <Plus />
           </Button>
@@ -902,8 +825,7 @@ function ChatWorkspace({
               <ShieldCheck className="size-4 text-neon-cyan" /> AI project scan
             </div>
             <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
-              Architecture scan tracks {workspace.files.length} files,{" "}
-              {workspace.stages.length}
+              Architecture scan tracks {workspace.files.length} files, {workspace.stages.length}
               production stages, dependencies, and checkpoint history.
             </p>
             <Button variant="outline" size="sm" className="mt-3 w-full">

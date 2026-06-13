@@ -73,8 +73,7 @@ export const createGame = createServerFn({ method: "POST" })
       })
       .select()
       .single();
-    if (error || !game)
-      throw new Error(error?.message ?? "Could not create game");
+    if (error || !game) throw new Error(error?.message ?? "Could not create game");
 
     const { data: thread, error: threadError } = await context.supabase
       .from("chat_threads")
@@ -121,37 +120,33 @@ export const createGame = createServerFn({ method: "POST" })
       language: "markdown",
       content: `# Development Roadmap\n\n${developmentStageBlueprint.map((stage, index) => `## ${index + 1}. ${stage.title}\nDependencies: ${stage.dependencies.join(", ") || "None"}\nDeliverables: ${stage.deliverables.join(", ")}\n`).join("\n")}\n## Change policy\nCreate a checkpoint before major refactors, exports, dependency upgrades, world migrations, or changes spanning multiple systems.`,
     };
-    const { error: filesError } = await context.supabase
-      .from("project_files")
-      .insert(
-        [
-          ...fileSeed,
-          designDocument,
-          technicalDocument,
-          architectureDocument,
-          milestoneDocument,
-          exportConfig,
-        ].map((file) => ({
-          ...file,
-          game_id: game.id,
-          owner_id: context.userId,
-        })),
-      );
+    const { error: filesError } = await context.supabase.from("project_files").insert(
+      [
+        ...fileSeed,
+        designDocument,
+        technicalDocument,
+        architectureDocument,
+        milestoneDocument,
+        exportConfig,
+      ].map((file) => ({
+        ...file,
+        game_id: game.id,
+        owner_id: context.userId,
+      })),
+    );
     if (filesError) throw new Error(filesError.message);
-    const { error: stagesError } = await context.supabase
-      .from("development_stages")
-      .insert(
-        developmentStageBlueprint.map((stage, index) => ({
-          game_id: game.id,
-          owner_id: context.userId,
-          stage_key: stage.key,
-          title: stage.title,
-          position: index + 1,
-          status: index === 0 ? "ready" : "planned",
-          dependencies: [...stage.dependencies],
-          deliverables: [...stage.deliverables],
-        })),
-      );
+    const { error: stagesError } = await context.supabase.from("development_stages").insert(
+      developmentStageBlueprint.map((stage, index) => ({
+        game_id: game.id,
+        owner_id: context.userId,
+        stage_key: stage.key,
+        title: stage.title,
+        position: index + 1,
+        status: index === 0 ? "ready" : "planned",
+        dependencies: [...stage.dependencies],
+        deliverables: [...stage.deliverables],
+      })),
+    );
     if (stagesError) throw new Error(stagesError.message);
     const fileManifest = [
       ...fileSeed,
@@ -161,17 +156,14 @@ export const createGame = createServerFn({ method: "POST" })
       milestoneDocument,
       exportConfig,
     ].map((file) => ({ path: file.path, version: 1 }));
-    const { error: checkpointError } = await context.supabase
-      .from("project_checkpoints")
-      .insert({
-        game_id: game.id,
-        owner_id: context.userId,
-        label: "Approved foundation",
-        summary:
-          "Initial game, technical architecture, roadmap, and export requirements approved.",
-        stage_key: "game-planning",
-        file_manifest: fileManifest,
-      });
+    const { error: checkpointError } = await context.supabase.from("project_checkpoints").insert({
+      game_id: game.id,
+      owner_id: context.userId,
+      label: "Approved foundation",
+      summary: "Initial game, technical architecture, roadmap, and export requirements approved.",
+      stage_key: "game-planning",
+      file_manifest: fileManifest,
+    });
     if (checkpointError) throw new Error(checkpointError.message);
     return { gameId: game.id, threadId: thread.id };
   });
@@ -197,8 +189,7 @@ export const createThread = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (error || !thread)
-      throw new Error(error?.message ?? "Could not create build session");
+    if (error || !thread) throw new Error(error?.message ?? "Could not create build session");
     return thread;
   });
 
@@ -210,47 +201,44 @@ export const getWorkspace = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => WorkspaceInput.parse(input))
   .handler(async ({ data, context }) => {
-    const [game, threads, messages, files, stages, checkpoints] =
-      await Promise.all([
-        context.supabase
-          .from("games")
-          .select("*")
-          .eq("id", data.gameId)
-          .eq("owner_id", context.userId)
-          .single(),
-        context.supabase
-          .from("chat_threads")
-          .select("*")
-          .eq("game_id", data.gameId)
-          .eq("owner_id", context.userId)
-          .order("updated_at", { ascending: false }),
-        context.supabase
-          .from("chat_messages")
-          .select("ai_message_id, role, parts")
-          .eq("thread_id", data.threadId)
-          .eq("owner_id", context.userId)
-          .order("created_at"),
-        context.supabase
-          .from("project_files")
-          .select("id, path, content, language, version")
-          .eq("game_id", data.gameId)
-          .eq("owner_id", context.userId)
-          .order("path"),
-        context.supabase
-          .from("development_stages")
-          .select(
-            "id, stage_key, title, position, status, dependencies, deliverables, test_summary",
-          )
-          .eq("game_id", data.gameId)
-          .eq("owner_id", context.userId)
-          .order("position"),
-        context.supabase
-          .from("project_checkpoints")
-          .select("id, label, summary, stage_key, created_at")
-          .eq("game_id", data.gameId)
-          .eq("owner_id", context.userId)
-          .order("created_at", { ascending: false }),
-      ]);
+    const [game, threads, messages, files, stages, checkpoints] = await Promise.all([
+      context.supabase
+        .from("games")
+        .select("*")
+        .eq("id", data.gameId)
+        .eq("owner_id", context.userId)
+        .single(),
+      context.supabase
+        .from("chat_threads")
+        .select("*")
+        .eq("game_id", data.gameId)
+        .eq("owner_id", context.userId)
+        .order("updated_at", { ascending: false }),
+      context.supabase
+        .from("chat_messages")
+        .select("ai_message_id, role, parts")
+        .eq("thread_id", data.threadId)
+        .eq("owner_id", context.userId)
+        .order("created_at"),
+      context.supabase
+        .from("project_files")
+        .select("id, path, content, language, version")
+        .eq("game_id", data.gameId)
+        .eq("owner_id", context.userId)
+        .order("path"),
+      context.supabase
+        .from("development_stages")
+        .select("id, stage_key, title, position, status, dependencies, deliverables, test_summary")
+        .eq("game_id", data.gameId)
+        .eq("owner_id", context.userId)
+        .order("position"),
+      context.supabase
+        .from("project_checkpoints")
+        .select("id, label, summary, stage_key, created_at")
+        .eq("game_id", data.gameId)
+        .eq("owner_id", context.userId)
+        .order("created_at", { ascending: false }),
+    ]);
     for (const result of [game, threads, messages, files, stages, checkpoints])
       if (result.error) throw new Error(result.error.message);
     return {

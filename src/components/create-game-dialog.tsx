@@ -176,9 +176,7 @@ export function CreateGameDialog({
       onOpenChange(false);
       navigate({ to: "/studio/$gameId/$threadId", params: result });
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Build could not start",
-      );
+      toast.error(error instanceof Error ? error.message : "Build could not start");
     } finally {
       setBusy(false);
     }
@@ -231,13 +229,11 @@ export function CreateGameDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="glass-panel max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-5xl overflow-hidden border-border p-0 sm:max-h-[92vh]">
         <DialogHeader className="border-b border-border bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-4 sm:p-6">
-          <p className="font-mono text-xs text-neon-cyan">
-            STANDALONE GAME WIZARD / 0{step}
-          </p>
+          <p className="font-mono text-xs text-neon-cyan">STANDALONE GAME WIZARD / 0{step}</p>
           <DialogTitle className="text-2xl">{titles[step - 1]}</DialogTitle>
           <DialogDescription>
-            FableForge will prepare a professional plan first. Nothing is built
-            until you approve it.
+            FableForge will prepare a professional plan first. Nothing is built until you approve
+            it.
           </DialogDescription>
         </DialogHeader>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:min-h-96 sm:p-6">
@@ -247,9 +243,7 @@ export function CreateGameDialog({
                 <Button
                   key={platform.label}
                   variant="outline"
-                  onClick={() =>
-                    setDraft({ ...draft, platform: platform.label })
-                  }
+                  onClick={() => setDraft({ ...draft, platform: platform.label })}
                   className={choice(draft.platform === platform.label)}
                 >
                   <platform.icon className="size-5 shrink-0 text-neon-cyan" />
@@ -298,9 +292,7 @@ export function CreateGameDialog({
                 GAME IDEA
                 <Input
                   value={draft.description}
-                  onChange={(event) =>
-                    setDraft({ ...draft, description: event.target.value })
-                  }
+                  onChange={(event) => setDraft({ ...draft, description: event.target.value })}
                   placeholder="Describe the world, player fantasy, and main goal…"
                   className="mt-2"
                 />
@@ -312,28 +304,21 @@ export function CreateGameDialog({
                       Website game setup
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Choose the complete player experience before the AI plans
-                      frontend, backend, data, multiplayer, and publishing.
+                      Choose the complete player experience before the AI plans frontend, backend,
+                      data, multiplayer, and publishing.
                     </p>
                   </div>
                   <div>
-                    <p className="mb-2 text-xs font-medium">
-                      SUPPORTED SCREENS
-                    </p>
+                    <p className="mb-2 text-xs font-medium">SUPPORTED SCREENS</p>
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                       {["Mobile", "Tablet", "Desktop"].map((target) => (
                         <Button
                           key={target}
                           variant="outline"
-                          className={choice(
-                            draft.responsiveTargets.includes(target),
-                          )}
+                          className={choice(draft.responsiveTargets.includes(target))}
                           onClick={() => toggleResponsiveTarget(target)}
                         >
-                          {draft.responsiveTargets.includes(target) && (
-                            <Check />
-                          )}{" "}
-                          {target}
+                          {draft.responsiveTargets.includes(target) && <Check />} {target}
                         </Button>
                       ))}
                     </div>
@@ -342,36 +327,22 @@ export function CreateGameDialog({
                     <WizardChoice
                       label="PLAYER ACCESS"
                       value={draft.accountMode}
-                      options={[
-                        "Accounts and guest play",
-                        "Accounts required",
-                        "Guest play only",
-                      ]}
-                      onChange={(accountMode) =>
-                        setDraft({ ...draft, accountMode })
-                      }
+                      options={["Accounts and guest play", "Accounts required", "Guest play only"]}
+                      onChange={(accountMode) => setDraft({ ...draft, accountMode })}
                       choice={choice}
                     />
                     <WizardChoice
                       label="REVENUE"
                       value={draft.revenueModel}
                       options={["None", "Purchases", "Subscriptions", "Ads"]}
-                      onChange={(revenueModel) =>
-                        setDraft({ ...draft, revenueModel })
-                      }
+                      onChange={(revenueModel) => setDraft({ ...draft, revenueModel })}
                       choice={choice}
                     />
                     <WizardChoice
                       label="DOMAIN"
                       value={draft.domainChoice}
-                      options={[
-                        "Free project domain",
-                        "Use my existing domain",
-                        "Buy a domain",
-                      ]}
-                      onChange={(domainChoice) =>
-                        setDraft({ ...draft, domainChoice })
-                      }
+                      options={["Free project domain", "Use my existing domain", "Buy a domain"]}
+                      onChange={(domainChoice) => setDraft({ ...draft, domainChoice })}
                       choice={choice}
                     />
                     <div>
@@ -389,9 +360,7 @@ export function CreateGameDialog({
                             key={field}
                             variant="outline"
                             className={choice(draft[field])}
-                            onClick={() =>
-                              setDraft({ ...draft, [field]: !draft[field] })
-                            }
+                            onClick={() => setDraft({ ...draft, [field]: !draft[field] })}
                           >
                             {draft[field] && <Check />} {label}
                           </Button>
@@ -406,9 +375,7 @@ export function CreateGameDialog({
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <p className="mb-3 text-xs font-medium text-muted-foreground">
-                  PLAY MODE
-                </p>
+                <p className="mb-3 text-xs font-medium text-muted-foreground">PLAY MODE</p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {modes.map((mode) => (
                     <Button
@@ -423,9 +390,7 @@ export function CreateGameDialog({
                 </div>
               </div>
               <div>
-                <p className="mb-3 text-xs font-medium text-muted-foreground">
-                  CONTROLS
-                </p>
+                <p className="mb-3 text-xs font-medium text-muted-foreground">CONTROLS</p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {controls.map((control) => (
                     <Button
@@ -467,9 +432,7 @@ export function CreateGameDialog({
                   className={choice(draft.systems.includes(system))}
                   onClick={() => toggle("systems", system)}
                 >
-                  {draft.systems.includes(system) && (
-                    <Check className="size-4 text-neon-cyan" />
-                  )}
+                  {draft.systems.includes(system) && <Check className="size-4 text-neon-cyan" />}
                   {system}
                 </Button>
               ))}
@@ -487,9 +450,7 @@ export function CreateGameDialog({
                     </p>
                   </div>
                 </div>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  {gdd.world}
-                </p>
+                <p className="text-sm leading-6 text-muted-foreground">{gdd.world}</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <GddItem title="Core gameplay loop" value={gdd.loop} />
@@ -508,9 +469,7 @@ export function CreateGameDialog({
                 />
                 <GddItem
                   title="Game mechanics"
-                  value={
-                    draft.systems.join(", ") || "Core movement and interaction"
-                  }
+                  value={draft.systems.join(", ") || "Core movement and interaction"}
                 />
                 <GddItem title="Controls" value={draft.controls.join(", ")} />
                 <GddItem title="Progression" value={gdd.progression} />
@@ -532,35 +491,25 @@ export function CreateGameDialog({
                 />
               </div>
               <div className="rounded-xl border border-warning/30 bg-warning/10 p-4 text-xs leading-5 text-muted-foreground">
-                <strong className="text-foreground">
-                  Approval checkpoint:
-                </strong>{" "}
-                creating the project generates source, scenes, menus, control
-                maps, save/settings foundations, export configuration, and a
-                versioned design document. Signed Windows, macOS, Android, and
-                iOS packages may still require external compilers, certificates,
-                platform SDKs, and build services; the Export Center will show
-                those requirements honestly.
+                <strong className="text-foreground">Approval checkpoint:</strong> creating the
+                project generates source, scenes, menus, control maps, save/settings foundations,
+                export configuration, and a versioned design document. Signed Windows, macOS,
+                Android, and iOS packages may still require external compilers, certificates,
+                platform SDKs, and build services; the Export Center will show those requirements
+                honestly.
               </div>
             </div>
           )}
         </div>
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 border-t border-border p-3 pb-[max(.75rem,env(safe-area-inset-bottom))] sm:p-4">
-          <Button
-            variant="ghost"
-            disabled={step === 1}
-            onClick={() => setStep(step - 1)}
-          >
+          <Button variant="ghost" disabled={step === 1} onClick={() => setStep(step - 1)}>
             <ArrowLeft /> Back
           </Button>
           <span className="text-center font-mono text-[9px] text-muted-foreground sm:text-[10px]">
             STEP {step} OF 6
           </span>
           {step < 6 ? (
-            <Button
-              disabled={step === 2 && !draft.name.trim()}
-              onClick={() => setStep(step + 1)}
-            >
+            <Button disabled={step === 2 && !draft.name.trim()} onClick={() => setStep(step + 1)}>
               Continue <ArrowRight />
             </Button>
           ) : (
@@ -582,9 +531,7 @@ export function CreateGameDialog({
 function GddItem({ title, value }: { title: string; value: string }) {
   return (
     <div className="rounded-xl border border-border bg-canvas/60 p-4">
-      <p className="font-mono text-[9px] uppercase tracking-wider text-neon-cyan">
-        {title}
-      </p>
+      <p className="font-mono text-[9px] uppercase tracking-wider text-neon-cyan">{title}</p>
       <p className="mt-2 text-xs leading-5 text-muted-foreground">{value}</p>
     </div>
   );
