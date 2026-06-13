@@ -782,6 +782,10 @@ function ChatWorkspace({
               size="sm"
               variant="outline"
               className="ml-auto h-7 shrink-0 font-mono text-[9px]"
+              onClick={() => {
+                setTab("tests");
+                toast.info("Playtest diagnostics opened. Ask Fable to repair any reported issue.");
+              }}
             >
               <Wand2 /> <span className="hidden sm:inline">Fix Responsive Design with AI</span>
               <span className="sm:hidden">AI Fix</span>
@@ -808,7 +812,13 @@ function ChatWorkspace({
       <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:flex">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
           <span className="font-mono text-[10px] tracking-wider">GAME INSPECTOR</span>{" "}
-          <Button variant="ghost" size="icon-sm" className="ml-auto">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="ml-auto"
+              onClick={() => setTab("models")}
+              aria-label="Open asset generator"
+            >
             <Plus />
           </Button>
         </div>
@@ -854,7 +864,12 @@ function ChatWorkspace({
               Architecture scan tracks {workspace.files.length} files, {workspace.stages.length}
               production stages, dependencies, and checkpoint history.
             </p>
-            <Button variant="outline" size="sm" className="mt-3 w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 w-full"
+              onClick={() => setTab("tests")}
+            >
               Run scan
             </Button>
           </div>
