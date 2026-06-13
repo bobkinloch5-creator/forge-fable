@@ -15,6 +15,7 @@ import {
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { TripoModelLab } from "@/components/tripo-model-lab";
 import { DesktopBuildCenter } from "@/components/desktop-build-center";
+import { WebsitePublishingCenter } from "@/components/website-publishing-center";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,7 @@ import {
   Rocket,
   ShieldCheck,
   Smartphone,
+  Tablet,
   Terminal,
   Undo2,
   Wand2,
@@ -79,8 +81,10 @@ export const Route = createFileRoute("/_authenticated/studio/$gameId/$threadId")
 
 type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWorkspace>>>>;
 type ReadyWorkspace = Omit<Workspace, "game"> & { game: NonNullable<Workspace["game"]> };
-type StudioTab = "planner" | "preview" | "models" | "code" | "console" | "export";
+type StudioTab = "planner" | "preview" | "models" | "code" | "console" | "export" | "publish";
 type ModelTier = "fast" | "balanced" | "pro" | "comet";
+type PreviewDevice = "mobile" | "tablet" | "desktop";
+type PreviewOrientation = "portrait" | "landscape";
 
 const buildStates = [
   "Planning",
@@ -119,6 +123,9 @@ function GameWorkspace() {
   const [modelTier, setModelTier] = useState<ModelTier>("balanced");
   const [selectedFile, setSelectedFile] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<PreviewDevice>("desktop");
+  const [previewOrientation, setPreviewOrientation] = useState<PreviewOrientation>("landscape");
+  const [previewFullscreen, setPreviewFullscreen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => {
     fetchWorkspace({ data: { gameId, threadId } })
@@ -166,6 +173,12 @@ function GameWorkspace() {
           setSelectedFile,
           playing,
           setPlaying,
+           previewDevice,
+           setPreviewDevice,
+           previewOrientation,
+           setPreviewOrientation,
+           previewFullscreen,
+           setPreviewFullscreen,
           textareaRef,
           addThread,
           navigate,
@@ -188,6 +201,12 @@ function ChatWorkspace({
   setSelectedFile,
   playing,
   setPlaying,
+  previewDevice,
+  setPreviewDevice,
+  previewOrientation,
+  setPreviewOrientation,
+  previewFullscreen,
+  setPreviewFullscreen,
   textareaRef,
   addThread,
   navigate,
@@ -204,6 +223,12 @@ function ChatWorkspace({
   setSelectedFile: Dispatch<SetStateAction<string>>;
   playing: boolean;
   setPlaying: Dispatch<SetStateAction<boolean>>;
+  previewDevice: PreviewDevice;
+  setPreviewDevice: Dispatch<SetStateAction<PreviewDevice>>;
+  previewOrientation: PreviewOrientation;
+  setPreviewOrientation: Dispatch<SetStateAction<PreviewOrientation>>;
+  previewFullscreen: boolean;
+  setPreviewFullscreen: Dispatch<SetStateAction<boolean>>;
   textareaRef: RefObject<HTMLTextAreaElement | null>;
   addThread: (options: { data: { gameId: string } }) => Promise<{ id: string }>;
   navigate: ReturnType<typeof useNavigate>;
@@ -262,7 +287,7 @@ function ChatWorkspace({
     navigate({ to: "/studio/$gameId/$threadId", params: { gameId, threadId: thread.id } });
   }
   return (
-    <div className="grid h-[calc(100vh-4.5rem)] min-h-[640px] grid-cols-1 grid-rows-[minmax(340px,50vh)_1fr] gap-2 overflow-hidden p-2 xl:grid-cols-[244px_minmax(480px,1fr)_380px] xl:grid-rows-1">
+    <div className="grid min-h-[calc(100dvh-4.5rem)] grid-cols-1 gap-2 overflow-x-hidden p-2 pb-[max(.5rem,env(safe-area-inset-bottom))] md:h-[calc(100dvh-4.5rem)] md:grid-rows-[minmax(360px,1.2fr)_minmax(340px,1fr)] md:overflow-hidden xl:grid-cols-[244px_minmax(480px,1fr)_380px] xl:grid-rows-1">
       <section className="glass-panel order-2 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-3">
         <div className="flex items-center gap-2 border-b border-border/60 bg-linear-to-r from-primary/10 via-neon-violet/5 to-transparent p-3">
           <div className="relative">
@@ -438,8 +463,8 @@ function ChatWorkspace({
       </section>
 
       <section className="glass-panel order-1 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-2">
-        <div className="flex h-12 items-center border-b border-border/60 bg-panel/80 px-2">
-          <div className="flex gap-1">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center border-b border-border/60 bg-panel/80 px-2 py-1">
+          <div className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain">
             {(
               [
                 { id: "planner", label: "Production Plan", icon: History },
@@ -448,6 +473,7 @@ function ChatWorkspace({
                 { id: "code", label: "Code Editor", icon: Code2 },
                 { id: "console", label: "Console", icon: Terminal },
                 { id: "export", label: "Export Center", icon: PackageOpen },
+                { id: "publish", label: "Website Publishing", icon: Globe2 },
               ] as const
             ).map((item) => (
               <Button
@@ -461,7 +487,7 @@ function ChatWorkspace({
               </Button>
             ))}
           </div>
-          <div className="ml-auto flex gap-1">
+          <div className="ml-1 flex shrink-0 gap-1">
             <Button
               variant={playing ? "secondary" : "ghost"}
               size="sm"
@@ -470,13 +496,16 @@ function ChatWorkspace({
               {playing ? <RefreshCw /> : <Play />}
               <span className="hidden sm:inline">{playing ? "Restart" : "Play"}</span>
             </Button>
-            <Button variant="ghost" size="icon-sm">
+            <Button variant={previewDevice === "mobile" ? "secondary" : "ghost"} size="icon-sm" onClick={() => { setTab("preview"); setPreviewDevice("mobile"); }} aria-label="Mobile phone preview">
               <Smartphone />
             </Button>
-            <Button variant="ghost" size="icon-sm">
+            <Button variant={previewDevice === "tablet" ? "secondary" : "ghost"} size="icon-sm" className="hidden sm:inline-flex" onClick={() => { setTab("preview"); setPreviewDevice("tablet"); }} aria-label="Tablet preview">
+              <Tablet />
+            </Button>
+            <Button variant={previewDevice === "desktop" ? "secondary" : "ghost"} size="icon-sm" className="hidden sm:inline-flex" onClick={() => { setTab("preview"); setPreviewDevice("desktop"); }} aria-label="Desktop preview">
               <Monitor />
             </Button>
-            <Button variant="ghost" size="icon-sm">
+            <Button variant={previewFullscreen ? "secondary" : "ghost"} size="icon-sm" onClick={() => { setTab("preview"); setPreviewFullscreen((value) => !value); }} aria-label="Fullscreen preview">
               <Maximize2 />
             </Button>
           </div>
@@ -552,11 +581,22 @@ function ChatWorkspace({
           </div>
         )}
         {tab === "preview" && (
-          <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
+          <div className={`panel-grid relative flex flex-1 flex-col items-center justify-center overflow-auto p-3 sm:p-5 ${previewFullscreen ? "fixed inset-0 z-[80] bg-background" : ""}`}>
             <div className="aurora-orb pointer-events-none absolute -left-28 top-0 size-80 rounded-full bg-neon-violet/12 blur-3xl" />
             <div className="aurora-orb pointer-events-none absolute -bottom-32 right-0 size-96 rounded-full bg-neon-cyan/10 blur-3xl [animation-delay:-6s]" />
+            <div className="relative z-10 mb-3 flex max-w-full flex-wrap items-center justify-center gap-1 rounded-xl border border-border bg-panel/90 p-1.5">
+              {([ ["mobile", Smartphone], ["tablet", Tablet], ["desktop", Monitor] ] as const).map(([device, Icon]) => (
+                <Button key={device} size="sm" variant={previewDevice === device ? "secondary" : "ghost"} onClick={() => setPreviewDevice(device)} className="min-h-10 capitalize">
+                  <Icon /> {device}
+                </Button>
+              ))}
+              <Button size="sm" variant="ghost" onClick={() => setPreviewOrientation((value) => value === "portrait" ? "landscape" : "portrait")} className="min-h-10">
+                <RefreshCw /> {previewOrientation}
+              </Button>
+              {previewFullscreen && <Button size="sm" variant="outline" onClick={() => setPreviewFullscreen(false)}>Exit fullscreen</Button>}
+            </div>
             <div
-              className={`spectrum-border relative aspect-video w-full max-w-6xl overflow-hidden rounded-2xl bg-panel shadow-2xl transition-all duration-500 ${playing ? "forge-glow scale-[1.005]" : ""}`}
+              className={`spectrum-border relative shrink-0 overflow-hidden rounded-2xl bg-panel shadow-2xl transition-all duration-500 ${playing ? "forge-glow" : ""} ${previewDevice === "mobile" ? previewOrientation === "portrait" ? "aspect-[9/16] h-[min(62dvh,680px)]" : "aspect-video w-[min(92vw,760px)]" : previewDevice === "tablet" ? previewOrientation === "portrait" ? "aspect-[3/4] h-[min(62dvh,760px)]" : "aspect-[4/3] w-[min(92vw,920px)]" : "aspect-video w-full max-w-6xl"}`}
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_65%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%)]" />
               <div className="absolute left-5 top-5 flex gap-2">
@@ -568,9 +608,9 @@ function ChatWorkspace({
               <div className="absolute inset-0 grid place-items-center text-center">
                 <div>
                   <BrandMark
-                    className={`mx-auto size-32 ${playing ? "animate-pulse" : "opacity-40 grayscale"}`}
+                    className={`mx-auto size-16 sm:size-24 lg:size-32 ${playing ? "animate-pulse" : "opacity-40 grayscale"}`}
                   />
-                  <h3 className="mt-3 font-mono text-2xl font-semibold uppercase tracking-[.14em]">
+                  <h3 className="mt-3 px-4 font-mono text-base font-semibold uppercase tracking-[.08em] sm:text-2xl sm:tracking-[.14em]">
                     {workspace.game.name}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -587,9 +627,15 @@ function ChatWorkspace({
                 </div>
               </div>
               <div className="absolute bottom-5 left-5 right-5 flex justify-between font-mono text-[9px] text-muted-foreground">
-                <span>WASD · MOVE</span>
+                <span>{previewDevice === "desktop" ? "WASD · MOVE" : "TOUCH · MOVE"}</span>
                 <span>BUILD 0.1.0</span>
               </div>
+              {playing && previewDevice !== "desktop" && (
+                <div className="absolute inset-x-4 bottom-10 flex items-end justify-between" aria-label="Touch game controls">
+                  <Button variant="outline" size="icon" className="size-14 rounded-full bg-background/60 backdrop-blur">◎</Button>
+                  <div className="flex gap-2"><Button variant="outline" size="icon" className="size-12 rounded-full bg-background/60">A</Button><Button variant="outline" size="icon" className="size-12 rounded-full bg-background/60">B</Button></div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -616,6 +662,7 @@ function ChatWorkspace({
           </div>
         )}
         {tab === "export" && <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />}
+        {tab === "publish" && <WebsitePublishingCenter gameName={workspace.game.name} />}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
             {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
@@ -626,8 +673,8 @@ function ChatWorkspace({
                 {label.toUpperCase()}
               </span>
             ))}
-            <Button size="sm" variant="outline" className="ml-auto h-6 font-mono text-[9px]">
-              <Wand2 /> Fix with AI
+            <Button size="sm" variant="outline" className="ml-auto h-7 shrink-0 font-mono text-[9px]">
+              <Wand2 /> <span className="hidden sm:inline">Fix Responsive Design with AI</span><span className="sm:hidden">AI Fix</span>
             </Button>
           </div>
           <div className="space-y-1 p-3 font-mono text-[10px]">
