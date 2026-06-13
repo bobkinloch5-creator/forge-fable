@@ -17,6 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const publishingFeatures = [
@@ -26,6 +27,12 @@ const publishingFeatures = [
   "Analytics and maintenance mode",
   "Automatic HTTPS after verification",
   "Deployment history and rollback",
+];
+
+const verificationChecks: Array<{ label: string; status: string; icon: LucideIcon }> = [
+  { label: "Domain ownership", status: "Waiting", icon: Globe2 },
+  { label: "DNS records", status: "Not checked", icon: Activity },
+  { label: "HTTPS certificate", status: "Not issued", icon: LockKeyhole },
 ];
 
 export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
@@ -101,12 +108,8 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
               </Button>
             </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {[
-                ["Domain ownership", "Waiting", Globe2],
-                ["DNS records", "Not checked", Activity],
-                ["HTTPS certificate", "Not issued", LockKeyhole],
-              ].map(([label, status, Icon]) => (
-                <div key={String(label)} className="rounded-xl border border-border bg-canvas/60 p-3">
+              {verificationChecks.map(({ label, status, icon: Icon }) => (
+                <div key={label} className="rounded-xl border border-border bg-canvas/60 p-3">
                   <Icon className="size-4 text-muted-foreground" />
                   <p className="mt-2 text-[10px] text-muted-foreground">{label}</p>
                   <p className="mt-1 text-xs font-medium text-warning">{status}</p>
