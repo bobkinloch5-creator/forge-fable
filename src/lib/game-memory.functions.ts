@@ -27,7 +27,7 @@ const MemoryInput = z.object({
 
 export const getGameMemory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => GameIdInput.parse(input))
+  .validator((input: unknown) => GameIdInput.parse(input))
   .handler(async ({ data, context }) => {
     const { data: memory, error } = await context.supabase
       .from("game_memory")
@@ -42,7 +42,7 @@ export const getGameMemory = createServerFn({ method: "POST" })
 
 export const saveGameMemory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => MemoryInput.parse(input))
+  .validator((input: unknown) => MemoryInput.parse(input))
   .handler(async ({ data, context }) => {
     const { data: game } = await context.supabase
       .from("games")

@@ -66,13 +66,17 @@ export function CreateGameDialog({
   }, [initialIdea, initialPlatform, open]);
 
   async function finish() {
-    if (!draft.name || !draft.description) {
+    const name = draft.name.trim();
+    const description = draft.description.trim();
+    if (!name || !description) {
       toast.error("Please provide a name and description");
       return;
     }
     setBusy(true);
     try {
-      const result = await create({ data: draft });
+      const result = await create({
+        data: { ...draft, name, description, playerMode: "single" },
+      });
       onOpenChange(false);
       navigate({ to: "/studio/$gameId/$threadId", params: result });
     } catch (error) {
@@ -143,6 +147,7 @@ export function CreateGameDialog({
                 value={draft.name}
                 onChange={(e) => setDraft({ ...draft, name: e.target.value })}
                 placeholder="My Awesome Game"
+                maxLength={80}
                 className="h-11"
               />
             </div>
@@ -156,6 +161,7 @@ export function CreateGameDialog({
               value={draft.description}
               onChange={(e) => setDraft({ ...draft, description: e.target.value })}
               placeholder="Describe your game idea, world, and what makes it fun..."
+              maxLength={500}
               className="min-h-32 leading-relaxed"
             />
           </div>
@@ -171,7 +177,7 @@ export function CreateGameDialog({
           </Button>
           <Button
             onClick={finish}
-            disabled={busy || !draft.name || !draft.description}
+            disabled={busy || !draft.name.trim() || !draft.description.trim()}
             className="bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_20px_color-mix(in_oklab,var(--primary)_30%,transparent)]"
           >
             {busy ? "Creating workspace…" : "Create project"}

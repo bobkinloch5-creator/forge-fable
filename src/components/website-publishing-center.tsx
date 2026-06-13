@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Activity,
+  AlertTriangle,
   ArrowRightLeft,
   CheckCircle2,
   CloudUpload,
@@ -18,7 +19,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { toast } from "sonner";
 
 const publishingFeatures = [
   "Custom title and SEO description",
@@ -41,11 +41,7 @@ const verificationChecks: Array<{
 
 export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
   const [domain, setDomain] = useState("");
-  const [domainMode, setDomainMode] = useState<"free" | "existing" | "buy">("free");
-
-  function requiresConnectedDomain(action: string) {
-    toast.info(`${action} becomes available after DNS and HTTPS verification succeeds.`);
-  }
+  const [domainMode] = useState<"free" | "existing" | "buy">("free");
 
   return (
     <div className="min-h-0 flex-1 overflow-auto p-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6">
@@ -63,8 +59,19 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
               </p>
             </div>
             <Badge variant="outline" className="w-fit border-warning/40 text-warning">
-              NOT PUBLISHED
+              SETUP REQUIRED
             </Badge>
+          </div>
+
+          <div className="flex items-start gap-3 rounded-2xl border border-warning/30 bg-warning/10 p-4 text-xs leading-5">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" />
+            <div>
+              <strong className="text-foreground">Publishing is not connected.</strong>
+              <p className="mt-1 text-muted-foreground">
+                A production deployment provider, domain API, and release-status database must be
+                configured before these controls can perform real work.
+              </p>
+            </div>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-3">
@@ -78,7 +85,7 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
               <Button
                 key={value}
                 variant="outline"
-                onClick={() => setDomainMode(value)}
+                disabled
                 className={`h-auto min-h-20 items-start justify-start whitespace-normal p-3 text-left ${domainMode === value ? "spectrum-border bg-primary/10" : "bg-panel/60"}`}
               >
                 <Globe2 className="mt-0.5 size-4 text-neon-cyan" />
@@ -104,21 +111,12 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
                 placeholder="play.mygame.com"
                 inputMode="url"
                 aria-label="Domain or subdomain"
+                disabled
               />
-              <Button
-                variant="outline"
-                onClick={() => toast.info("DNS instructions prepared for review.")}
-              >
+              <Button variant="outline" disabled>
                 <Settings2 /> DNS instructions
               </Button>
-              <Button
-                disabled={!domain}
-                onClick={() =>
-                  toast.info(
-                    "DNS and HTTPS verification started. No connection status has been changed yet.",
-                  )
-                }
-              >
+              <Button disabled>
                 <RefreshCw /> Check connection
               </Button>
             </div>
@@ -134,40 +132,22 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            <Button
-              onClick={() =>
-                toast.info(
-                  "A production deployment will start only after the project passes its release checks.",
-                )
-              }
-            >
+            <Button disabled>
               <CloudUpload /> Publish website game
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => toast.info("The latest verified build will be republished.")}
-            >
+            <Button variant="outline" disabled>
               <RefreshCw /> Republish website
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => toast.info("Deployment logs will appear after the first deployment.")}
-            >
+            <Button variant="outline" disabled>
               <History /> Deployment logs
             </Button>
-            <Button variant="outline" onClick={() => requiresConnectedDomain("Set primary domain")}>
+            <Button variant="outline" disabled>
               <CheckCircle2 /> Set primary domain
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => requiresConnectedDomain("Redirect management")}
-            >
+            <Button variant="outline" disabled>
               <ArrowRightLeft /> Add redirects
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => requiresConnectedDomain("Deployment rollback")}
-            >
+            <Button variant="outline" disabled>
               <RotateCcw /> Roll back deployment
             </Button>
           </div>
@@ -185,15 +165,11 @@ export function WebsitePublishingCenter({ gameName }: { gameName: string }) {
                   key={feature}
                   className="flex items-start gap-2 text-[11px] leading-5 text-muted-foreground"
                 >
-                  <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-success" /> {feature}
+                  <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-warning" /> {feature}
                 </div>
               ))}
             </div>
-            <Button
-              variant="outline"
-              className="mt-4 w-full"
-              onClick={() => toast.info("Opening website metadata and branding settings.")}
-            >
+            <Button variant="outline" className="mt-4 w-full" disabled>
               <ExternalLink /> Website settings
             </Button>
           </div>

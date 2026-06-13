@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { KeyRound } from "lucide-react";
@@ -39,17 +40,23 @@ function ResetPasswordPage() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (busy) return;
     if (password !== confirmPassword) return toast.error("Passwords do not match.");
     setBusy(true);
-    const { error } = await supabase.auth.updateUser({ password });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("Password updated. You can continue to your studio.");
-    navigate({ to: "/studio", replace: true });
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) return toast.error(error.message);
+      toast.success("Password updated. You can continue to your studio.");
+      navigate({ to: "/studio", replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Password could not be updated");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <main className="grid min-h-screen place-items-center px-6 py-12">
+    <main id="main-content" className="grid min-h-screen place-items-center px-6 py-12">
       <section className="glass-panel spectrum-border w-full max-w-md rounded-2xl p-7">
         <div className="mb-6 inline-flex size-11 items-center justify-center rounded-xl bg-secondary">
           <KeyRound className="size-5 text-primary" />
@@ -60,7 +67,9 @@ function ResetPasswordPage() {
         </p>
         {ready ? (
           <form onSubmit={submit} className="mt-7 space-y-4">
+            <Label htmlFor="new-password">New password</Label>
             <Input
+              id="new-password"
               type="password"
               required
               minLength={8}
@@ -70,16 +79,20 @@ function ResetPasswordPage() {
               placeholder="New password"
               className="h-11"
             />
-            <Input
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              placeholder="Confirm new password"
-              className="h-11"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">Confirm new password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                required
+                minLength={8}
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                placeholder="Confirm new password"
+                className="h-11"
+              />
+            </div>
             <Button disabled={busy} className="h-11 w-full">
               {busy ? "Updating…" : "Update password"}
             </Button>

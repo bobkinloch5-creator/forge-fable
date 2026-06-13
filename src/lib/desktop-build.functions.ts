@@ -13,7 +13,7 @@ async function hashToken(token: string) {
 
 export const connectDesktopBuildAgent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         name: z.string().min(1).max(80),
@@ -41,7 +41,7 @@ export const connectDesktopBuildAgent = createServerFn({ method: "POST" })
 const StateInput = z.object({ gameId: z.string().uuid() });
 export const getDesktopBuildState = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => StateInput.parse(input))
+  .validator((input: unknown) => StateInput.parse(input))
   .handler(async ({ data, context }) => {
     const [agents, jobs, artifacts] = await Promise.all([
       context.supabase
@@ -71,7 +71,7 @@ export const getDesktopBuildState = createServerFn({ method: "POST" })
 
 export const createDesktopBuild = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         gameId: z.string().uuid(),
@@ -118,9 +118,9 @@ export const createDesktopBuild = createServerFn({ method: "POST" })
 
 export const retryDesktopBuild = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ jobId: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ jobId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase
+    const { data: retriedJob, error } = await context.supabase
       .from("desktop_build_jobs")
       .update({
         status: "queued",
@@ -130,14 +130,17 @@ export const retryDesktopBuild = createServerFn({ method: "POST" })
       })
       .eq("id", data.jobId)
       .eq("owner_id", context.userId)
-      .in("status", ["failed", "additional_tools_required"]);
+      .in("status", ["failed", "additional_tools_required"])
+      .select("id")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    if (!retriedJob) throw new Error("This build cannot be retried in its current state");
     return { ok: true };
   });
 
 export const getDesktopArtifactDownload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ artifactId: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ artifactId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: artifact, error } = await context.supabase
       .from("desktop_build_artifacts")

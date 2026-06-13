@@ -174,10 +174,10 @@ export const fileSeed = [
 ];
 
 export const workspaceNav = [
-  { label: "Projects", icon: Gamepad2 },
-  { label: "Templates", icon: Blocks },
-  { label: "Assets", icon: Box },
-  { label: "AI Models", icon: Bot },
+  { label: "Projects", icon: Gamepad2, sectionId: "projects" },
+  { label: "Templates", icon: Blocks, sectionId: "templates" },
+  { label: "Assets", icon: Box, sectionId: "assets" },
+  { label: "AI Models", icon: Bot, sectionId: "ai-models" },
 ];
 
 export const developmentStageBlueprint = [

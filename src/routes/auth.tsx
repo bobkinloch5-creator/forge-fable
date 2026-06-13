@@ -1,6 +1,7 @@
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -31,44 +32,64 @@ function AuthPage() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (busy) return;
     setBusy(true);
-    if (recovery) {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+    try {
+      if (recovery) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) return toast.error(error.message);
+        toast.success("Password reset link sent. Check your email.");
+        return;
+      }
+      const normalizedEmail = email.trim();
+      const result =
+        mode === "signin"
+          ? await supabase.auth.signInWithPassword({ email: normalizedEmail, password })
+          : await supabase.auth.signUp({
+              email: normalizedEmail,
+              password,
+              options: {
+                data: { display_name: normalizedEmail.split("@")[0] },
+                emailRedirectTo: `${window.location.origin}/studio`,
+              },
+            });
+      if (result.error) return toast.error(result.error.message);
+      if (mode === "signup" && !result.data.session) {
+        toast.success("Check your email to confirm your account.");
+        return;
+      }
+      navigate({ to: "/studio" });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Authentication is temporarily unavailable",
+      );
+    } finally {
       setBusy(false);
-      if (error) return toast.error(error.message);
-      toast.success("Password reset link sent. Check your email.");
-      return;
     }
-    const result =
-      mode === "signin"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: { display_name: email.split("@")[0] },
-              emailRedirectTo: `${window.location.origin}/studio`,
-            },
-          });
-    setBusy(false);
-    if (result.error) return toast.error(result.error.message);
-    if (mode === "signup" && !result.data.session)
-      return toast.success("Check your email to confirm your account.");
-    navigate({ to: "/studio" });
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/studio`,
-    });
-    if (result.error) toast.error(result.error.message);
-    else if (!result.redirected) navigate({ to: "/studio", replace: true });
+    if (busy) return;
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: `${window.location.origin}/studio`,
+      });
+      if (result.error) toast.error(result.error.message);
+      else if (!result.redirected) navigate({ to: "/studio", replace: true });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Google sign-in is temporarily unavailable",
+      );
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <main className="grid min-h-screen lg:grid-cols-[1.05fr_.95fr]">
+    <main id="main-content" className="grid min-h-screen lg:grid-cols-[1.05fr_.95fr]">
       <section className="relative hidden overflow-hidden border-r border-border bg-canvas p-12 lg:flex lg:flex-col lg:justify-between">
         <div className="panel-grid absolute inset-0 opacity-20" />
         <div className="relative flex items-center gap-3">
@@ -112,7 +133,13 @@ function AuthPage() {
               Your projects, files, and build sessions sync securely.
             </p>
           </div>
-          <Button variant="outline" className="h-11 w-full" onClick={google}>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 w-full"
+            onClick={google}
+            disabled={busy}
+          >
             <Globe2 /> Continue with Google
           </Button>
           <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
@@ -121,25 +148,32 @@ function AuthPage() {
             <span className="h-px flex-1 bg-border" />
           </div>
           <form onSubmit={submit} className="space-y-4">
+            <Label htmlFor="auth-email">Email address</Label>
             <Input
+              id="auth-email"
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@studio.com"
               className="h-11"
             />
             {!recovery && (
-              <Input
-                type="password"
-                required
-                minLength={8}
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="h-11"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="auth-password">Password</Label>
+                <Input
+                  id="auth-password"
+                  type="password"
+                  required
+                  minLength={8}
+                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="h-11"
+                />
+              </div>
             )}
             <Button disabled={busy} className="h-11 w-full">
               {busy
@@ -156,6 +190,7 @@ function AuthPage() {
             {mode === "signin" && !recovery && (
               <Button
                 variant="link"
+                type="button"
                 className="w-full text-muted-foreground"
                 onClick={() => setRecovery(true)}
               >
@@ -164,6 +199,7 @@ function AuthPage() {
             )}
             <Button
               variant="link"
+              type="button"
               className="w-full text-muted-foreground"
               onClick={() => {
                 if (recovery) {

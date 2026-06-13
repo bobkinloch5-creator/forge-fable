@@ -1,1048 +1,1087 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
+    PostgrestVersion: "14.5";
+  };
   public: {
     Tables: {
       change_proposals: {
         Row: {
-          affected_systems: string[]
-          applied_at: string | null
-          changes: Json
-          created_at: string
-          decided_at: string | null
-          dependencies: string[]
-          error_message: string
-          game_id: string
-          id: string
-          owner_id: string
-          risk_level: string
-          risks: string[]
-          status: string
-          summary: string
-          test_plan: string[]
-          thread_id: string | null
-          title: string
-          updated_at: string
-        }
+          affected_systems: string[];
+          applied_at: string | null;
+          changes: Json;
+          created_at: string;
+          decided_at: string | null;
+          dependencies: string[];
+          error_message: string;
+          game_id: string;
+          id: string;
+          owner_id: string;
+          risk_level: string;
+          risks: string[];
+          status: string;
+          summary: string;
+          test_plan: string[];
+          thread_id: string | null;
+          title: string;
+          updated_at: string;
+        };
         Insert: {
-          affected_systems?: string[]
-          applied_at?: string | null
-          changes?: Json
-          created_at?: string
-          decided_at?: string | null
-          dependencies?: string[]
-          error_message?: string
-          game_id: string
-          id?: string
-          owner_id: string
-          risk_level?: string
-          risks?: string[]
-          status?: string
-          summary?: string
-          test_plan?: string[]
-          thread_id?: string | null
-          title: string
-          updated_at?: string
-        }
+          affected_systems?: string[];
+          applied_at?: string | null;
+          changes?: Json;
+          created_at?: string;
+          decided_at?: string | null;
+          dependencies?: string[];
+          error_message?: string;
+          game_id: string;
+          id?: string;
+          owner_id: string;
+          risk_level?: string;
+          risks?: string[];
+          status?: string;
+          summary?: string;
+          test_plan?: string[];
+          thread_id?: string | null;
+          title: string;
+          updated_at?: string;
+        };
         Update: {
-          affected_systems?: string[]
-          applied_at?: string | null
-          changes?: Json
-          created_at?: string
-          decided_at?: string | null
-          dependencies?: string[]
-          error_message?: string
-          game_id?: string
-          id?: string
-          owner_id?: string
-          risk_level?: string
-          risks?: string[]
-          status?: string
-          summary?: string
-          test_plan?: string[]
-          thread_id?: string | null
-          title?: string
-          updated_at?: string
-        }
+          affected_systems?: string[];
+          applied_at?: string | null;
+          changes?: Json;
+          created_at?: string;
+          decided_at?: string | null;
+          dependencies?: string[];
+          error_message?: string;
+          game_id?: string;
+          id?: string;
+          owner_id?: string;
+          risk_level?: string;
+          risks?: string[];
+          status?: string;
+          summary?: string;
+          test_plan?: string[];
+          thread_id?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "change_proposals_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "change_proposals_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "change_proposals_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "chat_threads"
-            referencedColumns: ["id"]
+            foreignKeyName: "change_proposals_thread_id_fkey";
+            columns: ["thread_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_threads";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
+      credit_transactions: {
+        Row: {
+          created_at: string;
+          debited_amount: number;
+          id: string;
+          operation_key: string;
+          refunded_at: string | null;
+          requested_amount: number;
+          status: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          debited_amount: number;
+          id?: string;
+          operation_key: string;
+          refunded_at?: string | null;
+          requested_amount: number;
+          status?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          debited_amount?: number;
+          id?: string;
+          operation_key?: string;
+          refunded_at?: string | null;
+          requested_amount?: number;
+          status?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       chat_messages: {
         Row: {
-          ai_message_id: string | null
-          created_at: string
-          id: string
-          owner_id: string
-          parts: Json
-          role: string
-          thread_id: string
-        }
+          ai_message_id: string | null;
+          created_at: string;
+          id: string;
+          owner_id: string;
+          parts: Json;
+          role: string;
+          thread_id: string;
+        };
         Insert: {
-          ai_message_id?: string | null
-          created_at?: string
-          id?: string
-          owner_id: string
-          parts?: Json
-          role: string
-          thread_id: string
-        }
+          ai_message_id?: string | null;
+          created_at?: string;
+          id?: string;
+          owner_id: string;
+          parts?: Json;
+          role: string;
+          thread_id: string;
+        };
         Update: {
-          ai_message_id?: string | null
-          created_at?: string
-          id?: string
-          owner_id?: string
-          parts?: Json
-          role?: string
-          thread_id?: string
-        }
+          ai_message_id?: string | null;
+          created_at?: string;
+          id?: string;
+          owner_id?: string;
+          parts?: Json;
+          role?: string;
+          thread_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "chat_messages_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "chat_threads"
-            referencedColumns: ["id"]
+            foreignKeyName: "chat_messages_thread_id_fkey";
+            columns: ["thread_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_threads";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       chat_threads: {
         Row: {
-          created_at: string
-          game_id: string
-          id: string
-          owner_id: string
-          title: string
-          updated_at: string
-        }
+          created_at: string;
+          game_id: string;
+          id: string;
+          owner_id: string;
+          title: string;
+          updated_at: string;
+        };
         Insert: {
-          created_at?: string
-          game_id: string
-          id?: string
-          owner_id: string
-          title?: string
-          updated_at?: string
-        }
+          created_at?: string;
+          game_id: string;
+          id?: string;
+          owner_id: string;
+          title?: string;
+          updated_at?: string;
+        };
         Update: {
-          created_at?: string
-          game_id?: string
-          id?: string
-          owner_id?: string
-          title?: string
-          updated_at?: string
-        }
+          created_at?: string;
+          game_id?: string;
+          id?: string;
+          owner_id?: string;
+          title?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "chat_threads_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "chat_threads_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       desktop_build_agents: {
         Row: {
-          created_at: string
-          godot_version: string
-          id: string
-          last_seen_at: string | null
-          name: string
-          owner_id: string
-          status: string
-          supported_platforms: string[]
-          token_hash: string
-          updated_at: string
-        }
+          created_at: string;
+          godot_version: string;
+          id: string;
+          last_seen_at: string | null;
+          name: string;
+          owner_id: string;
+          status: string;
+          supported_platforms: string[];
+          token_hash: string;
+          updated_at: string;
+        };
         Insert: {
-          created_at?: string
-          godot_version?: string
-          id?: string
-          last_seen_at?: string | null
-          name: string
-          owner_id: string
-          status?: string
-          supported_platforms?: string[]
-          token_hash: string
-          updated_at?: string
-        }
+          created_at?: string;
+          godot_version?: string;
+          id?: string;
+          last_seen_at?: string | null;
+          name: string;
+          owner_id: string;
+          status?: string;
+          supported_platforms?: string[];
+          token_hash: string;
+          updated_at?: string;
+        };
         Update: {
-          created_at?: string
-          godot_version?: string
-          id?: string
-          last_seen_at?: string | null
-          name?: string
-          owner_id?: string
-          status?: string
-          supported_platforms?: string[]
-          token_hash?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          godot_version?: string;
+          id?: string;
+          last_seen_at?: string | null;
+          name?: string;
+          owner_id?: string;
+          status?: string;
+          supported_platforms?: string[];
+          token_hash?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       desktop_build_artifacts: {
         Row: {
-          artifact_type: string
-          checksum_sha256: string
-          created_at: string
-          file_name: string
-          file_size: number
-          game_id: string
-          id: string
-          installation_instructions: string
-          job_id: string
-          owner_id: string
-          platform: string
-          storage_path: string
-          updated_at: string
-        }
+          artifact_type: string;
+          checksum_sha256: string;
+          created_at: string;
+          file_name: string;
+          file_size: number;
+          game_id: string;
+          id: string;
+          installation_instructions: string;
+          job_id: string;
+          owner_id: string;
+          platform: string;
+          storage_path: string;
+          updated_at: string;
+        };
         Insert: {
-          artifact_type: string
-          checksum_sha256: string
-          created_at?: string
-          file_name: string
-          file_size: number
-          game_id: string
-          id?: string
-          installation_instructions?: string
-          job_id: string
-          owner_id: string
-          platform: string
-          storage_path: string
-          updated_at?: string
-        }
+          artifact_type: string;
+          checksum_sha256: string;
+          created_at?: string;
+          file_name: string;
+          file_size: number;
+          game_id: string;
+          id?: string;
+          installation_instructions?: string;
+          job_id: string;
+          owner_id: string;
+          platform: string;
+          storage_path: string;
+          updated_at?: string;
+        };
         Update: {
-          artifact_type?: string
-          checksum_sha256?: string
-          created_at?: string
-          file_name?: string
-          file_size?: number
-          game_id?: string
-          id?: string
-          installation_instructions?: string
-          job_id?: string
-          owner_id?: string
-          platform?: string
-          storage_path?: string
-          updated_at?: string
-        }
+          artifact_type?: string;
+          checksum_sha256?: string;
+          created_at?: string;
+          file_name?: string;
+          file_size?: number;
+          game_id?: string;
+          id?: string;
+          installation_instructions?: string;
+          job_id?: string;
+          owner_id?: string;
+          platform?: string;
+          storage_path?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "desktop_build_artifacts_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "desktop_build_artifacts_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "desktop_build_artifacts_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "desktop_build_jobs"
-            referencedColumns: ["id"]
+            foreignKeyName: "desktop_build_artifacts_job_id_fkey";
+            columns: ["job_id"];
+            isOneToOne: false;
+            referencedRelation: "desktop_build_jobs";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       desktop_build_jobs: {
         Row: {
-          agent_id: string | null
-          claimed_at: string | null
-          completed_at: string | null
-          created_at: string
-          error_message: string
-          game_id: string
-          id: string
-          known_issues: string
-          logs: string
-          minimum_requirements: string
-          owner_id: string
-          package_type: string
-          platform: string
-          progress_percent: number
-          progress_stage: string
-          recommended_requirements: string
-          release_notes: string
-          status: string
-          updated_at: string
-          verification_results: Json
-          version: string
-        }
+          agent_id: string | null;
+          claimed_at: string | null;
+          completed_at: string | null;
+          created_at: string;
+          error_message: string;
+          game_id: string;
+          id: string;
+          known_issues: string;
+          logs: string;
+          minimum_requirements: string;
+          owner_id: string;
+          package_type: string;
+          platform: string;
+          progress_percent: number;
+          progress_stage: string;
+          recommended_requirements: string;
+          release_notes: string;
+          status: string;
+          updated_at: string;
+          verification_results: Json;
+          version: string;
+        };
         Insert: {
-          agent_id?: string | null
-          claimed_at?: string | null
-          completed_at?: string | null
-          created_at?: string
-          error_message?: string
-          game_id: string
-          id?: string
-          known_issues?: string
-          logs?: string
-          minimum_requirements?: string
-          owner_id: string
-          package_type: string
-          platform: string
-          progress_percent?: number
-          progress_stage?: string
-          recommended_requirements?: string
-          release_notes?: string
-          status?: string
-          updated_at?: string
-          verification_results?: Json
-          version?: string
-        }
+          agent_id?: string | null;
+          claimed_at?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          error_message?: string;
+          game_id: string;
+          id?: string;
+          known_issues?: string;
+          logs?: string;
+          minimum_requirements?: string;
+          owner_id: string;
+          package_type: string;
+          platform: string;
+          progress_percent?: number;
+          progress_stage?: string;
+          recommended_requirements?: string;
+          release_notes?: string;
+          status?: string;
+          updated_at?: string;
+          verification_results?: Json;
+          version?: string;
+        };
         Update: {
-          agent_id?: string | null
-          claimed_at?: string | null
-          completed_at?: string | null
-          created_at?: string
-          error_message?: string
-          game_id?: string
-          id?: string
-          known_issues?: string
-          logs?: string
-          minimum_requirements?: string
-          owner_id?: string
-          package_type?: string
-          platform?: string
-          progress_percent?: number
-          progress_stage?: string
-          recommended_requirements?: string
-          release_notes?: string
-          status?: string
-          updated_at?: string
-          verification_results?: Json
-          version?: string
-        }
+          agent_id?: string | null;
+          claimed_at?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          error_message?: string;
+          game_id?: string;
+          id?: string;
+          known_issues?: string;
+          logs?: string;
+          minimum_requirements?: string;
+          owner_id?: string;
+          package_type?: string;
+          platform?: string;
+          progress_percent?: number;
+          progress_stage?: string;
+          recommended_requirements?: string;
+          release_notes?: string;
+          status?: string;
+          updated_at?: string;
+          verification_results?: Json;
+          version?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "desktop_build_jobs_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "desktop_build_agents"
-            referencedColumns: ["id"]
+            foreignKeyName: "desktop_build_jobs_agent_id_fkey";
+            columns: ["agent_id"];
+            isOneToOne: false;
+            referencedRelation: "desktop_build_agents";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "desktop_build_jobs_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "desktop_build_jobs_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       development_stages: {
         Row: {
-          created_at: string
-          deliverables: string[]
-          dependencies: string[]
-          game_id: string
-          id: string
-          owner_id: string
-          position: number
-          stage_key: string
-          status: string
-          test_summary: string
-          title: string
-          updated_at: string
-        }
+          created_at: string;
+          deliverables: string[];
+          dependencies: string[];
+          game_id: string;
+          id: string;
+          owner_id: string;
+          position: number;
+          stage_key: string;
+          status: string;
+          test_summary: string;
+          title: string;
+          updated_at: string;
+        };
         Insert: {
-          created_at?: string
-          deliverables?: string[]
-          dependencies?: string[]
-          game_id: string
-          id?: string
-          owner_id: string
-          position: number
-          stage_key: string
-          status?: string
-          test_summary?: string
-          title: string
-          updated_at?: string
-        }
+          created_at?: string;
+          deliverables?: string[];
+          dependencies?: string[];
+          game_id: string;
+          id?: string;
+          owner_id: string;
+          position: number;
+          stage_key: string;
+          status?: string;
+          test_summary?: string;
+          title: string;
+          updated_at?: string;
+        };
         Update: {
-          created_at?: string
-          deliverables?: string[]
-          dependencies?: string[]
-          game_id?: string
-          id?: string
-          owner_id?: string
-          position?: number
-          stage_key?: string
-          status?: string
-          test_summary?: string
-          title?: string
-          updated_at?: string
-        }
+          created_at?: string;
+          deliverables?: string[];
+          dependencies?: string[];
+          game_id?: string;
+          id?: string;
+          owner_id?: string;
+          position?: number;
+          stage_key?: string;
+          status?: string;
+          test_summary?: string;
+          title?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "development_stages_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "development_stages_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       file_revisions: {
         Row: {
-          change_type: string
-          content: string
-          created_at: string
-          file_id: string | null
-          game_id: string
-          id: string
-          language: string
-          owner_id: string
-          path: string
-          summary: string
-          version: number
-        }
+          change_type: string;
+          content: string;
+          created_at: string;
+          file_id: string | null;
+          game_id: string;
+          id: string;
+          language: string;
+          owner_id: string;
+          path: string;
+          summary: string;
+          version: number;
+        };
         Insert: {
-          change_type: string
-          content?: string
-          created_at?: string
-          file_id?: string | null
-          game_id: string
-          id?: string
-          language?: string
-          owner_id: string
-          path: string
-          summary?: string
-          version: number
-        }
+          change_type: string;
+          content?: string;
+          created_at?: string;
+          file_id?: string | null;
+          game_id: string;
+          id?: string;
+          language?: string;
+          owner_id: string;
+          path: string;
+          summary?: string;
+          version: number;
+        };
         Update: {
-          change_type?: string
-          content?: string
-          created_at?: string
-          file_id?: string | null
-          game_id?: string
-          id?: string
-          language?: string
-          owner_id?: string
-          path?: string
-          summary?: string
-          version?: number
-        }
+          change_type?: string;
+          content?: string;
+          created_at?: string;
+          file_id?: string | null;
+          game_id?: string;
+          id?: string;
+          language?: string;
+          owner_id?: string;
+          path?: string;
+          summary?: string;
+          version?: number;
+        };
         Relationships: [
           {
-            foreignKeyName: "file_revisions_file_id_fkey"
-            columns: ["file_id"]
-            isOneToOne: false
-            referencedRelation: "project_files"
-            referencedColumns: ["id"]
+            foreignKeyName: "file_revisions_file_id_fkey";
+            columns: ["file_id"];
+            isOneToOne: false;
+            referencedRelation: "project_files";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "file_revisions_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "file_revisions_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       game_memory: {
         Row: {
-          category: string
-          content: string
-          created_at: string
-          game_id: string
-          id: string
-          importance: number
-          memory_key: string
-          owner_id: string
-          source: string
-          updated_at: string
-        }
+          category: string;
+          content: string;
+          created_at: string;
+          game_id: string;
+          id: string;
+          importance: number;
+          memory_key: string;
+          owner_id: string;
+          source: string;
+          updated_at: string;
+        };
         Insert: {
-          category: string
-          content: string
-          created_at?: string
-          game_id: string
-          id?: string
-          importance?: number
-          memory_key: string
-          owner_id: string
-          source?: string
-          updated_at?: string
-        }
+          category: string;
+          content: string;
+          created_at?: string;
+          game_id: string;
+          id?: string;
+          importance?: number;
+          memory_key: string;
+          owner_id: string;
+          source?: string;
+          updated_at?: string;
+        };
         Update: {
-          category?: string
-          content?: string
-          created_at?: string
-          game_id?: string
-          id?: string
-          importance?: number
-          memory_key?: string
-          owner_id?: string
-          source?: string
-          updated_at?: string
-        }
+          category?: string;
+          content?: string;
+          created_at?: string;
+          game_id?: string;
+          id?: string;
+          importance?: number;
+          memory_key?: string;
+          owner_id?: string;
+          source?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "game_memory_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "game_memory_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       games: {
         Row: {
-          art_style: string
-          created_at: string
-          description: string
-          genre: string
-          id: string
-          monetization: string
-          name: string
-          owner_id: string
-          platform: string
-          player_mode: string
-          status: string
-          thumbnail_url: string | null
-          updated_at: string
-        }
+          art_style: string;
+          created_at: string;
+          description: string;
+          genre: string;
+          id: string;
+          monetization: string;
+          name: string;
+          owner_id: string;
+          platform: string;
+          player_mode: string;
+          status: string;
+          thumbnail_url: string | null;
+          updated_at: string;
+        };
         Insert: {
-          art_style: string
-          created_at?: string
-          description?: string
-          genre: string
-          id?: string
-          monetization?: string
-          name: string
-          owner_id: string
-          platform: string
-          player_mode: string
-          status?: string
-          thumbnail_url?: string | null
-          updated_at?: string
-        }
+          art_style: string;
+          created_at?: string;
+          description?: string;
+          genre: string;
+          id?: string;
+          monetization?: string;
+          name: string;
+          owner_id: string;
+          platform: string;
+          player_mode: string;
+          status?: string;
+          thumbnail_url?: string | null;
+          updated_at?: string;
+        };
         Update: {
-          art_style?: string
-          created_at?: string
-          description?: string
-          genre?: string
-          id?: string
-          monetization?: string
-          name?: string
-          owner_id?: string
-          platform?: string
-          player_mode?: string
-          status?: string
-          thumbnail_url?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
+          art_style?: string;
+          created_at?: string;
+          description?: string;
+          genre?: string;
+          id?: string;
+          monetization?: string;
+          name?: string;
+          owner_id?: string;
+          platform?: string;
+          player_mode?: string;
+          status?: string;
+          thumbnail_url?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       playtest_results: {
         Row: {
-          created_at: string
-          details: string
-          duration_ms: number
-          evidence: Json
-          game_id: string
-          id: string
-          owner_id: string
-          reproduction_steps: string[]
-          run_id: string
-          safe_fix_available: boolean
-          severity: string
-          status: string
-          suite: string
-          test_name: string
-        }
+          created_at: string;
+          details: string;
+          duration_ms: number;
+          evidence: Json;
+          game_id: string;
+          id: string;
+          owner_id: string;
+          reproduction_steps: string[];
+          run_id: string;
+          safe_fix_available: boolean;
+          severity: string;
+          status: string;
+          suite: string;
+          test_name: string;
+        };
         Insert: {
-          created_at?: string
-          details?: string
-          duration_ms?: number
-          evidence?: Json
-          game_id: string
-          id?: string
-          owner_id: string
-          reproduction_steps?: string[]
-          run_id: string
-          safe_fix_available?: boolean
-          severity?: string
-          status: string
-          suite: string
-          test_name: string
-        }
+          created_at?: string;
+          details?: string;
+          duration_ms?: number;
+          evidence?: Json;
+          game_id: string;
+          id?: string;
+          owner_id: string;
+          reproduction_steps?: string[];
+          run_id: string;
+          safe_fix_available?: boolean;
+          severity?: string;
+          status: string;
+          suite: string;
+          test_name: string;
+        };
         Update: {
-          created_at?: string
-          details?: string
-          duration_ms?: number
-          evidence?: Json
-          game_id?: string
-          id?: string
-          owner_id?: string
-          reproduction_steps?: string[]
-          run_id?: string
-          safe_fix_available?: boolean
-          severity?: string
-          status?: string
-          suite?: string
-          test_name?: string
-        }
+          created_at?: string;
+          details?: string;
+          duration_ms?: number;
+          evidence?: Json;
+          game_id?: string;
+          id?: string;
+          owner_id?: string;
+          reproduction_steps?: string[];
+          run_id?: string;
+          safe_fix_available?: boolean;
+          severity?: string;
+          status?: string;
+          suite?: string;
+          test_name?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "playtest_results_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "playtest_results_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "playtest_results_run_id_fkey"
-            columns: ["run_id"]
-            isOneToOne: false
-            referencedRelation: "playtest_runs"
-            referencedColumns: ["id"]
+            foreignKeyName: "playtest_results_run_id_fkey";
+            columns: ["run_id"];
+            isOneToOne: false;
+            referencedRelation: "playtest_runs";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       playtest_runs: {
         Row: {
-          agent_id: string | null
-          completed_at: string | null
-          created_at: string
-          game_id: string
-          id: string
-          owner_id: string
-          progress_percent: number
-          started_at: string | null
-          status: string
-          summary: string
-          target_platform: string
-          test_suites: string[]
-          updated_at: string
-        }
+          agent_id: string | null;
+          completed_at: string | null;
+          created_at: string;
+          game_id: string;
+          id: string;
+          owner_id: string;
+          progress_percent: number;
+          started_at: string | null;
+          status: string;
+          summary: string;
+          target_platform: string;
+          test_suites: string[];
+          updated_at: string;
+        };
         Insert: {
-          agent_id?: string | null
-          completed_at?: string | null
-          created_at?: string
-          game_id: string
-          id?: string
-          owner_id: string
-          progress_percent?: number
-          started_at?: string | null
-          status?: string
-          summary?: string
-          target_platform: string
-          test_suites?: string[]
-          updated_at?: string
-        }
+          agent_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          game_id: string;
+          id?: string;
+          owner_id: string;
+          progress_percent?: number;
+          started_at?: string | null;
+          status?: string;
+          summary?: string;
+          target_platform: string;
+          test_suites?: string[];
+          updated_at?: string;
+        };
         Update: {
-          agent_id?: string | null
-          completed_at?: string | null
-          created_at?: string
-          game_id?: string
-          id?: string
-          owner_id?: string
-          progress_percent?: number
-          started_at?: string | null
-          status?: string
-          summary?: string
-          target_platform?: string
-          test_suites?: string[]
-          updated_at?: string
-        }
+          agent_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          game_id?: string;
+          id?: string;
+          owner_id?: string;
+          progress_percent?: number;
+          started_at?: string | null;
+          status?: string;
+          summary?: string;
+          target_platform?: string;
+          test_suites?: string[];
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "playtest_runs_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "desktop_build_agents"
-            referencedColumns: ["id"]
+            foreignKeyName: "playtest_runs_agent_id_fkey";
+            columns: ["agent_id"];
+            isOneToOne: false;
+            referencedRelation: "desktop_build_agents";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "playtest_runs_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "playtest_runs_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       profiles: {
         Row: {
-          avatar_url: string | null
-          created_at: string
-          credits: number
-          display_name: string
-          id: string
-          plan: string
-          updated_at: string
-        }
+          avatar_url: string | null;
+          created_at: string;
+          credits: number;
+          display_name: string;
+          id: string;
+          plan: string;
+          updated_at: string;
+        };
         Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          credits?: number
-          display_name?: string
-          id: string
-          plan?: string
-          updated_at?: string
-        }
+          avatar_url?: string | null;
+          created_at?: string;
+          credits?: number;
+          display_name?: string;
+          id: string;
+          plan?: string;
+          updated_at?: string;
+        };
         Update: {
-          avatar_url?: string | null
-          created_at?: string
-          credits?: number
-          display_name?: string
-          id?: string
-          plan?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
+          avatar_url?: string | null;
+          created_at?: string;
+          credits?: number;
+          display_name?: string;
+          id?: string;
+          plan?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       project_checkpoints: {
         Row: {
-          created_at: string
-          file_manifest: Json
-          game_id: string
-          id: string
-          label: string
-          owner_id: string
-          stage_key: string
-          summary: string
-          updated_at: string
-        }
+          created_at: string;
+          file_manifest: Json;
+          game_id: string;
+          id: string;
+          label: string;
+          owner_id: string;
+          stage_key: string;
+          summary: string;
+          updated_at: string;
+        };
         Insert: {
-          created_at?: string
-          file_manifest?: Json
-          game_id: string
-          id?: string
-          label: string
-          owner_id: string
-          stage_key?: string
-          summary?: string
-          updated_at?: string
-        }
+          created_at?: string;
+          file_manifest?: Json;
+          game_id: string;
+          id?: string;
+          label: string;
+          owner_id: string;
+          stage_key?: string;
+          summary?: string;
+          updated_at?: string;
+        };
         Update: {
-          created_at?: string
-          file_manifest?: Json
-          game_id?: string
-          id?: string
-          label?: string
-          owner_id?: string
-          stage_key?: string
-          summary?: string
-          updated_at?: string
-        }
+          created_at?: string;
+          file_manifest?: Json;
+          game_id?: string;
+          id?: string;
+          label?: string;
+          owner_id?: string;
+          stage_key?: string;
+          summary?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "project_checkpoints_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "project_checkpoints_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       project_files: {
         Row: {
-          content: string
-          created_at: string
-          game_id: string
-          id: string
-          language: string
-          owner_id: string
-          path: string
-          updated_at: string
-          version: number
-        }
+          content: string;
+          created_at: string;
+          game_id: string;
+          id: string;
+          language: string;
+          owner_id: string;
+          path: string;
+          updated_at: string;
+          version: number;
+        };
         Insert: {
-          content?: string
-          created_at?: string
-          game_id: string
-          id?: string
-          language?: string
-          owner_id: string
-          path: string
-          updated_at?: string
-          version?: number
-        }
+          content?: string;
+          created_at?: string;
+          game_id: string;
+          id?: string;
+          language?: string;
+          owner_id: string;
+          path: string;
+          updated_at?: string;
+          version?: number;
+        };
         Update: {
-          content?: string
-          created_at?: string
-          game_id?: string
-          id?: string
-          language?: string
-          owner_id?: string
-          path?: string
-          updated_at?: string
-          version?: number
-        }
+          content?: string;
+          created_at?: string;
+          game_id?: string;
+          id?: string;
+          language?: string;
+          owner_id?: string;
+          path?: string;
+          updated_at?: string;
+          version?: number;
+        };
         Relationships: [
           {
-            foreignKeyName: "project_files_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
+            foreignKeyName: "project_files_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       tripo_tasks: {
         Row: {
-          created_at: string
-          external_task_id: string
-          id: string
-          owner_id: string
-          prompt: string
-          status: string
-          updated_at: string
-        }
+          credit_operation_key: string | null;
+          created_at: string;
+          external_task_id: string;
+          id: string;
+          owner_id: string;
+          prompt: string;
+          status: string;
+          updated_at: string;
+        };
         Insert: {
-          created_at?: string
-          external_task_id: string
-          id?: string
-          owner_id: string
-          prompt?: string
-          status?: string
-          updated_at?: string
-        }
+          credit_operation_key?: string | null;
+          created_at?: string;
+          external_task_id: string;
+          id?: string;
+          owner_id: string;
+          prompt?: string;
+          status?: string;
+          updated_at?: string;
+        };
         Update: {
-          created_at?: string
-          external_task_id?: string
-          id?: string
-          owner_id?: string
-          prompt?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
+          credit_operation_key?: string | null;
+          created_at?: string;
+          external_task_id?: string;
+          id?: string;
+          owner_id?: string;
+          prompt?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       user_roles: {
         Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          updated_at: string
-          user_id: string
-        }
+          created_at: string;
+          id: string;
+          role: Database["public"]["Enums"]["app_role"];
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          updated_at?: string
-          user_id: string
-        }
+          created_at?: string;
+          id?: string;
+          role: Database["public"]["Enums"]["app_role"];
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-    }
+          created_at?: string;
+          id?: string;
+          role?: Database["public"]["Enums"]["app_role"];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
       claim_desktop_build_job: {
-        Args: { _agent_id: string }
+        Args: { _agent_id: string };
         Returns: {
-          agent_id: string | null
-          claimed_at: string | null
-          completed_at: string | null
-          created_at: string
-          error_message: string
-          game_id: string
-          id: string
-          known_issues: string
-          logs: string
-          minimum_requirements: string
-          owner_id: string
-          package_type: string
-          platform: string
-          progress_percent: number
-          progress_stage: string
-          recommended_requirements: string
-          release_notes: string
-          status: string
-          updated_at: string
-          verification_results: Json
-          version: string
-        }[]
+          agent_id: string | null;
+          claimed_at: string | null;
+          completed_at: string | null;
+          created_at: string;
+          error_message: string;
+          game_id: string;
+          id: string;
+          known_issues: string;
+          logs: string;
+          minimum_requirements: string;
+          owner_id: string;
+          package_type: string;
+          platform: string;
+          progress_percent: number;
+          progress_stage: string;
+          recommended_requirements: string;
+          release_notes: string;
+          status: string;
+          updated_at: string;
+          verification_results: Json;
+          version: string;
+        }[];
         SetofOptions: {
-          from: "*"
-          to: "desktop_build_jobs"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
+          from: "*";
+          to: "desktop_build_jobs";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
       consume_creator_credits: {
-        Args: { _amount: number; _user_id: string }
-        Returns: number
-      }
+        Args: { _amount: number; _user_id: string };
+        Returns: number;
+      };
+      consume_creator_credits_once: {
+        Args: { _amount: number; _operation_key: string; _user_id: string };
+        Returns: {
+          charged: boolean;
+          remaining: number;
+        }[];
+      };
       has_role: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+          _role: Database["public"]["Enums"]["app_role"];
+          _user_id: string;
+        };
+        Returns: boolean;
+      };
       refund_creator_credits: {
-        Args: { _amount: number; _user_id: string }
-        Returns: undefined
-      }
-    }
+        Args: { _amount: number; _user_id: string };
+        Returns: undefined;
+      };
+      refund_creator_credits_once: {
+        Args: { _operation_key: string; _user_id: string };
+        Returns: boolean;
+      };
+    };
     Enums: {
-      app_role: "owner" | "admin" | "moderator" | "user"
-    }
+      app_role: "owner" | "admin" | "moderator" | "staff" | "user";
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;
 
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "admin", "moderator", "user"],
+      app_role: ["owner", "admin", "moderator", "staff", "user"],
     },
   },
-} as const
+} as const;

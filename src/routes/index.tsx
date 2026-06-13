@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const navigate = useNavigate();
   return (
-    <main className="relative min-h-screen overflow-hidden bg-canvas">
+    <main id="main-content" className="relative min-h-screen overflow-hidden bg-canvas">
       <div className="panel-grid pointer-events-none absolute inset-0 opacity-15" />
       <div className="aurora-orb pointer-events-none absolute -left-40 top-24 size-[32rem] rounded-full bg-neon-violet/15 blur-[120px]" />
       <div className="aurora-orb pointer-events-none absolute -right-40 top-12 size-[34rem] rounded-full bg-neon-cyan/12 blur-[130px] [animation-delay:-4s]" />
@@ -73,8 +73,8 @@ function Index() {
             },
             {
               icon: Cloud,
-              title: "Publish anywhere",
-              text: "Web hosting plus mobile and desktop build pipelines.",
+              title: "Prepare real builds",
+              text: "Native exports run only through connected, authenticated build agents.",
             },
           ].map((item) => (
             <div
@@ -93,6 +93,11 @@ function Index() {
           ))}
         </div>
       </section>
+      <footer className="relative z-10 mx-auto flex max-w-7xl flex-wrap justify-center gap-4 border-t border-border/60 px-6 py-6 text-xs text-muted-foreground">
+        <Link to="/terms">Terms</Link>
+        <Link to="/privacy">Privacy</Link>
+        <Link to="/support">Support</Link>
+      </footer>
     </main>
   );
 }

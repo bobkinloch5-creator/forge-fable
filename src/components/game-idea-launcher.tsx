@@ -1,18 +1,9 @@
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  ArrowUp,
-  Blocks,
-  Code2,
-  Gamepad2,
-  Globe2,
-  ImageUp,
-  Monitor,
-  Smartphone,
-  Upload,
-} from "lucide-react";
+import { ArrowUp, Blocks, Code2, Gamepad2, Globe2, Monitor, Smartphone } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 const launchModes = [
   { label: "Website Game", icon: Globe2 },
@@ -20,7 +11,6 @@ const launchModes = [
   { label: "PC Game", icon: Monitor },
   { label: "Cross-Platform", icon: Gamepad2 },
   { label: "Start From Template", icon: Blocks },
-  { label: "Import Project", icon: Upload },
 ];
 
 const exampleIdeas = [
@@ -67,12 +57,12 @@ export function GameIdeaLauncher({
           What game do you want to build?
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-          No code required. FableForge plans the systems, creates the project, tests each build, and
-          prepares a real web, mobile, or desktop release.
+          No code required to begin. FableForge organizes the project, preserves decisions, and
+          prepares work for connected AI, testing, and native build services.
         </p>
       </div>
 
-      <div className="relative mt-7 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="relative mt-7 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {launchModes.map((item) => (
           <Button
             key={item.label}
@@ -94,12 +84,29 @@ export function GameIdeaLauncher({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*,.zip,.godot,.unitypackage"
+          accept=".txt,.md,.json,.js,.jsx,.ts,.tsx,.gd,.cs"
           className="sr-only"
-          onChange={(event) => {
+          aria-label="Import a text reference"
+          onChange={async (event) => {
             const file = event.target.files?.[0];
             if (!file) return;
-            setIdea(`Use my uploaded reference “${file.name}” to guide this game project. `);
+            event.target.value = "";
+            if (file.size > 256 * 1024) {
+              toast.error("Text references must be 256 KB or smaller.");
+              return;
+            }
+            try {
+              const text = (await file.text()).trim();
+              if (!text) {
+                toast.error("That reference file is empty.");
+                return;
+              }
+              const prefix = `Use the text reference "${file.name}" when planning this game:\n`;
+              setIdea(`${prefix}${text}`.slice(0, 500));
+              toast.success("Text reference loaded into the project brief.");
+            } catch {
+              toast.error("That reference file could not be read.");
+            }
           }}
         />
         <Textarea
@@ -107,6 +114,8 @@ export function GameIdeaLauncher({
           value={idea}
           onChange={(event) => setIdea(event.target.value)}
           placeholder="Describe your game idea, world, players, and what should make it fun…"
+          aria-label="Game idea"
+          maxLength={500}
           className="min-h-32 resize-none border-0 bg-transparent p-4 pr-16 text-base leading-7 shadow-none focus-visible:ring-0 sm:min-h-40 sm:p-5 sm:pr-20 sm:text-lg"
         />
         <div className="flex items-center justify-between gap-2 border-t border-border/60 px-2 py-2 sm:px-3">
@@ -118,19 +127,7 @@ export function GameIdeaLauncher({
               className="shrink-0 text-muted-foreground"
               onClick={() => fileInputRef.current?.click()}
             >
-              <ImageUp /> Reference
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="shrink-0 text-muted-foreground"
-              onClick={() => {
-                setMode("Import Project");
-                fileInputRef.current?.click();
-              }}
-            >
-              <Code2 /> Code project
+              <Code2 /> Text reference
             </Button>
           </div>
           <Button

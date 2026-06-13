@@ -1,25 +1,31 @@
 import { CreateGameDialog } from "@/components/create-game-dialog";
 import { GameIdeaLauncher } from "@/components/game-idea-launcher";
+import { GuidedTour } from "@/components/guided-tour";
 import { NewProjectButton, StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getStudioOverview } from "@/lib/studio.functions";
+import { deleteGame, duplicateGame, getStudioOverview, renameGame } from "@/lib/studio.functions";
 import { templates } from "@/lib/studio-data";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  AlertTriangle,
   Box,
   Clock3,
   Gamepad2,
   Layers3,
   Plus,
+  Copy,
+  Pencil,
+  Trash2,
   Smartphone,
   Monitor,
   Globe2,
   Zap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Tables } from "@/integrations/supabase/types";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/studio")({
   component: StudioDashboard,
@@ -41,12 +47,25 @@ function StudioDashboard() {
   const [data, setData] = useState<{
     profile: { display_name: string; plan: string; credits: number } | null;
     games: Tables<"games">[];
-    roles: { role: "owner" | "admin" | "moderator" | "user" }[];
+    roles: { role: "owner" | "admin" | "moderator" | "staff" | "user" }[];
   } | null>(null);
+  const [loadError, setLoadError] = useState("");
+  const [projectActionId, setProjectActionId] = useState("");
   const getOverview = useServerFn(getStudioOverview);
-  useEffect(() => {
-    getOverview().then(setData);
+  const renameProject = useServerFn(renameGame);
+  const duplicateProject = useServerFn(duplicateGame);
+  const deleteProject = useServerFn(deleteGame);
+  const loadOverview = useCallback(async () => {
+    setLoadError("");
+    try {
+      setData(await getOverview());
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : "Studio data could not be loaded");
+    }
   }, [getOverview]);
+  useEffect(() => {
+    void loadOverview();
+  }, [loadOverview]);
   useEffect(() => {
     const savedIdea = sessionStorage.getItem("fableforge:draft-idea");
     const savedMode = sessionStorage.getItem("fableforge:draft-mode");
@@ -70,6 +89,48 @@ function StudioDashboard() {
     setInitialPlatform(platform);
     setOpen(true);
   }
+  async function rename(game: Tables<"games">) {
+    const name = window.prompt("Project name", game.name)?.trim();
+    if (!name || name === game.name) return;
+    setProjectActionId(game.id);
+    try {
+      await renameProject({ data: { gameId: game.id, name } });
+      await loadOverview();
+      toast.success("Project renamed");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Project could not be renamed");
+    } finally {
+      setProjectActionId("");
+    }
+  }
+  async function duplicate(game: Tables<"games">) {
+    setProjectActionId(game.id);
+    try {
+      await duplicateProject({ data: { gameId: game.id } });
+      await loadOverview();
+      toast.success("Project duplicated without chat or build history");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Project could not be duplicated");
+    } finally {
+      setProjectActionId("");
+    }
+  }
+  async function remove(game: Tables<"games">) {
+    if (
+      !window.confirm(`Delete "${game.name}" and all of its project data? This cannot be undone.`)
+    )
+      return;
+    setProjectActionId(game.id);
+    try {
+      await deleteProject({ data: { gameId: game.id } });
+      await loadOverview();
+      toast.success("Project deleted");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Project could not be deleted");
+    } finally {
+      setProjectActionId("");
+    }
+  }
   return (
     <StudioShell
       title="Project hub"
@@ -77,7 +138,16 @@ function StudioDashboard() {
       accountRole={isOwner ? "owner" : undefined}
       credits={isOwner ? "unlimited" : data?.profile?.credits}
     >
-      <main className="mx-auto max-w-[1500px] p-3 pb-24 sm:p-6 sm:pb-24 lg:p-8">
+      <main id="main-content" className="mx-auto max-w-[1500px] p-3 pb-24 sm:p-6 sm:pb-24 lg:p-8">
+        {loadError && (
+          <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm">
+            <AlertTriangle className="size-4 text-destructive" />
+            <span className="min-w-0 flex-1">{loadError}</span>
+            <Button variant="outline" size="sm" onClick={() => void loadOverview()}>
+              Try again
+            </Button>
+          </div>
+        )}
         <section className="mb-8">
           <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-4 sm:p-8 lg:p-10">
             <div className="panel-grid absolute inset-0 opacity-20" />
@@ -89,10 +159,10 @@ function StudioDashboard() {
               { label: "Active projects", value: games.length, icon: Gamepad2 },
               {
                 label: "Forge credits",
-                value: isOwner ? "Unlimited" : (data?.profile?.credits ?? 250),
+                value: isOwner ? "Unlimited" : (data?.profile?.credits ?? "—"),
                 icon: Zap,
               },
-              { label: "Build artifacts", value: games.length * 4, icon: Box },
+              { label: "Build pipeline", value: "Per project", icon: Box },
               {
                 label: "Plan",
                 value: isOwner
@@ -112,7 +182,7 @@ function StudioDashboard() {
             ))}
           </div>
         </section>
-        <section className="mb-10">
+        <section id="projects" className="mb-10 scroll-mt-20">
           <div className="mb-4 flex items-end justify-between">
             <div>
               <h3 className="text-lg font-semibold">Recent projects</h3>
@@ -120,7 +190,16 @@ function StudioDashboard() {
             </div>
             <NewProjectButton onClick={() => setOpen(true)} />
           </div>
-          {games.length === 0 ? (
+          {!data && !loadError ? (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading projects">
+              {[0, 1, 2].map((item) => (
+                <div
+                  key={item}
+                  className="glass-panel h-48 animate-pulse rounded-2xl bg-panel/50"
+                />
+              ))}
+            </div>
+          ) : games.length === 0 ? (
             <Button
               variant="outline"
               onClick={() => setOpen(true)}
@@ -144,34 +223,64 @@ function StudioDashboard() {
                       ? Monitor
                       : Globe2;
                 return (
-                  <Link
+                  <article
                     key={game.id}
-                    to="/studio/$gameId"
-                    params={{ gameId: game.id }}
-                    className="glass-panel group rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-neon-cyan/50 hover:shadow-[0_18px_50px_color-mix(in_oklab,var(--primary)_16%,transparent)]"
+                    className="glass-panel group rounded-2xl p-5 transition-all duration-300 hover:border-neon-cyan/50"
                   >
-                    <div className="mb-7 flex items-start justify-between">
-                      <span className="grid size-10 place-items-center rounded-lg bg-secondary">
-                        <Icon className="size-5 text-accent" />
-                      </span>
-                      <Badge variant="outline" className="font-mono text-[10px] uppercase">
-                        {game.status}
-                      </Badge>
+                    <Link to="/studio/$gameId" params={{ gameId: game.id }} className="block">
+                      <div className="mb-7 flex items-start justify-between">
+                        <span className="grid size-10 place-items-center rounded-lg bg-secondary">
+                          <Icon className="size-5 text-accent" />
+                        </span>
+                        <Badge variant="outline" className="font-mono text-[10px] uppercase">
+                          {game.status}
+                        </Badge>
+                      </div>
+                      <h4 className="font-semibold group-hover:text-primary">{game.name}</h4>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {game.art_style} {game.genre} · {game.player_mode}
+                      </p>
+                      <div className="mt-5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <Clock3 className="size-3" /> Updated recently
+                      </div>
+                    </Link>
+                    <div className="mt-4 flex gap-1 border-t border-border/60 pt-3">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`Rename ${game.name}`}
+                        disabled={Boolean(projectActionId)}
+                        onClick={() => void rename(game)}
+                      >
+                        <Pencil />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`Duplicate ${game.name}`}
+                        disabled={Boolean(projectActionId)}
+                        onClick={() => void duplicate(game)}
+                      >
+                        <Copy />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="ml-auto text-destructive"
+                        aria-label={`Delete ${game.name}`}
+                        disabled={Boolean(projectActionId)}
+                        onClick={() => void remove(game)}
+                      >
+                        <Trash2 />
+                      </Button>
                     </div>
-                    <h4 className="font-semibold group-hover:text-primary">{game.name}</h4>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {game.art_style} {game.genre} · {game.player_mode}
-                    </p>
-                    <div className="mt-5 flex items-center gap-1 text-[11px] text-muted-foreground">
-                      <Clock3 className="size-3" /> Updated recently
-                    </div>
-                  </Link>
+                  </article>
                 );
               })}
             </div>
           )}
         </section>
-        <section>
+        <section id="templates" className="scroll-mt-20">
           <div className="mb-4">
             <h3 className="text-lg font-semibold">Production-ready starters</h3>
             <p className="text-sm text-muted-foreground">
@@ -212,6 +321,24 @@ function StudioDashboard() {
             ))}
           </div>
         </section>
+        <section id="assets" className="mt-10 scroll-mt-20">
+          <div className="glass-panel rounded-2xl p-5">
+            <h3 className="text-lg font-semibold">Assets</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Open a project to manage its private files, generated assets, previews, and connected
+              build outputs.
+            </p>
+          </div>
+        </section>
+        <section id="ai-models" className="mt-4 scroll-mt-20">
+          <div className="glass-panel rounded-2xl p-5">
+            <h3 className="text-lg font-semibold">AI Models</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Model selection belongs to each project workspace so access, credit costs, project
+              memory, and generation history remain tied to the correct account and project.
+            </p>
+          </div>
+        </section>
       </main>
       <CreateGameDialog
         open={open}
@@ -219,6 +346,7 @@ function StudioDashboard() {
         initialIdea={initialIdea}
         initialPlatform={initialPlatform}
       />
+      <GuidedTour variant="dashboard" />
     </StudioShell>
   );
 }

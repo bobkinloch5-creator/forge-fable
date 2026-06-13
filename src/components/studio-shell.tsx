@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { workspaceNav } from "@/lib/studio-data";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { BadgeDollarSign, ChevronLeft, Cloud, Command, LogOut, Menu, Plus } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { ChevronLeft, Cloud, Command, LogOut, Menu, Plus } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 export function StudioShell({
@@ -24,14 +24,49 @@ export function StudioShell({
   credits?: number | "unlimited";
 }) {
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const location = useLocation();
+  const [activeSection, setActiveSection] = useState(
+    location.pathname === "/studio" ? location.hash.replace("#", "") || "projects" : "",
+  );
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  useEffect(() => {
+    if (location.pathname !== "/studio") {
+      setActiveSection("");
+      return;
+    }
+    const sectionId = location.hash.replace("#", "") || "projects";
+    setActiveSection(sectionId);
+    requestAnimationFrame(() => {
+      document.getElementById(sectionId)?.scrollIntoView({ block: "start" });
+    });
+  }, [location.hash, location.pathname]);
+
+  async function openSection(sectionId: string) {
+    setOpen(false);
+    setActiveSection(sectionId);
+    if (location.pathname !== "/studio") {
+      await navigate({ to: "/studio", hash: sectionId });
+      return;
+    }
+    window.history.replaceState(null, "", `/studio#${sectionId}`);
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
   async function signOut() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    const { error } = await supabase.auth.signOut();
-    if (error) return toast.error(error.message);
-    navigate({ to: "/auth", replace: true });
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      const { error } = await supabase.auth.signOut();
+      if (error) return toast.error(error.message);
+      navigate({ to: "/auth", replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Sign out failed");
+    } finally {
+      setSigningOut(false);
+    }
   }
   return (
     <div className="relative flex min-h-dvh overflow-x-hidden bg-background text-foreground">
@@ -52,21 +87,24 @@ export function StudioShell({
             size="icon-sm"
             className="ml-auto lg:hidden"
             onClick={() => setOpen(false)}
+            aria-label="Close navigation"
           >
             <ChevronLeft />
           </Button>
         </div>
         <nav className="flex-1 space-y-1 p-2">
-          {workspaceNav.map((item, index) => (
-            <Link
+          {workspaceNav.map((item) => (
+            <button
+              type="button"
               key={item.label}
-              to="/studio"
               title={compact ? item.label : undefined}
-              className={`flex h-10 items-center gap-3 rounded-xl px-3 font-mono text-[11px] transition-all duration-300 ${index === 0 ? "spectrum-border bg-primary/10 text-neon-cyan" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_12%,transparent)]"}`}
+              aria-current={activeSection === item.sectionId ? "page" : undefined}
+              onClick={() => void openSection(item.sectionId)}
+              className={`flex h-10 w-full items-center gap-3 rounded-xl px-3 text-left font-mono text-[11px] transition-all duration-300 ${activeSection === item.sectionId ? "spectrum-border bg-primary/10 text-neon-cyan" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_12%,transparent)]"}`}
             >
               <item.icon className="size-4 shrink-0" />
               {!compact && item.label}
-            </Link>
+            </button>
           ))}
         </nav>
         <div className="space-y-2 border-t border-sidebar-border p-2">
@@ -77,12 +115,16 @@ export function StudioShell({
                   {accountRole === "owner" ? "Platform owner" : "Forge credits"}
                 </span>
                 <span className="font-mono text-primary">
-                  {credits === "unlimited" ? "Unlimited" : (credits ?? 250).toLocaleString()}
+                  {credits === "unlimited"
+                    ? "Unlimited"
+                    : credits === undefined
+                      ? "—"
+                      : credits.toLocaleString()}
                 </span>
               </div>
               <div className="h-1 overflow-hidden rounded-full bg-muted">
                 <div
-                  className={`h-full bg-primary ${credits === "unlimited" ? "w-full" : "w-2/3"}`}
+                  className={`h-full bg-primary ${credits === "unlimited" ? "w-full" : credits === undefined ? "w-0" : "w-2/3"}`}
                 />
               </div>
             </div>
@@ -91,9 +133,10 @@ export function StudioShell({
             variant="ghost"
             className={`${compact ? "w-full px-0" : "w-full justify-start"}`}
             onClick={signOut}
+            disabled={signingOut}
           >
             <LogOut />
-            {!compact && "Sign out"}
+            {!compact && (signingOut ? "Signing out…" : "Sign out")}
           </Button>
         </div>
       </aside>
@@ -111,6 +154,7 @@ export function StudioShell({
             size="icon-sm"
             className="lg:hidden"
             onClick={() => setOpen(true)}
+            aria-label="Open navigation"
           >
             <Menu />
           </Button>
@@ -134,9 +178,6 @@ export function StudioShell({
             <kbd className="hidden items-center gap-1 rounded border border-border bg-muted px-2 py-1 font-mono text-[10px] text-muted-foreground sm:flex">
               <Command className="size-3" /> K
             </kbd>
-            <span className="hidden items-center gap-1 rounded-md border border-border bg-background/50 px-2 py-1 font-mono text-[10px] text-muted-foreground lg:flex">
-              <BadgeDollarSign className="size-3 text-accent" /> 2,400
-            </span>
           </div>
         </header>
         {children}
@@ -144,14 +185,16 @@ export function StudioShell({
           className="glass-panel fixed inset-x-2 bottom-[max(.5rem,env(safe-area-inset-bottom))] z-30 grid grid-cols-4 rounded-2xl p-1 lg:hidden"
           aria-label="Mobile navigation"
         >
-          {workspaceNav.map((item, index) => (
-            <Link
+          {workspaceNav.map((item) => (
+            <button
+              type="button"
               key={item.label}
-              to="/studio"
-              className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[9px] ${index === 0 ? "bg-primary/10 text-neon-cyan" : "text-muted-foreground"}`}
+              aria-current={activeSection === item.sectionId ? "page" : undefined}
+              onClick={() => void openSection(item.sectionId)}
+              className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[9px] ${activeSection === item.sectionId ? "bg-primary/10 text-neon-cyan" : "text-muted-foreground"}`}
             >
               <item.icon className="size-4" /> {item.label}
-            </Link>
+            </button>
           ))}
         </nav>
       </div>

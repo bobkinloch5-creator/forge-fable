@@ -15,12 +15,14 @@ const RestoreInput = z.object({
 
 export const getProjectHistory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => GameIdInput.parse(input))
+  .validator((input: unknown) => GameIdInput.parse(input))
   .handler(async ({ data, context }) => {
     const [proposals, revisions] = await Promise.all([
       context.supabase
         .from("change_proposals")
-        .select("id, title, summary, risk_level, status, affected_systems, dependencies, risks, changes, test_plan, created_at")
+        .select(
+          "id, title, summary, risk_level, status, affected_systems, dependencies, risks, changes, test_plan, created_at",
+        )
         .eq("game_id", data.gameId)
         .eq("owner_id", context.userId)
         .order("created_at", { ascending: false })
@@ -40,22 +42,25 @@ export const getProjectHistory = createServerFn({ method: "POST" })
 
 export const decideChangeProposal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => DecideInput.parse(input))
+  .validator((input: unknown) => DecideInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase
+    const { data: updated, error } = await context.supabase
       .from("change_proposals")
       .update({ status: data.decision, decided_at: new Date().toISOString() })
       .eq("id", data.proposalId)
       .eq("game_id", data.gameId)
       .eq("owner_id", context.userId)
-      .eq("status", "pending");
+      .eq("status", "pending")
+      .select("id")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    if (!updated) throw new Error("This proposal was already decided or is unavailable");
     return { ok: true };
   });
 
 export const restoreFileRevision = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => RestoreInput.parse(input))
+  .validator((input: unknown) => RestoreInput.parse(input))
   .handler(async ({ data, context }) => {
     const { data: revision, error } = await context.supabase
       .from("file_revisions")
