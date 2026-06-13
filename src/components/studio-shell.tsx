@@ -2,6 +2,7 @@ import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { workspaceNav } from "@/lib/studio-data";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
@@ -15,6 +16,7 @@ import {
   Plus,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 export function StudioShell({
   children,
@@ -29,9 +31,13 @@ export function StudioShell({
 }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/auth" });
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    const { error } = await supabase.auth.signOut();
+    if (error) return toast.error(error.message);
+    navigate({ to: "/auth", replace: true });
   }
   return (
     <div className="relative flex min-h-screen overflow-hidden bg-background text-foreground">
