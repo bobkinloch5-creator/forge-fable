@@ -3,7 +3,17 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { workspaceNav } from "@/lib/studio-data";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BadgeDollarSign, ChevronLeft, Cloud, Command, Download, Eye, LogOut, Menu, Plus } from "lucide-react";
+import {
+  BadgeDollarSign,
+  ChevronLeft,
+  Cloud,
+  Command,
+  Download,
+  Eye,
+  LogOut,
+  Menu,
+  Plus,
+} from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 export function StudioShell({
@@ -98,17 +108,27 @@ export function StudioShell({
           </Button>
           <div className="flex min-w-0 items-center gap-3">
             <div className="min-w-0">
-              <p className="font-mono text-[9px] uppercase tracking-[.18em] text-muted-foreground">Project</p>
+              <p className="font-mono text-[9px] uppercase tracking-[.18em] text-muted-foreground">
+                Project
+              </p>
               <h1 className="truncate font-mono text-xs font-semibold uppercase">{title}</h1>
             </div>
-            <span className="hidden items-center gap-1 font-mono text-[9px] text-success md:flex"><Cloud className="size-3" /> SAVED</span>
-            {subtitle && <p className="hidden truncate border-l border-border pl-3 text-[10px] text-muted-foreground lg:block">{subtitle}</p>}
+            <span className="hidden items-center gap-1 font-mono text-[9px] text-success md:flex">
+              <Cloud className="size-3" /> SAVED
+            </span>
+            {subtitle && (
+              <p className="hidden truncate border-l border-border pl-3 text-[10px] text-muted-foreground lg:block">
+                {subtitle}
+              </p>
+            )}
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-1.5">
             <kbd className="flex items-center gap-1 rounded border border-border bg-muted px-2 py-1 font-mono text-[10px] text-muted-foreground">
               <Command className="size-3" /> K
             </kbd>
-            <span className="hidden items-center gap-1 rounded-md border border-border bg-background/50 px-2 py-1 font-mono text-[10px] text-muted-foreground lg:flex"><BadgeDollarSign className="size-3 text-accent" /> 2,400</span>
+            <span className="hidden items-center gap-1 rounded-md border border-border bg-background/50 px-2 py-1 font-mono text-[10px] text-muted-foreground lg:flex">
+              <BadgeDollarSign className="size-3 text-accent" /> 2,400
+            </span>
             <Button variant="outline" size="sm" className="hidden md:inline-flex">
               <Eye /> Preview
             </Button>
