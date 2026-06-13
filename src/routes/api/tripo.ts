@@ -26,10 +26,33 @@ export const Route = createFileRoute("/api/tripo")({
           auth: { persistSession: false },
         });
         const { data: claims } = await db.auth.getClaims(auth.slice(7));
-        if (!claims?.claims?.sub) return new Response("Invalid session", { status: 401 });
+        const userId = claims?.claims?.sub;
+        if (!userId) return new Response("Invalid session", { status: 401 });
         const parsed = RequestBody.safeParse(await request.json());
         if (!parsed.success) return new Response("Invalid 3D generation request", { status: 400 });
 
+        const generationCost = 12;
+        let charged = false;
+        let supabaseAdmin:
+          | Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"]
+          | null = null;
+        if (parsed.data.action === "create") {
+          ({ supabaseAdmin } = await import("@/integrations/supabase/client.server"));
+          const { error: creditError } = await supabaseAdmin.rpc("consume_creator_credits", {
+            _user_id: userId,
+            _amount: generationCost,
+          });
+          if (creditError) return new Response("Insufficient credits", { status: 402 });
+          charged = true;
+        } else {
+          const { data: ownedTask } = await db
+            .from("tripo_tasks")
+            .select("external_task_id")
+            .eq("external_task_id", parsed.data.taskId)
+            .eq("owner_id", userId)
+            .maybeSingle();
+          if (!ownedTask) return new Response("3D generation task not found", { status: 404 });
+        }
         const endpoint =
           parsed.data.action === "create"
             ? `${TRIPO_API}/task`
@@ -56,6 +79,12 @@ export const Route = createFileRoute("/api/tripo")({
           };
         };
         if (!upstream.ok || payload.code !== 0) {
+          if (charged && supabaseAdmin) {
+            await supabaseAdmin.rpc("refund_creator_credits", {
+              _user_id: userId,
+              _amount: generationCost,
+            });
+          }
           console.error("Tripo API error", upstream.status, payload.message);
           return new Response(payload.message || "Tripo request failed", {
             status: upstream.status || 502,
@@ -64,9 +93,30 @@ export const Route = createFileRoute("/api/tripo")({
         if (parsed.data.action === "create") {
           if (!payload.data?.task_id)
             return new Response("Tripo did not return a task", { status: 502 });
+          if (!supabaseAdmin)
+            return new Response("Could not register 3D generation task", { status: 500 });
+          const { error: taskError } = await supabaseAdmin.from("tripo_tasks").insert({
+            owner_id: userId,
+            external_task_id: payload.data.task_id,
+            prompt: parsed.data.prompt,
+            status: payload.data.status ?? "queued",
+          });
+          if (taskError) {
+            await supabaseAdmin.rpc("refund_creator_credits", {
+              _user_id: userId,
+              _amount: generationCost,
+            });
+            return new Response("Could not register 3D generation task", { status: 500 });
+          }
           return Response.json({ taskId: payload.data.task_id });
         }
         const status = payload.data?.status ?? "running";
+        const { supabaseAdmin: taskAdmin } = await import("@/integrations/supabase/client.server");
+        await taskAdmin
+          .from("tripo_tasks")
+          .update({ status })
+          .eq("external_task_id", parsed.data.taskId)
+          .eq("owner_id", userId);
         const output = payload.data?.output;
         return Response.json({
           status,

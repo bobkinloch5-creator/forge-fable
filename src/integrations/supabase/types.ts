@@ -495,6 +495,36 @@ export type Database = {
           },
         ]
       }
+      tripo_tasks: {
+        Row: {
+          created_at: string
+          external_task_id: string
+          id: string
+          owner_id: string
+          prompt: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          external_task_id: string
+          id?: string
+          owner_id: string
+          prompt?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          external_task_id?: string
+          id?: string
+          owner_id?: string
+          prompt?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -531,6 +561,14 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      consume_creator_credits: {
+        Args: { _amount: number; _user_id: string }
+        Returns: number
+      }
+      refund_creator_credits: {
+        Args: { _amount: number; _user_id: string }
+        Returns: undefined
       }
     }
     Enums: {
