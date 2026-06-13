@@ -131,7 +131,7 @@ function StudioDashboard() {
               </span>
               <strong>Forge your first game</strong>
               <span className="mt-1 text-sm text-muted-foreground">
-                 Start with a clean workspace, then build through conversation.
+                Start with a clean workspace, then build through conversation.
               </span>
             </Button>
           ) : (

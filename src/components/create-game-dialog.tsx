@@ -11,12 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createGame } from "@/lib/studio.functions";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Gamepad2,
-  Globe2,
-  Monitor,
-  Smartphone,
-} from "lucide-react";
+import { Gamepad2, Globe2, Monitor, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -104,7 +99,9 @@ export function CreateGameDialog({
         </DialogHeader>
         <div className="min-h-0 space-y-6 overflow-y-auto overscroll-contain p-4 sm:p-8">
           <div className="space-y-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Target Platform</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Target Platform
+            </p>
             <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:gap-3 lg:grid-cols-4">
               {platforms.map((platform) => (
                 <Button
@@ -122,7 +119,9 @@ export function CreateGameDialog({
 
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Format</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Format
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 {(["2D", "3D"] as const).map((dimension) => (
                   <Button
@@ -137,7 +136,9 @@ export function CreateGameDialog({
               </div>
             </div>
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Project Name</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Project Name
+              </p>
               <Input
                 value={draft.name}
                 onChange={(e) => setDraft({ ...draft, name: e.target.value })}
@@ -148,7 +149,9 @@ export function CreateGameDialog({
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Game Description</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Game Description
+            </p>
             <Textarea
               value={draft.description}
               onChange={(e) => setDraft({ ...draft, description: e.target.value })}
@@ -163,7 +166,9 @@ export function CreateGameDialog({
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-border bg-panel/40 p-4 sm:px-8">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button
             onClick={finish}
             disabled={busy || !draft.name || !draft.description}

@@ -74,14 +74,7 @@ type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWork
 type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
-type StudioTab =
-  | "memory"
-  | "versions"
-  | "tests"
-  | "preview"
-  | "models"
-  | "code"
-  ;
+type StudioTab = "memory" | "versions" | "tests" | "preview" | "models" | "code";
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
 
