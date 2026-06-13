@@ -38,14 +38,16 @@ function StudioDashboard() {
   const [data, setData] = useState<{
     profile: { display_name: string; plan: string; credits: number } | null;
     games: Tables<"games">[];
+    roles: { role: "owner" | "admin" | "moderator" | "user" }[];
   } | null>(null);
   const getOverview = useServerFn(getStudioOverview);
   useEffect(() => {
     getOverview().then(setData);
   }, [getOverview]);
   const games = data?.games ?? [];
+  const isOwner = data?.roles.some((item) => item.role === "owner") ?? false;
   return (
-    <StudioShell title="Project hub" subtitle="Build across web, mobile, and PC">
+    <StudioShell title="Project hub" subtitle="Build across web, mobile, and PC" accountRole={isOwner ? "owner" : undefined} credits={isOwner ? "unlimited" : data?.profile?.credits}>
       <main className="mx-auto max-w-[1500px] p-3 pb-24 sm:p-6 sm:pb-24 lg:p-8">
         <section className="mb-8 grid gap-4 xl:grid-cols-[1.5fr_1fr]">
           <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-5 sm:p-9">
@@ -77,13 +79,13 @@ function StudioDashboard() {
               { label: "Active projects", value: games.length, icon: Gamepad2 },
               {
                 label: "Forge credits",
-                value: data?.profile?.credits ?? 250,
+                value: isOwner ? "Unlimited" : (data?.profile?.credits ?? 250),
                 icon: Zap,
               },
               { label: "Build artifacts", value: games.length * 4, icon: Box },
               {
                 label: "Plan",
-                value: (data?.profile?.plan ?? "free").replace("_", " "),
+                value: isOwner ? "Platform owner" : (data?.profile?.plan ?? "free").replace("_", " "),
                 icon: Layers3,
               },
             ].map((stat) => (

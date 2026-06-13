@@ -27,7 +27,7 @@ const GameInput = z.object({
 export const getStudioOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const [profile, games] = await Promise.all([
+    const [profile, games, roles] = await Promise.all([
       context.supabase
         .from("profiles")
         .select("display_name, plan, credits")
@@ -38,10 +38,12 @@ export const getStudioOverview = createServerFn({ method: "GET" })
         .select("*")
         .eq("owner_id", context.userId)
         .order("updated_at", { ascending: false }),
+      context.supabase.from("user_roles").select("role").eq("user_id", context.userId),
     ]);
     if (profile.error) throw new Error(profile.error.message);
     if (games.error) throw new Error(games.error.message);
-    return { profile: profile.data, games: games.data ?? [] };
+    if (roles.error) throw new Error(roles.error.message);
+    return { profile: profile.data, games: games.data ?? [], roles: roles.data ?? [] };
   });
 
 export const createGame = createServerFn({ method: "POST" })
@@ -240,7 +242,7 @@ export const getWorkspace = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => WorkspaceInput.parse(input))
   .handler(async ({ data, context }) => {
-    const [game, threads, messages, files, stages, checkpoints] = await Promise.all([
+    const [game, threads, messages, files, stages, checkpoints, roles] = await Promise.all([
       context.supabase
         .from("games")
         .select("*")
@@ -277,8 +279,9 @@ export const getWorkspace = createServerFn({ method: "POST" })
         .eq("game_id", data.gameId)
         .eq("owner_id", context.userId)
         .order("created_at", { ascending: false }),
+      context.supabase.from("user_roles").select("role").eq("user_id", context.userId),
     ]);
-    for (const result of [game, threads, messages, files, stages, checkpoints])
+    for (const result of [game, threads, messages, files, stages, checkpoints, roles])
       if (result.error) throw new Error(result.error.message);
     return {
       game: game.data,
@@ -287,5 +290,6 @@ export const getWorkspace = createServerFn({ method: "POST" })
       files: files.data ?? [],
       stages: stages.data ?? [],
       checkpoints: checkpoints.data ?? [],
+      roles: roles.data ?? [],
     };
   });

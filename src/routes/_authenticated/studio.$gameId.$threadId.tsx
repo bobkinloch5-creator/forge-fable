@@ -16,6 +16,9 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import { TripoModelLab } from "@/components/tripo-model-lab";
 import { DesktopBuildCenter } from "@/components/desktop-build-center";
 import { WebsitePublishingCenter } from "@/components/website-publishing-center";
+import { ProjectMemoryPanel } from "@/components/project-memory-panel";
+import { VersionControlPanel } from "@/components/version-control-panel";
+import { PlaytestCenter } from "@/components/playtest-center";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -46,6 +49,9 @@ import {
   Gamepad2,
   Globe2,
   History,
+  Brain,
+  GitBranch,
+  FlaskConical,
   Image,
   Maximize2,
   Monitor,
@@ -83,7 +89,7 @@ type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWork
 type ReadyWorkspace = Omit<Workspace, "game"> & {
   game: NonNullable<Workspace["game"]>;
 };
-type StudioTab = "planner" | "preview" | "models" | "code" | "console" | "export" | "publish";
+type StudioTab = "planner" | "memory" | "versions" | "tests" | "preview" | "models" | "code" | "console" | "export" | "publish";
 type ModelTier = "fast" | "balanced" | "pro" | "comet";
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewOrientation = "portrait" | "landscape";
@@ -159,6 +165,8 @@ function GameWorkspace() {
       title={workspace.game.name}
       subtitle={`${workspace.game.platform} / ${workspace.game.genre}`}
       compact
+      accountRole={workspace.roles.some((item) => item.role === "owner") ? "owner" : undefined}
+      credits={workspace.roles.some((item) => item.role === "owner") ? "unlimited" : undefined}
     >
       <ChatWorkspace
         key={threadId}
@@ -475,6 +483,9 @@ function ChatWorkspace({
             {(
               [
                 { id: "planner", label: "Production Plan", icon: History },
+                { id: "memory", label: "Memory", icon: Brain },
+                { id: "versions", label: "Versions", icon: GitBranch },
+                { id: "tests", label: "Playtests", icon: FlaskConical },
                 { id: "preview", label: "Viewport", icon: Gamepad2 },
                 { id: "models", label: "3D Forge", icon: Cuboid },
                 { id: "code", label: "Code Editor", icon: Code2 },
@@ -621,6 +632,9 @@ function ChatWorkspace({
             </div>
           </div>
         )}
+        {tab === "memory" && <ProjectMemoryPanel gameId={gameId} />}
+        {tab === "versions" && <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />}
+        {tab === "tests" && <PlaytestCenter gameId={gameId} />}
         {tab === "preview" && (
           <div
             className={`panel-grid relative flex flex-1 flex-col items-center justify-center overflow-auto p-3 sm:p-5 ${previewFullscreen ? "fixed inset-0 z-[80] bg-background" : ""}`}
