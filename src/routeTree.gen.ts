@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiTripoRouteImport } from './routes/api/tripo'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as AuthenticatedStudioGameIdRouteImport } from './routes/_authenticated/studio.$gameId'
@@ -35,6 +36,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTripoRoute = ApiTripoRouteImport.update({
+  id: '/api/tripo',
+  path: '/api/tripo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/tripo': typeof ApiTripoRoute
   '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/tripo': typeof ApiTripoRoute
   '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/tripo': typeof ApiTripoRoute
   '/_authenticated/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/_authenticated/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/studio'
     | '/api/chat'
+    | '/api/tripo'
     | '/studio/$gameId'
     | '/studio/$gameId/$threadId'
   fileRoutesByTo: FileRoutesByTo
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/studio'
     | '/api/chat'
+    | '/api/tripo'
     | '/studio/$gameId'
     | '/studio/$gameId/$threadId'
   id:
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/studio'
     | '/api/chat'
+    | '/api/tripo'
     | '/_authenticated/studio/$gameId'
     | '/_authenticated/studio/$gameId/$threadId'
   fileRoutesById: FileRoutesById
@@ -126,6 +138,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiTripoRoute: typeof ApiTripoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -156,6 +169,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/tripo': {
+      id: '/api/tripo'
+      path: '/api/tripo'
+      fullPath: '/api/tripo'
+      preLoaderRoute: typeof ApiTripoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -232,6 +252,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiTripoRoute: ApiTripoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

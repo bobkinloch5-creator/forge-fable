@@ -13,6 +13,7 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import { TripoModelLab } from "@/components/tripo-model-lab";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ import {
   Bot,
   ChevronDown,
   Code2,
+  Cuboid,
   FileCode2,
   Folder,
   Gamepad2,
@@ -64,7 +66,7 @@ export const Route = createFileRoute("/_authenticated/studio/$gameId/$threadId")
 
 type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWorkspace>>>>;
 type ReadyWorkspace = Omit<Workspace, "game"> & { game: NonNullable<Workspace["game"]> };
-type StudioTab = "preview" | "code" | "console";
+type StudioTab = "preview" | "models" | "code" | "console";
 type ModelTier = "fast" | "balanced" | "pro";
 
 function GameWorkspace() {
@@ -303,6 +305,7 @@ function ChatWorkspace({
             {(
               [
                 { id: "preview", label: "Viewport", icon: Gamepad2 },
+                { id: "models", label: "3D Forge", icon: Cuboid },
                 { id: "code", label: "Code Editor", icon: Code2 },
                 { id: "console", label: "Console", icon: Terminal },
               ] as const
@@ -375,6 +378,7 @@ function ChatWorkspace({
             </div>
           </div>
         )}
+        {tab === "models" && <TripoModelLab />}
         {tab === "code" && (
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex h-10 items-center gap-2 border-b border-border bg-panel px-4 text-xs">
