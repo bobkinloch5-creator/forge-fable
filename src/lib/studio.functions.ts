@@ -1,5 +1,5 @@
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { developmentStageBlueprint, fileSeed } from "@/lib/studio-data";
+import { fileSeed } from "@/lib/studio-data";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -26,21 +26,22 @@ const GameInput = z.object({
   name: z.string().min(1).max(80),
   platform: z.enum(platformValues),
   dimension: z.enum(["2D", "3D"]),
-  genre: z.string().min(0).max(40).default("General"),
-  artStyle: z.string().min(0).max(40).default("Default"),
-  playerMode: z.string().min(0).max(40).default("Single-player"),
-  controls: z.array(z.string().max(60)).max(12),
-  systems: z.array(z.string().max(60)).max(30),
-  monetization: z.string().min(0).max(40).default("Free"),
   description: z.string().max(500),
-  responsiveTargets: z.array(z.enum(["Mobile", "Tablet", "Desktop"])).max(3),
-  accountMode: z.string().min(0).max(40).default("Guest"),
-  saveProgress: z.boolean(),
-  leaderboards: z.boolean(),
-  achievements: z.boolean(),
-  revenueModel: z.string().min(0).max(40).default("None"),
-  domainChoice: z.string().min(0).max(40).default("Free"),
-  publicLandingPage: z.boolean(),
+  // Defaulted fields to satisfy DB schema
+  genre: z.string().default("General"),
+  artStyle: z.string().default("Default"),
+  playerMode: z.string().default("Single-player"),
+  monetization: z.string().default("Free"),
+  controls: z.array(z.string()).default([]),
+  systems: z.array(z.string()).default([]),
+  responsiveTargets: z.array(z.string()).default([]),
+  accountMode: z.string().default("Guest"),
+  saveProgress: z.boolean().default(false),
+  leaderboards: z.boolean().default(false),
+  achievements: z.boolean().default(false),
+  revenueModel: z.string().default("None"),
+  domainChoice: z.string().default("Free"),
+  publicLandingPage: z.boolean().default(false),
 });
 
 export const getStudioOverview = createServerFn({ method: "GET" })
@@ -80,18 +81,8 @@ export const createGame = createServerFn({ method: "POST" })
         art_style: data.artStyle,
         player_mode: data.playerMode,
         monetization: data.monetization,
-        description: [
-          data.description,
-          `Dimension: ${data.dimension}`,
-          `Controls: ${data.controls.join(", ")}`,
-          `Systems: ${data.systems.join(", ")}`,
-          data.platform === "Web browser game"
-            ? `Website targets: ${data.responsiveTargets.join(", ")}\nPlayer access: ${data.accountMode}\nCloud progress: ${data.saveProgress ? "Yes" : "No"}\nLeaderboards: ${data.leaderboards ? "Yes" : "No"}\nAchievements: ${data.achievements ? "Yes" : "No"}\nRevenue: ${data.revenueModel}\nDomain: ${data.domainChoice}\nPublic landing page: ${data.publicLandingPage ? "Yes" : "No"}`
-            : "",
-        ]
-          .filter(Boolean)
-          .join("\n\n"),
-        status: "plan_approved",
+        status: "approved",
+        description: `${data.description}\n\nDimension: ${data.dimension}`,
       })
       .select()
       .single();
@@ -102,93 +93,40 @@ export const createGame = createServerFn({ method: "POST" })
       .insert({
         game_id: game.id,
         owner_id: context.userId,
-        title: "Foundation build",
+        title: "Initial build",
       })
       .select()
       .single();
     if (threadError || !thread)
       throw new Error(threadError?.message ?? "Could not create build session");
 
-    const designDocument = {
-      path: "docs/game-design-document.md",
-      language: "markdown",
-      content: `# ${data.name}\n\n## Approved foundation\n- Platform: ${data.platform}\n- Format: ${data.dimension}\n- Genre: ${data.genre}\n- Play mode: ${data.playerMode}\n- Art direction: ${data.artStyle}\n- Controls: ${data.controls.join(", ")}\n- Systems: ${data.systems.join(", ")}\n${data.platform === "Web browser game" ? `- Responsive targets: ${data.responsiveTargets.join(", ")}\n- Player access: ${data.accountMode}\n- Save progress: ${data.saveProgress}\n- Multiplayer: ${data.playerMode.includes("multiplayer")}\n- Leaderboards: ${data.leaderboards}\n- Achievements: ${data.achievements}\n- Revenue model: ${data.revenueModel}\n- Domain plan: ${data.domainChoice}\n- Public landing page: ${data.publicLandingPage}` : ""}\n\n## Game vision\n${data.description || "To be refined with Fable 5 during the foundation build."}\n\n## Responsive quality gates\nTest phone, tablet, laptop, desktop, portrait, and landscape layouts for overlaps, clipping, tap targets, scaling, controls, loading, keyboard behavior, safe areas, and performance before release.\n\n## Export policy\nBuilds are reported as complete only after the required compiler, SDK, signing, packaging, and validation steps succeed.`,
-    };
-    const exportConfig = {
-      path: "config/export-targets.json",
-      language: "json",
-      content: JSON.stringify(
-        {
-          targets: [data.platform],
-          status: "configuration_ready",
-          signing: "required_for_store_or_installer_builds",
-        },
-        null,
-        2,
-      ),
-    };
-    const technicalDocument = {
-      path: "docs/technical-design-document.md",
-      language: "markdown",
-      content: `# ${data.name} — Technical Design\n\n## Architecture principles\n- Modular, reusable systems with explicit interfaces\n- Dependency-aware features with one authoritative implementation per concern\n- Versioned data and save migrations\n- Platform-specific input, performance budgets, and export pipelines\n- Client/server separation and server authority when networking is enabled\n\n## Planned systems\n${data.systems.map((system) => `- ${system}`).join("\n")}\n\n## Quality gates\nEvery stage requires dependency checks, tests, performance review, and a checkpoint before high-risk changes.`,
-    };
-    const architectureDocument = {
-      path: "docs/system-architecture.md",
-      language: "markdown",
-      content: `# System Architecture\n\n## Layers\n1. Platform and runtime services\n2. Data, saves, content registries, and networking\n3. Reusable gameplay systems\n4. World, encounters, quests, and authored content\n5. UI, audio, VFX, accessibility, and telemetry\n\n## Dependency rule\nHigher layers consume stable interfaces from lower layers. Systems may communicate through typed events and services, never duplicate ownership of the same state.\n\n## Scale targets\nMultiple maps and game modes, streamed worlds, data-driven enemies/items/quests/abilities, pooled entities, asynchronous asset loading, and measurable CPU/GPU/memory/network budgets.`,
-    };
-    const milestoneDocument = {
-      path: "docs/development-roadmap.md",
-      language: "markdown",
-      content: `# Development Roadmap\n\n${developmentStageBlueprint.map((stage, index) => `## ${index + 1}. ${stage.title}\nDependencies: ${stage.dependencies.join(", ") || "None"}\nDeliverables: ${stage.deliverables.join(", ")}\n`).join("\n")}\n## Change policy\nCreate a checkpoint before major refactors, exports, dependency upgrades, world migrations, or changes spanning multiple systems.`,
-    };
     const { error: filesError } = await context.supabase.from("project_files").insert(
-      [
-        ...fileSeed,
-        designDocument,
-        technicalDocument,
-        architectureDocument,
-        milestoneDocument,
-        exportConfig,
-      ].map((file) => ({
+      fileSeed.map((file) => ({
         ...file,
         game_id: game.id,
         owner_id: context.userId,
       })),
     );
     if (filesError) throw new Error(filesError.message);
-    const memoryRows = [
-      { category: "vision", memory_key: "game-vision", content: data.description || `${data.name} is a ${data.dimension} ${data.genre} game.` },
-      { category: "genre", memory_key: "genre", content: data.genre },
-      { category: "art_style", memory_key: "art-direction", content: data.artStyle },
-      { category: "control", memory_key: "control-scheme", content: data.controls.join(", ") },
-      { category: "multiplayer", memory_key: "player-mode", content: data.playerMode },
-      { category: "mechanic", memory_key: "selected-systems", content: data.systems.join(", ") || "Core movement and interaction" },
-    ];
-    const { error: memoryError } = await context.supabase.from("game_memory").insert(
-      memoryRows.map((memory) => ({
-        ...memory,
-        game_id: game.id,
-        owner_id: context.userId,
-        source: "approved_plan",
-        importance: 90,
-      })),
-    );
+
+    const { error: memoryError } = await context.supabase.from("game_memory").insert({
+      category: "vision",
+      memory_key: "game-vision",
+      content: data.description || `${data.name} is a ${data.dimension} game.`,
+      game_id: game.id,
+      owner_id: context.userId,
+      source: "creation",
+      importance: 90,
+    });
     if (memoryError) throw new Error(memoryError.message);
-    const allInitialFiles = [
-      ...fileSeed,
-      designDocument,
-      technicalDocument,
-      architectureDocument,
-      milestoneDocument,
-      exportConfig,
-    ];
+
     const { data: insertedFiles, error: insertedFilesError } = await context.supabase
       .from("project_files")
       .select("id, path, content, language, version")
       .eq("game_id", game.id)
       .eq("owner_id", context.userId);
     if (insertedFilesError) throw new Error(insertedFilesError.message);
+
     const { error: revisionError } = await context.supabase.from("file_revisions").insert(
       (insertedFiles ?? []).map((file) => ({
         game_id: game.id,
@@ -199,33 +137,20 @@ export const createGame = createServerFn({ method: "POST" })
         language: file.language,
         version: file.version,
         change_type: "created",
-        summary: "Approved foundation",
+        summary: "Initial files",
       })),
     );
     if (revisionError) throw new Error(revisionError.message);
-    const { error: stagesError } = await context.supabase.from("development_stages").insert(
-      developmentStageBlueprint.map((stage, index) => ({
-        game_id: game.id,
-        owner_id: context.userId,
-        stage_key: stage.key,
-        title: stage.title,
-        position: index + 1,
-        status: index === 0 ? "ready" : "planned",
-        dependencies: [...stage.dependencies],
-        deliverables: [...stage.deliverables],
-      })),
-    );
-    if (stagesError) throw new Error(stagesError.message);
-    const fileManifest = allInitialFiles.map((file) => ({ path: file.path, version: 1 }));
+
     const { error: checkpointError } = await context.supabase.from("project_checkpoints").insert({
       game_id: game.id,
       owner_id: context.userId,
-      label: "Approved foundation",
-      summary: "Initial game, technical architecture, roadmap, and export requirements approved.",
-      stage_key: "game-planning",
-      file_manifest: fileManifest,
+      label: "Project created",
+      summary: "Minimal project foundation started.",
+      file_manifest: (insertedFiles ?? []).map((file) => ({ path: file.path, version: 1 })),
     });
     if (checkpointError) throw new Error(checkpointError.message);
+
     return { gameId: game.id, threadId: thread.id };
   });
 
