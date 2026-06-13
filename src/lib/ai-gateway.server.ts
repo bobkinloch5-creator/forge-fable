@@ -6,10 +6,15 @@ export function createLovableAiGatewayProvider(apiKey: string, initialRunId?: st
   let runId = initialRunId?.trim() || undefined;
   let resolveRunId: (value: string | undefined) => void = () => {};
   let resolved = false;
-  const ready = new Promise<string | undefined>((resolve) => { resolveRunId = resolve; });
+  const ready = new Promise<string | undefined>((resolve) => {
+    resolveRunId = resolve;
+  });
   const publish = (value?: string) => {
     runId ||= value?.trim() || undefined;
-    if (!resolved) { resolved = true; resolveRunId(runId); }
+    if (!resolved) {
+      resolved = true;
+      resolveRunId(runId);
+    }
   };
   if (runId) publish(runId);
 
@@ -24,12 +29,15 @@ export function createLovableAiGatewayProvider(apiKey: string, initialRunId?: st
         const response = await fetch(input, { ...init, headers });
         publish(response.headers.get(RUN_ID_HEADER) ?? undefined);
         return response;
-      } catch (error) { publish(); throw error; }
+      } catch (error) {
+        publish();
+        throw error;
+      }
     },
   });
   return Object.assign(provider, {
     getRunId: () => runId,
-    waitForRunId: () => runId ? Promise.resolve(runId) : ready,
+    waitForRunId: () => (runId ? Promise.resolve(runId) : ready),
   });
 }
 
@@ -37,7 +45,10 @@ export function getGatewayRunId(request: Request) {
   return request.headers.get(RUN_ID_HEADER)?.trim() || undefined;
 }
 
-export async function withGatewayRunId(response: Response, gateway: ReturnType<typeof createLovableAiGatewayProvider>) {
+export async function withGatewayRunId(
+  response: Response,
+  gateway: ReturnType<typeof createLovableAiGatewayProvider>,
+) {
   if (!response.body) return response;
   const reader = response.body.getReader();
   const firstChunk = reader.read();
@@ -56,7 +67,9 @@ export async function withGatewayRunId(response: Response, gateway: ReturnType<t
           controller.enqueue(chunk.value);
         }
         controller.close();
-      } catch (error) { controller.error(error); }
+      } catch (error) {
+        controller.error(error);
+      }
     },
     cancel: (reason) => reader.cancel(reason),
   });

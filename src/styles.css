@@ -153,16 +153,40 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    background-image: radial-gradient(circle at 65% -10%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 28%), radial-gradient(circle at 10% 20%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 24%);
+    background-image:
+      radial-gradient(
+        circle at 65% -10%,
+        color-mix(in oklab, var(--accent) 10%, transparent),
+        transparent 28%
+      ),
+      radial-gradient(
+        circle at 10% 20%,
+        color-mix(in oklab, var(--primary) 8%, transparent),
+        transparent 24%
+      );
     min-width: 320px;
   }
 
-  ::selection { background: color-mix(in oklab, var(--primary) 42%, transparent); }
-  button, a { -webkit-tap-highlight-color: transparent; }
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 42%, transparent);
+  }
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer utilities {
-  .panel-grid { background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 28px 28px; }
-  .text-balance { text-wrap: balance; }
-  .forge-glow { box-shadow: 0 0 48px color-mix(in oklab, var(--primary) 14%, transparent); }
+  .panel-grid {
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .forge-glow {
+    box-shadow: 0 0 48px color-mix(in oklab, var(--primary) 14%, transparent);
+  }
 }
