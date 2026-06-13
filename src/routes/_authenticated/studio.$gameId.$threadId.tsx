@@ -49,6 +49,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 
 export const Route = createFileRoute("/_authenticated/studio/$gameId/$threadId")({
   component: GameWorkspace,
@@ -64,6 +65,9 @@ export const Route = createFileRoute("/_authenticated/studio/$gameId/$threadId")
 });
 
 type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWorkspace>>>>;
+type ReadyWorkspace = Omit<Workspace, "game"> & { game: NonNullable<Workspace["game"]> };
+type StudioTab = "preview" | "code" | "console";
+type ModelTier = "fast" | "balanced" | "pro";
 
 function GameWorkspace() {
   const { gameId, threadId } = Route.useParams();
@@ -71,8 +75,8 @@ function GameWorkspace() {
   const addThread = useServerFn(createThread);
   const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [tab, setTab] = useState<"preview" | "code" | "console">("preview");
-  const [modelTier, setModelTier] = useState<"fast" | "balanced" | "pro">("balanced");
+  const [tab, setTab] = useState<StudioTab>("preview");
+  const [modelTier, setModelTier] = useState<ModelTier>("balanced");
   const [selectedFile, setSelectedFile] = useState("");
   const [playing, setPlaying] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -110,7 +114,7 @@ function GameWorkspace() {
       <ChatWorkspace
         key={threadId}
         {...{
-          workspace,
+          workspace: workspace as ReadyWorkspace,
           initialMessages,
           gameId,
           threadId,
@@ -147,7 +151,23 @@ function ChatWorkspace({
   textareaRef,
   addThread,
   navigate,
-}: any) {
+}: {
+  workspace: ReadyWorkspace;
+  initialMessages: UIMessage[];
+  gameId: string;
+  threadId: string;
+  tab: StudioTab;
+  setTab: Dispatch<SetStateAction<StudioTab>>;
+  modelTier: ModelTier;
+  setModelTier: Dispatch<SetStateAction<ModelTier>>;
+  selectedFile: string;
+  setSelectedFile: Dispatch<SetStateAction<string>>;
+  playing: boolean;
+  setPlaying: Dispatch<SetStateAction<boolean>>;
+  textareaRef: RefObject<HTMLTextAreaElement | null>;
+  addThread: (options: { data: { gameId: string } }) => Promise<{ id: string }>;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
   const transport = useMemo(
     () =>
       new DefaultChatTransport<UIMessage>({
@@ -180,7 +200,7 @@ function ChatWorkspace({
     textareaRef.current?.focus();
   }, [threadId, textareaRef]);
   const activeFile =
-    workspace.files.find((file: any) => file.path === selectedFile) ?? workspace.files[0];
+    workspace.files.find((file) => file.path === selectedFile) ?? workspace.files[0];
   async function submit(message: { text: string }) {
     if (!message.text.trim()) return;
     await sendMessage({ text: message.text.trim() });
@@ -203,7 +223,7 @@ function ChatWorkspace({
           </Button>
         </div>
         <div className="flex gap-1 overflow-x-auto border-b border-border p-2 xl:block xl:space-y-1">
-          {workspace.threads.map((thread: any) => (
+          {workspace.threads.map((thread) => (
             <button
               key={thread.id}
               onClick={() =>
@@ -385,7 +405,7 @@ function ChatWorkspace({
             <Folder className="size-4 text-primary" />
             {workspace.game.name}
           </div>
-          {workspace.files.map((file: any) => (
+          {workspace.files.map((file) => (
             <button
               key={file.id}
               onClick={() => {

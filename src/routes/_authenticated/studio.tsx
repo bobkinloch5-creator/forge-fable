@@ -18,6 +18,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { Tables } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/studio")({
   component: StudioDashboard,
@@ -36,7 +37,7 @@ function StudioDashboard() {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<{
     profile: { display_name: string; plan: string; credits: number } | null;
-    games: any[];
+    games: Tables<"games">[];
   } | null>(null);
   const getOverview = useServerFn(getStudioOverview);
   useEffect(() => {
