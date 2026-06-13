@@ -23,11 +23,15 @@ export function StudioShell({
   title,
   subtitle,
   compact = false,
+  accountRole,
+  credits,
 }: {
   children: ReactNode;
   title: string;
   subtitle?: string;
   compact?: boolean;
+  accountRole?: string;
+  credits?: number | "unlimited";
 }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -79,11 +83,11 @@ export function StudioShell({
           {!compact && (
             <div className="rounded-lg border border-border bg-panel p-3">
               <div className="mb-2 flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Forge credits</span>
-                <span className="font-mono text-primary">250</span>
+                <span className="text-muted-foreground">{accountRole === "owner" ? "Platform owner" : "Forge credits"}</span>
+                <span className="font-mono text-primary">{credits === "unlimited" ? "Unlimited" : (credits ?? 250).toLocaleString()}</span>
               </div>
               <div className="h-1 overflow-hidden rounded-full bg-muted">
-                <div className="h-full w-2/3 bg-primary" />
+                <div className={`h-full bg-primary ${credits === "unlimited" ? "w-full" : "w-2/3"}`} />
               </div>
             </div>
           )}

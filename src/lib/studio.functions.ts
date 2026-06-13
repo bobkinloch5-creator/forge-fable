@@ -27,7 +27,7 @@ const GameInput = z.object({
 export const getStudioOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const [profile, games] = await Promise.all([
+    const [profile, games, roles] = await Promise.all([
       context.supabase
         .from("profiles")
         .select("display_name, plan, credits")
@@ -38,10 +38,12 @@ export const getStudioOverview = createServerFn({ method: "GET" })
         .select("*")
         .eq("owner_id", context.userId)
         .order("updated_at", { ascending: false }),
+      context.supabase.from("user_roles").select("role").eq("user_id", context.userId),
     ]);
     if (profile.error) throw new Error(profile.error.message);
     if (games.error) throw new Error(games.error.message);
-    return { profile: profile.data, games: games.data ?? [] };
+    if (roles.error) throw new Error(roles.error.message);
+    return { profile: profile.data, games: games.data ?? [], roles: roles.data ?? [] };
   });
 
 export const createGame = createServerFn({ method: "POST" })
@@ -135,6 +137,52 @@ export const createGame = createServerFn({ method: "POST" })
       })),
     );
     if (filesError) throw new Error(filesError.message);
+    const memoryRows = [
+      { category: "vision", memory_key: "game-vision", content: data.description || `${data.name} is a ${data.dimension} ${data.genre} game.` },
+      { category: "genre", memory_key: "genre", content: data.genre },
+      { category: "art_style", memory_key: "art-direction", content: data.artStyle },
+      { category: "control", memory_key: "control-scheme", content: data.controls.join(", ") },
+      { category: "multiplayer", memory_key: "player-mode", content: data.playerMode },
+      { category: "mechanic", memory_key: "selected-systems", content: data.systems.join(", ") || "Core movement and interaction" },
+    ];
+    const { error: memoryError } = await context.supabase.from("game_memory").insert(
+      memoryRows.map((memory) => ({
+        ...memory,
+        game_id: game.id,
+        owner_id: context.userId,
+        source: "approved_plan",
+        importance: 90,
+      })),
+    );
+    if (memoryError) throw new Error(memoryError.message);
+    const allInitialFiles = [
+      ...fileSeed,
+      designDocument,
+      technicalDocument,
+      architectureDocument,
+      milestoneDocument,
+      exportConfig,
+    ];
+    const { data: insertedFiles, error: insertedFilesError } = await context.supabase
+      .from("project_files")
+      .select("id, path, content, language, version")
+      .eq("game_id", game.id)
+      .eq("owner_id", context.userId);
+    if (insertedFilesError) throw new Error(insertedFilesError.message);
+    const { error: revisionError } = await context.supabase.from("file_revisions").insert(
+      (insertedFiles ?? []).map((file) => ({
+        game_id: game.id,
+        file_id: file.id,
+        owner_id: context.userId,
+        path: file.path,
+        content: file.content,
+        language: file.language,
+        version: file.version,
+        change_type: "created",
+        summary: "Approved foundation",
+      })),
+    );
+    if (revisionError) throw new Error(revisionError.message);
     const { error: stagesError } = await context.supabase.from("development_stages").insert(
       developmentStageBlueprint.map((stage, index) => ({
         game_id: game.id,
@@ -148,14 +196,7 @@ export const createGame = createServerFn({ method: "POST" })
       })),
     );
     if (stagesError) throw new Error(stagesError.message);
-    const fileManifest = [
-      ...fileSeed,
-      designDocument,
-      technicalDocument,
-      architectureDocument,
-      milestoneDocument,
-      exportConfig,
-    ].map((file) => ({ path: file.path, version: 1 }));
+    const fileManifest = allInitialFiles.map((file) => ({ path: file.path, version: 1 }));
     const { error: checkpointError } = await context.supabase.from("project_checkpoints").insert({
       game_id: game.id,
       owner_id: context.userId,
@@ -201,7 +242,7 @@ export const getWorkspace = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => WorkspaceInput.parse(input))
   .handler(async ({ data, context }) => {
-    const [game, threads, messages, files, stages, checkpoints] = await Promise.all([
+    const [game, threads, messages, files, stages, checkpoints, roles] = await Promise.all([
       context.supabase
         .from("games")
         .select("*")
@@ -238,8 +279,9 @@ export const getWorkspace = createServerFn({ method: "POST" })
         .eq("game_id", data.gameId)
         .eq("owner_id", context.userId)
         .order("created_at", { ascending: false }),
+      context.supabase.from("user_roles").select("role").eq("user_id", context.userId),
     ]);
-    for (const result of [game, threads, messages, files, stages, checkpoints])
+    for (const result of [game, threads, messages, files, stages, checkpoints, roles])
       if (result.error) throw new Error(result.error.message);
     return {
       game: game.data,
@@ -248,5 +290,6 @@ export const getWorkspace = createServerFn({ method: "POST" })
       files: files.data ?? [],
       stages: stages.data ?? [],
       checkpoints: checkpoints.data ?? [],
+      roles: roles.data ?? [],
     };
   });

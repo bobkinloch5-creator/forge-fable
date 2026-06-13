@@ -1,0 +1,20 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { decideChangeProposal, getProjectHistory, restoreFileRevision } from "@/lib/project-changes.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { Check, GitBranch, RotateCcw, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+
+type History = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getProjectHistory>>>>;
+export function VersionControlPanel({ gameId, onRestored }: { gameId: string; onRestored: () => void }) {
+  const loadHistory = useServerFn(getProjectHistory);
+  const decide = useServerFn(decideChangeProposal);
+  const restore = useServerFn(restoreFileRevision);
+  const [history, setHistory] = useState<History>({ proposals: [], revisions: [] });
+  const refresh = useCallback(async () => setHistory(await loadHistory({ data: { gameId } })), [gameId, loadHistory]);
+  useEffect(() => { void refresh().catch((error) => toast.error(error.message)); }, [refresh]);
+  async function decideProposal(proposalId: string, decision: "approved" | "rejected") { await decide({ data: { gameId, proposalId, decision } }); await refresh(); toast.success(`Change ${decision}`); }
+  async function restoreRevision(revisionId: string) { await restore({ data: { gameId, revisionId } }); await refresh(); onRestored(); toast.success("File restored with an automatic backup"); }
+  return <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6"><div className="mb-5 flex items-start gap-3"><span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary"><GitBranch /></span><div><h2 className="text-xl font-semibold">Changes & versions</h2><p className="mt-1 text-xs text-muted-foreground">Review AI proposals and restore immutable file revisions safely.</p></div></div><section><h3 className="mb-3 text-sm font-semibold">Approval queue</h3><div className="grid gap-3 lg:grid-cols-2">{history.proposals.map((proposal) => <article key={proposal.id} className="rounded-xl border border-border bg-panel/60 p-4"><div className="flex items-center justify-between gap-2"><Badge variant="outline">{proposal.status}</Badge><Badge variant="outline" className={proposal.risk_level === "critical" || proposal.risk_level === "high" ? "text-destructive" : ""}>{proposal.risk_level} risk</Badge></div><h4 className="mt-3 font-medium">{proposal.title}</h4><p className="mt-2 text-xs leading-5 text-muted-foreground">{proposal.summary}</p>{proposal.status === "pending" && <div className="mt-4 flex gap-2"><Button size="sm" onClick={() => decideProposal(proposal.id, "approved")}><Check />Approve</Button><Button size="sm" variant="outline" onClick={() => decideProposal(proposal.id, "rejected")}><X />Reject</Button></div>}</article>)}{history.proposals.length === 0 && <p className="text-xs text-muted-foreground">No proposed changes awaiting review.</p>}</div></section><section className="mt-7 border-t border-border pt-5"><h3 className="mb-3 text-sm font-semibold">File revision history</h3><div className="space-y-2">{history.revisions.map((revision) => <div key={revision.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-canvas/60 p-3"><Badge variant="outline">v{revision.version}</Badge><div className="min-w-0 flex-1"><p className="truncate text-xs font-medium">{revision.path}</p><p className="truncate text-[10px] text-muted-foreground">{revision.change_type} · {revision.summary || "Recorded revision"}</p></div><Button size="sm" variant="outline" onClick={() => restoreRevision(revision.id)}><RotateCcw />Restore</Button></div>)}{history.revisions.length === 0 && <p className="text-xs text-muted-foreground">Revisions appear when approved changes or restores modify files.</p>}</div></section></div>;
+}

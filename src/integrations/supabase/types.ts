@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      change_proposals: {
+        Row: {
+          affected_systems: string[]
+          applied_at: string | null
+          changes: Json
+          created_at: string
+          decided_at: string | null
+          dependencies: string[]
+          error_message: string
+          game_id: string
+          id: string
+          owner_id: string
+          risk_level: string
+          risks: string[]
+          status: string
+          summary: string
+          test_plan: string[]
+          thread_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          affected_systems?: string[]
+          applied_at?: string | null
+          changes?: Json
+          created_at?: string
+          decided_at?: string | null
+          dependencies?: string[]
+          error_message?: string
+          game_id: string
+          id?: string
+          owner_id: string
+          risk_level?: string
+          risks?: string[]
+          status?: string
+          summary?: string
+          test_plan?: string[]
+          thread_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          affected_systems?: string[]
+          applied_at?: string | null
+          changes?: Json
+          created_at?: string
+          decided_at?: string | null
+          dependencies?: string[]
+          error_message?: string
+          game_id?: string
+          id?: string
+          owner_id?: string
+          risk_level?: string
+          risks?: string[]
+          status?: string
+          summary?: string
+          test_plan?: string[]
+          thread_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "change_proposals_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "change_proposals_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           ai_message_id: string | null
@@ -329,6 +407,110 @@ export type Database = {
           },
         ]
       }
+      file_revisions: {
+        Row: {
+          change_type: string
+          content: string
+          created_at: string
+          file_id: string | null
+          game_id: string
+          id: string
+          language: string
+          owner_id: string
+          path: string
+          summary: string
+          version: number
+        }
+        Insert: {
+          change_type: string
+          content?: string
+          created_at?: string
+          file_id?: string | null
+          game_id: string
+          id?: string
+          language?: string
+          owner_id: string
+          path: string
+          summary?: string
+          version: number
+        }
+        Update: {
+          change_type?: string
+          content?: string
+          created_at?: string
+          file_id?: string | null
+          game_id?: string
+          id?: string
+          language?: string
+          owner_id?: string
+          path?: string
+          summary?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_revisions_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "project_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "file_revisions_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_memory: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          game_id: string
+          id: string
+          importance: number
+          memory_key: string
+          owner_id: string
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          game_id: string
+          id?: string
+          importance?: number
+          memory_key: string
+          owner_id: string
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          game_id?: string
+          id?: string
+          importance?: number
+          memory_key?: string
+          owner_id?: string
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_memory_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           art_style: string
@@ -376,6 +558,135 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      playtest_results: {
+        Row: {
+          created_at: string
+          details: string
+          duration_ms: number
+          evidence: Json
+          game_id: string
+          id: string
+          owner_id: string
+          reproduction_steps: string[]
+          run_id: string
+          safe_fix_available: boolean
+          severity: string
+          status: string
+          suite: string
+          test_name: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string
+          duration_ms?: number
+          evidence?: Json
+          game_id: string
+          id?: string
+          owner_id: string
+          reproduction_steps?: string[]
+          run_id: string
+          safe_fix_available?: boolean
+          severity?: string
+          status: string
+          suite: string
+          test_name: string
+        }
+        Update: {
+          created_at?: string
+          details?: string
+          duration_ms?: number
+          evidence?: Json
+          game_id?: string
+          id?: string
+          owner_id?: string
+          reproduction_steps?: string[]
+          run_id?: string
+          safe_fix_available?: boolean
+          severity?: string
+          status?: string
+          suite?: string
+          test_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playtest_results_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playtest_results_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "playtest_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playtest_runs: {
+        Row: {
+          agent_id: string | null
+          completed_at: string | null
+          created_at: string
+          game_id: string
+          id: string
+          owner_id: string
+          progress_percent: number
+          started_at: string | null
+          status: string
+          summary: string
+          target_platform: string
+          test_suites: string[]
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          game_id: string
+          id?: string
+          owner_id: string
+          progress_percent?: number
+          started_at?: string | null
+          status?: string
+          summary?: string
+          target_platform: string
+          test_suites?: string[]
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          game_id?: string
+          id?: string
+          owner_id?: string
+          progress_percent?: number
+          started_at?: string | null
+          status?: string
+          summary?: string
+          target_platform?: string
+          test_suites?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playtest_runs_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "desktop_build_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playtest_runs_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
