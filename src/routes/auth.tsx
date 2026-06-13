@@ -64,6 +64,7 @@ function AuthPage() {
       redirect_uri: `${window.location.origin}/studio`,
     });
     if (result.error) toast.error(result.error.message);
+    else if (!result.redirected) navigate({ to: "/studio", replace: true });
   }
 
   return (
@@ -153,7 +154,11 @@ function AuthPage() {
           </form>
           <div className="mt-4 space-y-1">
             {mode === "signin" && !recovery && (
-              <Button variant="link" className="w-full text-muted-foreground" onClick={() => setRecovery(true)}>
+              <Button
+                variant="link"
+                className="w-full text-muted-foreground"
+                onClick={() => setRecovery(true)}
+              >
                 Forgot your password?
               </Button>
             )}
