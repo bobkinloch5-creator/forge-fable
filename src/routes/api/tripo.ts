@@ -26,10 +26,23 @@ export const Route = createFileRoute("/api/tripo")({
           auth: { persistSession: false },
         });
         const { data: claims } = await db.auth.getClaims(auth.slice(7));
-        if (!claims?.claims?.sub) return new Response("Invalid session", { status: 401 });
+        const userId = claims?.claims?.sub;
+        if (!userId) return new Response("Invalid session", { status: 401 });
         const parsed = RequestBody.safeParse(await request.json());
         if (!parsed.success) return new Response("Invalid 3D generation request", { status: 400 });
 
+        const generationCost = 12;
+        let charged = false;
+        let supabaseAdmin: Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"] | null = null;
+        if (parsed.data.action === "create") {
+          ({ supabaseAdmin } = await import("@/integrations/supabase/client.server"));
+          const { error: creditError } = await supabaseAdmin.rpc("consume_creator_credits", {
+            _user_id: userId,
+            _amount: generationCost,
+          });
+          if (creditError) return new Response("Insufficient credits", { status: 402 });
+          charged = true;
+        }
         const endpoint =
           parsed.data.action === "create"
             ? `${TRIPO_API}/task`
@@ -56,6 +69,12 @@ export const Route = createFileRoute("/api/tripo")({
           };
         };
         if (!upstream.ok || payload.code !== 0) {
+          if (charged && supabaseAdmin) {
+            await supabaseAdmin.rpc("refund_creator_credits", {
+              _user_id: userId,
+              _amount: generationCost,
+            });
+          }
           console.error("Tripo API error", upstream.status, payload.message);
           return new Response(payload.message || "Tripo request failed", {
             status: upstream.status || 502,
