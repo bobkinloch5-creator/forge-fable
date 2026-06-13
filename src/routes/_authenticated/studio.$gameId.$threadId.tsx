@@ -398,16 +398,14 @@ function ChatWorkspace({
         )}
         <div className="h-32 shrink-0 border-t border-border bg-background/90">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
-            {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map(
-              (label, index) => (
-                <span
-                  key={label}
-                  className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
-                >
-                  {label.toUpperCase()}
-                </span>
-              ),
-            )}
+            {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
+              <span
+                key={label}
+                className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
+              >
+                {label.toUpperCase()}
+              </span>
+            ))}
             <Button size="sm" variant="outline" className="ml-auto h-6 font-mono text-[9px]">
               <Wand2 /> Fix with AI
             </Button>
@@ -415,7 +413,8 @@ function ChatWorkspace({
           <div className="space-y-1 p-3 font-mono text-[10px]">
             <p>
               <span className="text-muted-foreground">14:20:04</span>{" "}
-              <span className="text-success">BUILD</span> Starter scene compiled · 18 files · 42 assets
+              <span className="text-success">BUILD</span> Starter scene compiled · 18 files · 42
+              assets
             </p>
             <p>
               <span className="text-muted-foreground">14:20:12</span>{" "}
