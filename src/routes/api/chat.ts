@@ -9,8 +9,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { z } from "zod";
 
+const TextMessage = z.object({
+  id: z.string().min(1).max(200),
+  role: z.enum(["user", "assistant"]),
+  parts: z.array(z.object({ type: z.literal("text"), text: z.string().max(32000) })).min(1).max(20),
+});
 const Body = z.object({
-  messages: z.array(z.custom<UIMessage>()),
+  messages: z.array(TextMessage).min(1).max(200),
   gameId: z.string().uuid(),
   threadId: z.string().uuid(),
   modelTier: z.enum(["fast", "balanced", "pro", "comet"]).default("balanced"),
@@ -37,7 +42,7 @@ export const Route = createFileRoute("/api/chat")({
         if (!userId) return new Response("Invalid session", { status: 401 });
         const parsed = Body.safeParse(await request.json());
         if (!parsed.success) return new Response("Invalid chat request", { status: 400 });
-        const { messages, gameId, threadId, modelTier } = parsed.data;
+        const { messages: clientMessages, gameId, threadId, modelTier } = parsed.data;
         const { data: thread } = await db
           .from("chat_threads")
           .select("id, game_id")
@@ -47,7 +52,7 @@ export const Route = createFileRoute("/api/chat")({
           .maybeSingle();
         if (!thread) return new Response("Build session not found", { status: 404 });
 
-        const [gameResult, stageResult, fileResult, checkpointResult] = await Promise.all([
+        const [gameResult, stageResult, fileResult, checkpointResult, historyResult] = await Promise.all([
           db
             .from("games")
             .select("name, platform, genre, art_style, player_mode, description, status")
@@ -73,11 +78,27 @@ export const Route = createFileRoute("/api/chat")({
             .eq("owner_id", userId)
             .order("created_at", { ascending: false })
             .limit(5),
+          db
+            .from("chat_messages")
+            .select("ai_message_id, role, parts")
+            .eq("thread_id", threadId)
+            .eq("owner_id", userId)
+            .order("created_at")
+            .limit(199),
         ]);
         if (gameResult.error)
           return new Response("Project context could not be loaded", { status: 500 });
 
-        const latestUser = [...messages].reverse().find((message) => message.role === "user");
+        const latestUser = [...clientMessages].reverse().find((message) => message.role === "user");
+        if (!latestUser) return new Response("A user message is required", { status: 400 });
+        const messages = [
+          ...(historyResult.data ?? []).map((message, index) => ({
+            id: message.ai_message_id ?? `stored-${index}`,
+            role: message.role as "user" | "assistant",
+            parts: TextMessage.shape.parts.parse(message.parts),
+          })),
+          latestUser,
+        ] satisfies UIMessage[];
         if (latestUser) {
           const { error } = await db.from("chat_messages").upsert(
             {
@@ -91,6 +112,14 @@ export const Route = createFileRoute("/api/chat")({
           );
           if (error) return new Response("Could not save message", { status: 500 });
         }
+
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const creditCost = modelTier === "pro" || modelTier === "comet" ? 8 : modelTier === "balanced" ? 4 : 2;
+        const { error: creditError } = await supabaseAdmin.rpc("consume_creator_credits", {
+          _user_id: userId,
+          _amount: creditCost,
+        });
+        if (creditError) return new Response("Insufficient credits", { status: 402 });
 
         const initialRunId = getGatewayRunId(request);
         const gateway = createLovableAiGatewayProvider(aiKey, initialRunId);
@@ -144,6 +173,7 @@ For file reports, use bullets prefixed with Created, Updated, Removed, or Backed
         const response = result.toUIMessageStreamResponse({
           originalMessages: messages,
           onError: (error) => {
+            void supabaseAdmin.rpc("refund_creator_credits", { _user_id: userId, _amount: creditCost });
             const message = error instanceof Error ? error.message : String(error);
             if (message.includes("402"))
               return "AI credits are exhausted. Add workspace AI balance to continue.";
