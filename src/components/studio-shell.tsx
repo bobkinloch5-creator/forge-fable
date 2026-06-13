@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { workspaceNav } from "@/lib/studio-data";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BadgeDollarSign, ChevronLeft, Cloud, Command, Download, Eye, LogOut, Menu, Plus, Rocket } from "lucide-react";
+import { BadgeDollarSign, ChevronLeft, Cloud, Command, Download, Eye, LogOut, Menu, Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 export function StudioShell({
