@@ -704,31 +704,6 @@ function ChatWorkspace({
             </pre>
           </div>
         )}
-        <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
-          <div className="flex h-8 items-center gap-1 border-b border-border px-2">
-            {["Build Logs", "Errors 1", "Warnings", "Testing", "Performance", "Multiplayer"].map(
-              (label, index) => (
-                <span
-                  key={label}
-                  className={`px-2 font-mono text-[9px] ${index === 1 ? "text-destructive" : index === 0 ? "text-foreground" : "text-muted-foreground"}`}
-                >
-                  {label.toUpperCase()}
-                </span>
-              ),
-            )}
-            <Button
-              size="sm"
-              variant="outline"
-              className="ml-auto h-7 shrink-0 font-mono text-[9px]"
-              onClick={() => {
-                setTab("tests");
-                toast.info("Playtest diagnostics opened. Ask Fable to repair any reported issue.");
-              }}
-            >
-              <Wand2 /> <span className="hidden sm:inline">Fix Responsive Design with AI</span>
-              <span className="sm:hidden">AI Fix</span>
-            </Button>
-          </div>
           <div className="space-y-1 p-3 font-mono text-[10px]">
             <p>
               <span className="text-muted-foreground">14:20:04</span>{" "}
