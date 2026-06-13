@@ -93,7 +93,8 @@ export const Route = createFileRoute("/api/tripo")({
         if (parsed.data.action === "create") {
           if (!payload.data?.task_id)
             return new Response("Tripo did not return a task", { status: 502 });
-          if (!supabaseAdmin) return new Response("Could not register 3D generation task", { status: 500 });
+          if (!supabaseAdmin)
+            return new Response("Could not register 3D generation task", { status: 500 });
           const { error: taskError } = await supabaseAdmin.from("tripo_tasks").insert({
             owner_id: userId,
             external_task_id: payload.data.task_id,
