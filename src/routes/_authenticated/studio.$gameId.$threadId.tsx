@@ -338,7 +338,7 @@ function ChatWorkspace({
             {status === "submitted" && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Bot className="size-4 text-accent" />
-                <Shimmer>{buildStates[activeBuildStep] ?? "Thinking"}…</Shimmer>
+                <Shimmer>{`${buildStates[activeBuildStep] ?? "Thinking"}…`}</Shimmer>
               </div>
             )}
             {error && <p className="text-xs text-destructive">{error.message}</p>}
@@ -376,8 +376,8 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <section className="order-1 flex min-h-0 flex-col bg-canvas xl:order-2">
-        <div className="flex h-11 items-center border-b border-border bg-panel px-2">
+      <section className="glass-panel order-1 flex min-h-0 flex-col overflow-hidden rounded-2xl xl:order-2">
+        <div className="flex h-12 items-center border-b border-border/60 bg-panel/80 px-2">
           <div className="flex gap-1">
             {(
               [
@@ -419,9 +419,11 @@ function ChatWorkspace({
           </div>
         </div>
         {tab === "preview" && (
-          <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
+           <div className="panel-grid relative flex flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
+             <div className="aurora-orb pointer-events-none absolute -left-28 top-0 size-80 rounded-full bg-neon-violet/12 blur-3xl" />
+             <div className="aurora-orb pointer-events-none absolute -bottom-32 right-0 size-96 rounded-full bg-neon-cyan/10 blur-3xl [animation-delay:-6s]" />
             <div
-              className={`relative aspect-video w-full max-w-6xl overflow-hidden rounded-md border border-primary/25 bg-panel shadow-2xl ${playing ? "forge-glow" : ""}`}
+               className={`spectrum-border relative aspect-video w-full max-w-6xl overflow-hidden rounded-2xl bg-panel shadow-2xl transition-all duration-500 ${playing ? "forge-glow scale-[1.005]" : ""}`}
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_65%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_28%)]" />
               <div className="absolute left-5 top-5 flex gap-2">
@@ -442,7 +444,7 @@ function ChatWorkspace({
                     {playing ? "Starter scene is running" : "Press play to enter the starter scene"}
                   </p>
                   {!playing && (
-                    <Button className="mt-5" onClick={() => setPlaying(true)}>
+                   <Button className="mt-5 bg-linear-to-r from-primary via-neon-violet to-neon-pink shadow-[0_0_26px_color-mix(in_oklab,var(--primary)_35%,transparent)]" onClick={() => setPlaying(true)}>
                       <Play /> Play game
                     </Button>
                   )}
@@ -477,7 +479,7 @@ function ChatWorkspace({
             <p className="text-muted-foreground">[preview] waiting for play command</p>
           </div>
         )}
-        <div className="h-32 shrink-0 border-t border-border bg-background/90">
+        <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
             {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
               <span
@@ -509,7 +511,7 @@ function ChatWorkspace({
         </div>
       </section>
 
-      <aside className="order-3 hidden min-h-0 flex-col border-r border-border bg-panel xl:order-1 xl:flex">
+      <aside className="glass-panel order-3 hidden min-h-0 flex-col overflow-hidden rounded-2xl xl:order-1 xl:flex">
         <div className="flex h-11 items-center border-b border-border px-3 text-xs font-semibold">
           <span className="font-mono text-[10px] tracking-wider">PROJECT / ASSETS</span>{" "}
           <Button variant="ghost" size="icon-sm" className="ml-auto">
@@ -537,9 +539,9 @@ function ChatWorkspace({
           ))}
         </div>
         <div className="border-t border-border p-3">
-          <div className="rounded-lg bg-secondary p-3">
+           <div className="spectrum-border rounded-xl bg-secondary/70 p-3">
             <div className="flex items-center gap-2 text-xs font-medium">
-              <Wand2 className="size-4 text-primary" /> AI project scan
+               <ShieldCheck className="size-4 text-neon-cyan" /> AI project scan
             </div>
             <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
               No blocking errors. Starter files are ready for your first build instruction.
