@@ -31,12 +31,12 @@ function GameWorkspace() {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => { fetchWorkspace({ data: { gameId, threadId } }).then((data) => { setWorkspace(data); setSelectedFile(data.files[0]?.path ?? ""); }).catch((error) => toast.error(error.message)); }, [fetchWorkspace, gameId, threadId]);
   const initialMessages = useMemo<UIMessage[]>(() => (workspace?.messages ?? []).map((message, index) => ({ id: message.ai_message_id ?? `saved-${index}`, role: message.role as UIMessage["role"], parts: message.parts as UIMessage["parts"] })), [workspace]);
-  if (!workspace) return <StudioShell title="Loading workspace…" compact><div className="grid h-[calc(100vh-4rem)] place-items-center"><Shimmer>Warming the forge…</Shimmer></div></StudioShell>;
+  if (!workspace?.game) return <StudioShell title="Loading workspace…" compact><div className="grid h-[calc(100vh-4rem)] place-items-center"><Shimmer>Warming the forge…</Shimmer></div></StudioShell>;
   return <StudioShell title={workspace.game.name} subtitle={`${workspace.game.platform} / ${workspace.game.genre}`} compact><ChatWorkspace key={threadId} {...{ workspace, initialMessages, gameId, threadId, tab, setTab, modelTier, setModelTier, selectedFile, setSelectedFile, playing, setPlaying, textareaRef, addThread, navigate }} /></StudioShell>;
 }
 
 function ChatWorkspace({ workspace, initialMessages, gameId, threadId, tab, setTab, modelTier, setModelTier, selectedFile, setSelectedFile, playing, setPlaying, textareaRef, addThread, navigate }: any) {
-  const transport = useMemo(() => new DefaultChatTransport<UIMessage>({ api: "/api/chat", headers: async () => { const { data } = await supabase.auth.getSession(); return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {}; }, body: { gameId, threadId, modelTier } }), [gameId, threadId, modelTier]);
+  const transport = useMemo(() => new DefaultChatTransport<UIMessage>({ api: "/api/chat", headers: async () => { const { data } = await supabase.auth.getSession(); const headers = new Headers(); if (data.session) headers.set("Authorization", `Bearer ${data.session.access_token}`); return headers; }, body: { gameId, threadId, modelTier } }), [gameId, threadId, modelTier]);
   const { messages, sendMessage, status, stop, error } = useChat({ id: threadId, messages: initialMessages, transport, onFinish: () => textareaRef.current?.focus(), onError: (cause) => toast.error(cause.message.includes("402") ? "AI credits are exhausted. Add workspace AI balance to continue." : cause.message.includes("429") ? "The forge is busy. Try again in a moment." : cause.message) });
   useEffect(() => { textareaRef.current?.focus(); }, [threadId, textareaRef]);
   const activeFile = workspace.files.find((file: any) => file.path === selectedFile) ?? workspace.files[0];
