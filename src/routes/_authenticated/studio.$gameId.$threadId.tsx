@@ -532,49 +532,6 @@ function ChatWorkspace({
             </Button>
           </div>
         </div>
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-xs font-semibold">{stage.title}</h3>
-                        <Badge variant="outline" className="font-mono text-[8px] uppercase">
-                          {stage.status.replace("_", " ")}
-                        </Badge>
-                      </div>
-                      <p className="mt-1 truncate text-[10px] text-muted-foreground">
-                        Depends on: {stage.dependencies.join(", ") || "No prior stage"}
-                      </p>
-                      <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
-                        {stage.deliverables.join(" · ")}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 border-t border-border pt-4">
-              <div className="mb-3 flex items-center gap-2">
-                <ShieldCheck className="size-4 text-neon-cyan" />
-                <h3 className="text-sm font-semibold">Recovery checkpoints</h3>
-                <Badge variant="outline" className="ml-auto">
-                  {workspace.checkpoints.length} SAVED
-                </Badge>
-              </div>
-              <div className="grid gap-2 md:grid-cols-2">
-                {workspace.checkpoints.map((checkpoint) => (
-                  <div
-                    key={checkpoint.id}
-                    className="rounded-xl border border-border bg-canvas/60 p-3"
-                  >
-                    <p className="text-xs font-medium">{checkpoint.label}</p>
-                    <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
-                      {checkpoint.summary}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
         {tab === "memory" && <ProjectMemoryPanel gameId={gameId} />}
         {tab === "versions" && (
           <VersionControlPanel gameId={gameId} onRestored={() => window.location.reload()} />
