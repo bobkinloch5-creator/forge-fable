@@ -661,22 +661,6 @@ function ChatWorkspace({
             </pre>
           </div>
         )}
-          <div className="space-y-1 p-3 font-mono text-[10px]">
-            <p>
-              <span className="text-muted-foreground">14:20:04</span>{" "}
-              <span className="text-success">BUILD</span> Starter scene compiled · 18 files · 42
-              assets
-            </p>
-            <p>
-              <span className="text-muted-foreground">14:20:12</span>{" "}
-              <span className="text-destructive">ERROR</span> Mobile input map needs a touch control
-              binding
-            </p>
-            <p className="text-muted-foreground">
-              Fable 5 can repair this without changing your game logic.
-            </p>
-          </div>
-        </div>
       </section>
 
       <aside className="hidden">
