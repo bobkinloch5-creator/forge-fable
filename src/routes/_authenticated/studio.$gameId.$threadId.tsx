@@ -32,19 +32,27 @@ import { useServerFn } from "@tanstack/react-start";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import {
   Bot,
+  Check,
   ChevronDown,
   Code2,
   Cuboid,
+  Eye,
   FileCode2,
   Folder,
   Gamepad2,
+  History,
+  Image,
   Maximize2,
   Monitor,
+  PackageOpen,
   Play,
   Plus,
   RefreshCw,
+  Rocket,
+  ShieldCheck,
   Smartphone,
   Terminal,
+  Undo2,
   Wand2,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -68,6 +76,29 @@ type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWork
 type ReadyWorkspace = Omit<Workspace, "game"> & { game: NonNullable<Workspace["game"]> };
 type StudioTab = "preview" | "models" | "code" | "console";
 type ModelTier = "fast" | "balanced" | "pro";
+
+const buildStates = [
+  "Understanding your request",
+  "Planning the game systems",
+  "Generating code",
+  "Creating the UI",
+  "Preparing assets",
+  "Testing gameplay",
+  "Checking for bugs",
+  "Applying improvements",
+];
+
+const quickActions = [
+  { label: "Apply Changes", icon: Check },
+  { label: "Preview Game", icon: Play },
+  { label: "Fix Errors", icon: Wand2 },
+  { label: "Improve Graphics", icon: Image },
+  { label: "Add Features", icon: Plus },
+  { label: "Optimize", icon: Rocket },
+  { label: "Undo", icon: Undo2 },
+  { label: "View Files", icon: Eye },
+  { label: "Export", icon: PackageOpen },
+];
 
 function GameWorkspace() {
   const { gameId, threadId } = Route.useParams();
