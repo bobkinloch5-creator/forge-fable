@@ -33,7 +33,9 @@ export const Route = createFileRoute("/api/tripo")({
 
         const generationCost = 12;
         let charged = false;
-        let supabaseAdmin: Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"] | null = null;
+        let supabaseAdmin:
+          | Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"]
+          | null = null;
         if (parsed.data.action === "create") {
           ({ supabaseAdmin } = await import("@/integrations/supabase/client.server"));
           const { error: creditError } = await supabaseAdmin.rpc("consume_creator_credits", {

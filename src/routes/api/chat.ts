@@ -12,7 +12,10 @@ import { z } from "zod";
 const TextMessage = z.object({
   id: z.string().min(1).max(200),
   role: z.enum(["user", "assistant"]),
-  parts: z.array(z.object({ type: z.literal("text"), text: z.string().max(32000) })).min(1).max(20),
+  parts: z
+    .array(z.object({ type: z.literal("text"), text: z.string().max(32000) }))
+    .min(1)
+    .max(20),
 });
 const Body = z.object({
   messages: z.array(TextMessage).min(1).max(200),
@@ -52,40 +55,43 @@ export const Route = createFileRoute("/api/chat")({
           .maybeSingle();
         if (!thread) return new Response("Build session not found", { status: 404 });
 
-        const [gameResult, stageResult, fileResult, checkpointResult, historyResult] = await Promise.all([
-          db
-            .from("games")
-            .select("name, platform, genre, art_style, player_mode, description, status")
-            .eq("id", gameId)
-            .eq("owner_id", userId)
-            .single(),
-          db
-            .from("development_stages")
-            .select("stage_key, title, position, status, dependencies, deliverables, test_summary")
-            .eq("game_id", gameId)
-            .eq("owner_id", userId)
-            .order("position"),
-          db
-            .from("project_files")
-            .select("path, language, version")
-            .eq("game_id", gameId)
-            .eq("owner_id", userId)
-            .order("path"),
-          db
-            .from("project_checkpoints")
-            .select("label, summary, stage_key, created_at")
-            .eq("game_id", gameId)
-            .eq("owner_id", userId)
-            .order("created_at", { ascending: false })
-            .limit(5),
-          db
-            .from("chat_messages")
-            .select("ai_message_id, role, parts")
-            .eq("thread_id", threadId)
-            .eq("owner_id", userId)
-            .order("created_at")
-            .limit(199),
-        ]);
+        const [gameResult, stageResult, fileResult, checkpointResult, historyResult] =
+          await Promise.all([
+            db
+              .from("games")
+              .select("name, platform, genre, art_style, player_mode, description, status")
+              .eq("id", gameId)
+              .eq("owner_id", userId)
+              .single(),
+            db
+              .from("development_stages")
+              .select(
+                "stage_key, title, position, status, dependencies, deliverables, test_summary",
+              )
+              .eq("game_id", gameId)
+              .eq("owner_id", userId)
+              .order("position"),
+            db
+              .from("project_files")
+              .select("path, language, version")
+              .eq("game_id", gameId)
+              .eq("owner_id", userId)
+              .order("path"),
+            db
+              .from("project_checkpoints")
+              .select("label, summary, stage_key, created_at")
+              .eq("game_id", gameId)
+              .eq("owner_id", userId)
+              .order("created_at", { ascending: false })
+              .limit(5),
+            db
+              .from("chat_messages")
+              .select("ai_message_id, role, parts")
+              .eq("thread_id", threadId)
+              .eq("owner_id", userId)
+              .order("created_at")
+              .limit(199),
+          ]);
         if (gameResult.error)
           return new Response("Project context could not be loaded", { status: 500 });
 
@@ -114,7 +120,8 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const creditCost = modelTier === "pro" || modelTier === "comet" ? 8 : modelTier === "balanced" ? 4 : 2;
+        const creditCost =
+          modelTier === "pro" || modelTier === "comet" ? 8 : modelTier === "balanced" ? 4 : 2;
         const { error: creditError } = await supabaseAdmin.rpc("consume_creator_credits", {
           _user_id: userId,
           _amount: creditCost,
@@ -173,7 +180,10 @@ For file reports, use bullets prefixed with Created, Updated, Removed, or Backed
         const response = result.toUIMessageStreamResponse({
           originalMessages: messages,
           onError: (error) => {
-            void supabaseAdmin.rpc("refund_creator_credits", { _user_id: userId, _amount: creditCost });
+            void supabaseAdmin.rpc("refund_creator_credits", {
+              _user_id: userId,
+              _amount: creditCost,
+            });
             const message = error instanceof Error ? error.message : String(error);
             if (message.includes("402"))
               return "AI credits are exhausted. Add workspace AI balance to continue.";
