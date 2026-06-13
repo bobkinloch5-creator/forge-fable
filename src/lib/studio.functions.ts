@@ -5,10 +5,13 @@ import { z } from "zod";
 
 const GameInput = z.object({
   name: z.string().min(1).max(80),
-  platform: z.enum(["web", "mobile", "pc"]),
+  platform: z.string().min(1).max(60),
+  dimension: z.enum(["2D", "3D"]),
   genre: z.string().min(1).max(40),
   artStyle: z.string().min(1).max(40),
-  playerMode: z.enum(["single", "multiplayer"]),
+  playerMode: z.string().min(1).max(40),
+  controls: z.array(z.string().max(60)).max(12),
+  systems: z.array(z.string().max(60)).max(30),
   monetization: z.string().min(1).max(40),
   description: z.string().max(500),
 });
@@ -47,8 +50,15 @@ export const createGame = createServerFn({ method: "POST" })
         art_style: data.artStyle,
         player_mode: data.playerMode,
         monetization: data.monetization,
-        description: data.description,
-        status: "building",
+        description: [
+          data.description,
+          `Dimension: ${data.dimension}`,
+          `Controls: ${data.controls.join(", ")}`,
+          `Systems: ${data.systems.join(", ")}`,
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+        status: "plan_approved",
       })
       .select()
       .single();
@@ -66,9 +76,31 @@ export const createGame = createServerFn({ method: "POST" })
     if (threadError || !thread)
       throw new Error(threadError?.message ?? "Could not create build session");
 
-    const { error: filesError } = await context.supabase
-      .from("project_files")
-      .insert(fileSeed.map((file) => ({ ...file, game_id: game.id, owner_id: context.userId })));
+    const designDocument = {
+      path: "docs/game-design-document.md",
+      language: "markdown",
+      content: `# ${data.name}\n\n## Approved foundation\n- Platform: ${data.platform}\n- Format: ${data.dimension}\n- Genre: ${data.genre}\n- Play mode: ${data.playerMode}\n- Art direction: ${data.artStyle}\n- Controls: ${data.controls.join(", ")}\n- Systems: ${data.systems.join(", ")}\n\n## Game vision\n${data.description || "To be refined with Fable 5 during the foundation build."}\n\n## Export policy\nBuilds are reported as complete only after the required compiler, SDK, signing, packaging, and validation steps succeed.`,
+    };
+    const exportConfig = {
+      path: "config/export-targets.json",
+      language: "json",
+      content: JSON.stringify(
+        {
+          targets: [data.platform],
+          status: "configuration_ready",
+          signing: "required_for_store_or_installer_builds",
+        },
+        null,
+        2,
+      ),
+    };
+    const { error: filesError } = await context.supabase.from("project_files").insert(
+      [...fileSeed, designDocument, exportConfig].map((file) => ({
+        ...file,
+        game_id: game.id,
+        owner_id: context.userId,
+      })),
+    );
     if (filesError) throw new Error(filesError.message);
     return { gameId: game.id, threadId: thread.id };
   });
