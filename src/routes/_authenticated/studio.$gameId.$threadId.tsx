@@ -615,9 +615,7 @@ function ChatWorkspace({
             <p className="text-muted-foreground">[preview] waiting for play command</p>
           </div>
         )}
-        {tab === "export" && (
-          <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />
-        )}
+        {tab === "export" && <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
             {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
@@ -695,4 +693,3 @@ function ChatWorkspace({
     </div>
   );
 }
-

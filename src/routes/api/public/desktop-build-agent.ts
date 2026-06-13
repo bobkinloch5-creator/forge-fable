@@ -71,8 +71,16 @@ export const Route = createFileRoute("/api/public/desktop-build-agent")({
         const job = jobs?.[0];
         if (!job) return new Response(null, { status: 204 });
         const [game, files] = await Promise.all([
-          supabaseAdmin.from("games").select("name, description, genre, art_style, player_mode").eq("id", job.game_id).single(),
-          supabaseAdmin.from("project_files").select("path, content, language, version").eq("game_id", job.game_id).order("path"),
+          supabaseAdmin
+            .from("games")
+            .select("name, description, genre, art_style, player_mode")
+            .eq("id", job.game_id)
+            .single(),
+          supabaseAdmin
+            .from("project_files")
+            .select("path, content, language, version")
+            .eq("game_id", job.game_id)
+            .order("path"),
         ]);
         return Response.json({
           protocolVersion: 1,
@@ -80,7 +88,20 @@ export const Route = createFileRoute("/api/public/desktop-build-agent")({
           job,
           game: game.data,
           files: files.data ?? [],
-          requiredChecks: ["launch", "main_menu", "save_load", "controls", "controller", "display_modes", "audio", "level_loading", "file_integrity", "installer", "uninstall", "package_checksum"],
+          requiredChecks: [
+            "launch",
+            "main_menu",
+            "save_load",
+            "controls",
+            "controller",
+            "display_modes",
+            "audio",
+            "level_loading",
+            "file_integrity",
+            "installer",
+            "uninstall",
+            "package_checksum",
+          ],
         });
       },
       POST: async ({ request }) => {
@@ -102,7 +123,14 @@ export const Route = createFileRoute("/api/public/desktop-build-agent")({
         if (report.action === "progress") {
           const { error } = await supabaseAdmin
             .from("desktop_build_jobs")
-            .update({ status: report.status, progress_stage: report.stage, progress_percent: report.progress, logs: report.logs, error_message: report.error, verification_results: report.verificationResults ?? {} })
+            .update({
+              status: report.status,
+              progress_stage: report.stage,
+              progress_percent: report.progress,
+              logs: report.logs,
+              error_message: report.error,
+              verification_results: report.verificationResults ?? {},
+            })
             .eq("id", job.id);
           if (error) return new Response("Could not save progress", { status: 500 });
           return Response.json({ ok: true });
@@ -121,25 +149,51 @@ export const Route = createFileRoute("/api/public/desktop-build-agent")({
         if (!report.storagePath.startsWith(`${agent.owner_id}/${job.game_id}/${job.id}/`)) {
           return new Response("Invalid artifact path", { status: 403 });
         }
-        const requiredChecks = ["launch", "main_menu", "save_load", "controls", "display_modes", "audio", "level_loading", "file_integrity", "package_checksum"];
-        const checksPass = requiredChecks.every((check) => report.verificationResults[check] === true);
-        if (!checksPass) return new Response("Required release checks did not pass", { status: 409 });
-        const { error: artifactError } = await supabaseAdmin.from("desktop_build_artifacts").insert({
-          job_id: job.id,
-          game_id: job.game_id,
-          owner_id: job.owner_id,
-          artifact_type: report.artifactType,
-          platform: job.platform,
-          file_name: report.fileName,
-          storage_path: report.storagePath,
-          file_size: report.fileSize,
-          checksum_sha256: report.checksumSha256.toLowerCase(),
-          installation_instructions: report.installationInstructions,
-        });
+        const requiredChecks = [
+          "launch",
+          "main_menu",
+          "save_load",
+          "controls",
+          "display_modes",
+          "audio",
+          "level_loading",
+          "file_integrity",
+          "package_checksum",
+        ];
+        const checksPass = requiredChecks.every(
+          (check) => report.verificationResults[check] === true,
+        );
+        if (!checksPass)
+          return new Response("Required release checks did not pass", { status: 409 });
+        const { error: artifactError } = await supabaseAdmin
+          .from("desktop_build_artifacts")
+          .insert({
+            job_id: job.id,
+            game_id: job.game_id,
+            owner_id: job.owner_id,
+            artifact_type: report.artifactType,
+            platform: job.platform,
+            file_name: report.fileName,
+            storage_path: report.storagePath,
+            file_size: report.fileSize,
+            checksum_sha256: report.checksumSha256.toLowerCase(),
+            installation_instructions: report.installationInstructions,
+          });
         if (artifactError) return new Response("Could not register artifact", { status: 500 });
         const { error: jobError } = await supabaseAdmin
           .from("desktop_build_jobs")
-          .update({ status: "complete", progress_stage: "build_complete", progress_percent: 100, completed_at: new Date().toISOString(), logs: report.logs, release_notes: report.releaseNotes, known_issues: report.knownIssues, minimum_requirements: report.minimumRequirements, recommended_requirements: report.recommendedRequirements, verification_results: report.verificationResults })
+          .update({
+            status: "complete",
+            progress_stage: "build_complete",
+            progress_percent: 100,
+            completed_at: new Date().toISOString(),
+            logs: report.logs,
+            release_notes: report.releaseNotes,
+            known_issues: report.knownIssues,
+            minimum_requirements: report.minimumRequirements,
+            recommended_requirements: report.recommendedRequirements,
+            verification_results: report.verificationResults,
+          })
           .eq("id", job.id);
         if (jobError) return new Response("Could not complete build", { status: 500 });
         return Response.json({ ok: true, status: "complete" });
