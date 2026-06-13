@@ -413,7 +413,7 @@ function ChatWorkspace({
                 <SelectContent>
                   <SelectItem value="fast">Fable 5 Fast</SelectItem>
                   <SelectItem value="balanced">Fable 5</SelectItem>
-                  <SelectItem value="pro">Fable 5 Pro</SelectItem>
+                  <SelectItem value="pro">Claude Fable 5 Pro</SelectItem>
                 </SelectContent>
               </Select>
               <PromptInputSubmit status={status} onStop={stop} />
