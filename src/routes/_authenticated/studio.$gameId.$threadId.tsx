@@ -14,6 +14,7 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { TripoModelLab } from "@/components/tripo-model-lab";
+import { DesktopBuildCenter } from "@/components/desktop-build-center";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -614,7 +615,9 @@ function ChatWorkspace({
             <p className="text-muted-foreground">[preview] waiting for play command</p>
           </div>
         )}
-        {tab === "export" && <ExportCenter platform={workspace.game.platform} />}
+        {tab === "export" && (
+          <DesktopBuildCenter gameId={gameId} gameName={workspace.game.name} />
+        )}
         <div className="h-32 shrink-0 border-t border-border/60 bg-background/80 backdrop-blur-xl">
           <div className="flex h-8 items-center gap-1 border-b border-border px-2">
             {["Build Logs", "Errors 1", "Console", "AI Fixes", "Tasks"].map((label, index) => (
@@ -693,111 +696,3 @@ function ChatWorkspace({
   );
 }
 
-const exportTargets = [
-  {
-    label: "Build for Windows",
-    icon: Monitor,
-    requirement: "Windows compiler and signing certificate required for signed .exe or installer",
-  },
-  {
-    label: "Build for macOS",
-    icon: Monitor,
-    requirement: "macOS build host, Apple certificate, signing, and notarization required",
-  },
-  { label: "Build for Linux", icon: Terminal, requirement: "Linux packaging runtime required" },
-  {
-    label: "Build for Android",
-    icon: Smartphone,
-    requirement: "Android SDK and signing key required for APK or App Bundle",
-  },
-  {
-    label: "Prepare for iOS",
-    icon: Smartphone,
-    requirement:
-      "Produces an iOS-ready project; final signing requires Xcode and Apple credentials",
-  },
-  {
-    label: "Publish as Web Game",
-    icon: Globe2,
-    requirement: "Ready after web build, hosting, and multiplayer endpoint checks",
-  },
-];
-
-function ExportCenter({ platform }: { platform: string }) {
-  return (
-    <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
-      <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
-        <div className="min-w-0">
-          <p className="font-mono text-[9px] uppercase tracking-[.18em] text-neon-cyan">
-            Standalone delivery
-          </p>
-          <h2 className="mt-1 text-xl font-semibold">Export Center</h2>
-          <p className="mt-2 max-w-2xl text-xs leading-5 text-muted-foreground">
-            Real package status only—FableForge will never mark an export complete until
-            compilation, platform requirements, signing, and validation actually succeed.
-          </p>
-        </div>
-        <Badge variant="outline" className="shrink-0">
-          TARGET · {platform}
-        </Badge>
-      </div>
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {exportTargets.map((target) => (
-          <div
-            key={target.label}
-            className="glass-panel rounded-2xl p-4 transition-all hover:border-neon-cyan/40"
-          >
-            <div className="flex items-center gap-3">
-              <span className="grid size-10 place-items-center rounded-xl bg-primary/10">
-                <target.icon className="size-5 text-neon-cyan" />
-              </span>
-              <div>
-                <h3 className="text-sm font-medium">{target.label}</h3>
-                <span className="font-mono text-[9px] text-warning">REQUIREMENTS CHECK</span>
-              </div>
-            </div>
-            <p className="mt-4 min-h-12 text-[11px] leading-5 text-muted-foreground">
-              {target.requirement}
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-3 w-full"
-              onClick={() => toast.info(target.requirement)}
-            >
-              <Wrench /> Check requirements
-            </Button>
-          </div>
-        ))}
-      </div>
-      <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: "Download Source Code", icon: Code2 },
-          { label: "Download Complete Project", icon: FileArchive },
-          { label: "Generate Installer", icon: PackageOpen },
-          { label: "View Build Logs", icon: Terminal },
-        ].map((action) => (
-          <Button
-            key={action.label}
-            variant="outline"
-            className="justify-start"
-            onClick={() => toast.info(`${action.label}: waiting for a successful build artifact`)}
-          >
-            <action.icon />
-            {action.label}
-          </Button>
-        ))}
-      </div>
-      <div className="mt-5 rounded-2xl border border-border bg-canvas/70 p-4">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <Download className="size-4 text-neon-cyan" />
-          No downloadable artifact yet
-        </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          The approved design and export configuration are ready. Generate the gameplay project, run
-          automated system tests, and satisfy the selected platform toolchain before packaging.
-        </p>
-      </div>
-    </div>
-  );
-}
