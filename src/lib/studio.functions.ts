@@ -14,6 +14,14 @@ const GameInput = z.object({
   systems: z.array(z.string().max(60)).max(30),
   monetization: z.string().min(1).max(40),
   description: z.string().max(500),
+  responsiveTargets: z.array(z.enum(["Mobile", "Tablet", "Desktop"])).max(3),
+  accountMode: z.string().min(1).max(40),
+  saveProgress: z.boolean(),
+  leaderboards: z.boolean(),
+  achievements: z.boolean(),
+  revenueModel: z.string().min(1).max(40),
+  domainChoice: z.string().min(1).max(40),
+  publicLandingPage: z.boolean(),
 });
 
 export const getStudioOverview = createServerFn({ method: "GET" })
@@ -55,6 +63,9 @@ export const createGame = createServerFn({ method: "POST" })
           `Dimension: ${data.dimension}`,
           `Controls: ${data.controls.join(", ")}`,
           `Systems: ${data.systems.join(", ")}`,
+          data.platform === "Web browser game"
+            ? `Website targets: ${data.responsiveTargets.join(", ")}\nPlayer access: ${data.accountMode}\nCloud progress: ${data.saveProgress ? "Yes" : "No"}\nLeaderboards: ${data.leaderboards ? "Yes" : "No"}\nAchievements: ${data.achievements ? "Yes" : "No"}\nRevenue: ${data.revenueModel}\nDomain: ${data.domainChoice}\nPublic landing page: ${data.publicLandingPage ? "Yes" : "No"}`
+            : "",
         ]
           .filter(Boolean)
           .join("\n\n"),
@@ -79,7 +90,7 @@ export const createGame = createServerFn({ method: "POST" })
     const designDocument = {
       path: "docs/game-design-document.md",
       language: "markdown",
-      content: `# ${data.name}\n\n## Approved foundation\n- Platform: ${data.platform}\n- Format: ${data.dimension}\n- Genre: ${data.genre}\n- Play mode: ${data.playerMode}\n- Art direction: ${data.artStyle}\n- Controls: ${data.controls.join(", ")}\n- Systems: ${data.systems.join(", ")}\n\n## Game vision\n${data.description || "To be refined with Fable 5 during the foundation build."}\n\n## Export policy\nBuilds are reported as complete only after the required compiler, SDK, signing, packaging, and validation steps succeed.`,
+      content: `# ${data.name}\n\n## Approved foundation\n- Platform: ${data.platform}\n- Format: ${data.dimension}\n- Genre: ${data.genre}\n- Play mode: ${data.playerMode}\n- Art direction: ${data.artStyle}\n- Controls: ${data.controls.join(", ")}\n- Systems: ${data.systems.join(", ")}\n${data.platform === "Web browser game" ? `- Responsive targets: ${data.responsiveTargets.join(", ")}\n- Player access: ${data.accountMode}\n- Save progress: ${data.saveProgress}\n- Multiplayer: ${data.playerMode.includes("multiplayer")}\n- Leaderboards: ${data.leaderboards}\n- Achievements: ${data.achievements}\n- Revenue model: ${data.revenueModel}\n- Domain plan: ${data.domainChoice}\n- Public landing page: ${data.publicLandingPage}` : ""}\n\n## Game vision\n${data.description || "To be refined with Fable 5 during the foundation build."}\n\n## Responsive quality gates\nTest phone, tablet, laptop, desktop, portrait, and landscape layouts for overlaps, clipping, tap targets, scaling, controls, loading, keyboard behavior, safe areas, and performance before release.\n\n## Export policy\nBuilds are reported as complete only after the required compiler, SDK, signing, packaging, and validation steps succeed.`,
     };
     const exportConfig = {
       path: "config/export-targets.json",
@@ -182,7 +193,10 @@ export const createThread = createServerFn({ method: "POST" })
     return thread;
   });
 
-const WorkspaceInput = z.object({ gameId: z.string().uuid(), threadId: z.string().uuid() });
+const WorkspaceInput = z.object({
+  gameId: z.string().uuid(),
+  threadId: z.string().uuid(),
+});
 export const getWorkspace = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => WorkspaceInput.parse(input))

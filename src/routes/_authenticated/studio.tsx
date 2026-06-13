@@ -46,16 +46,16 @@ function StudioDashboard() {
   const games = data?.games ?? [];
   return (
     <StudioShell title="Project hub" subtitle="Build across web, mobile, and PC">
-      <main className="mx-auto max-w-[1500px] p-4 sm:p-6 lg:p-8">
+      <main className="mx-auto max-w-[1500px] p-3 pb-24 sm:p-6 sm:pb-24 lg:p-8">
         <section className="mb-8 grid gap-4 xl:grid-cols-[1.5fr_1fr]">
-          <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-7 sm:p-9">
+          <div className="glass-panel spectrum-border relative overflow-hidden rounded-3xl p-5 sm:p-9">
             <div className="panel-grid absolute inset-0 opacity-20" />
             <div className="aurora-orb absolute -right-24 -top-32 size-80 rounded-full bg-neon-violet/20 blur-3xl" />
             <div className="relative max-w-2xl">
               <Badge variant="outline" className="mb-5 border-primary/40 text-primary">
                 <Zap className="mr-1 size-3" /> AI GAME ENGINE
               </Badge>
-              <h2 className="text-balance text-4xl font-semibold tracking-[-.045em] sm:text-5xl">
+              <h2 className="text-balance text-3xl font-semibold tracking-[-.035em] sm:text-5xl sm:tracking-[-.045em]">
                 Build the world.
                 <br />
                 <span className="bg-linear-to-r from-neon-cyan via-primary to-neon-pink bg-clip-text text-transparent">
@@ -66,7 +66,7 @@ function StudioDashboard() {
                 Start from a concept or template. FableForge plans the systems, writes the files,
                 and keeps every major change reviewable.
               </p>
-              <div className="mt-7 flex gap-3">
+              <div className="mt-7 grid gap-3 sm:flex">
                 <NewProjectButton onClick={() => setOpen(true)} />
                 <Button variant="outline">Browse templates</Button>
               </div>
@@ -75,7 +75,11 @@ function StudioDashboard() {
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: "Active projects", value: games.length, icon: Gamepad2 },
-              { label: "Forge credits", value: data?.profile?.credits ?? 250, icon: Zap },
+              {
+                label: "Forge credits",
+                value: data?.profile?.credits ?? 250,
+                icon: Zap,
+              },
               { label: "Build artifacts", value: games.length * 4, icon: Box },
               {
                 label: "Plan",
@@ -103,9 +107,10 @@ function StudioDashboard() {
             <NewProjectButton onClick={() => setOpen(true)} />
           </div>
           {games.length === 0 ? (
-            <button
+            <Button
+              variant="outline"
               onClick={() => setOpen(true)}
-              className="flex min-h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-panel/50 text-center hover:border-primary"
+              className="flex h-auto min-h-48 w-full flex-col items-center justify-center rounded-xl border-dashed bg-panel/50 text-center hover:border-primary"
             >
               <span className="mb-4 grid size-12 place-items-center rounded-full bg-secondary">
                 <Plus className="text-primary" />
@@ -114,7 +119,7 @@ function StudioDashboard() {
               <span className="mt-1 text-sm text-muted-foreground">
                 A playable starter project is four choices away.
               </span>
-            </button>
+            </Button>
           ) : (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {games.map((game) => {
