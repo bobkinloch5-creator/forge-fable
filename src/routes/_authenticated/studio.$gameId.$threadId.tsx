@@ -36,7 +36,9 @@ import {
   ChevronDown,
   Code2,
   Cuboid,
+  Download,
   Eye,
+  FileArchive,
   FileCode2,
   Folder,
   Gamepad2,
@@ -54,6 +56,7 @@ import {
   Terminal,
   Undo2,
   Wand2,
+  Wrench,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -74,18 +77,22 @@ export const Route = createFileRoute("/_authenticated/studio/$gameId/$threadId")
 
 type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWorkspace>>>>;
 type ReadyWorkspace = Omit<Workspace, "game"> & { game: NonNullable<Workspace["game"]> };
-type StudioTab = "preview" | "models" | "code" | "console";
+type StudioTab = "preview" | "models" | "code" | "console" | "export";
 type ModelTier = "fast" | "balanced" | "pro";
 
 const buildStates = [
-  "Understanding your request",
-  "Planning the game systems",
-  "Generating code",
-  "Creating the UI",
-  "Preparing assets",
+  "Planning",
+  "Creating project structure",
+  "Generating gameplay systems",
+  "Building maps",
+  "Creating menus",
+  "Connecting controls",
+  "Adding audio",
   "Testing gameplay",
-  "Checking for bugs",
-  "Applying improvements",
+  "Checking performance",
+  "Fixing errors",
+  "Preparing standalone build",
+  "Export complete",
 ];
 
 const quickActions = [
