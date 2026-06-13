@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTripoRouteImport } from './routes/api/tripo'
+import { Route as ApiCometModelsRouteImport } from './routes/api/comet-models'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as ApiPublicDesktopBuildAgentRouteImport } from './routes/api/public/desktop-build-agent'
@@ -48,6 +49,11 @@ const IndexRoute = IndexRouteImport.update({
 const ApiTripoRoute = ApiTripoRouteImport.update({
   id: '/api/tripo',
   path: '/api/tripo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCometModelsRoute = ApiCometModelsRouteImport.update({
+  id: '/api/comet-models',
+  path: '/api/comet-models',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/comet-models': typeof ApiCometModelsRoute
   '/api/tripo': typeof ApiTripoRoute
   '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/comet-models': typeof ApiCometModelsRoute
   '/api/tripo': typeof ApiTripoRoute
   '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/comet-models': typeof ApiCometModelsRoute
   '/api/tripo': typeof ApiTripoRoute
   '/_authenticated/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
   '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/studio'
     | '/api/chat'
+    | '/api/comet-models'
     | '/api/tripo'
     | '/studio/$gameId'
     | '/api/public/desktop-build-agent'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/studio'
     | '/api/chat'
+    | '/api/comet-models'
     | '/api/tripo'
     | '/studio/$gameId'
     | '/api/public/desktop-build-agent'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/studio'
     | '/api/chat'
+    | '/api/comet-models'
     | '/api/tripo'
     | '/_authenticated/studio/$gameId'
     | '/api/public/desktop-build-agent'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiCometModelsRoute: typeof ApiCometModelsRoute
   ApiTripoRoute: typeof ApiTripoRoute
   ApiPublicDesktopBuildAgentRoute: typeof ApiPublicDesktopBuildAgentRoute
 }
@@ -210,6 +223,13 @@ declare module '@tanstack/react-router' {
       path: '/api/tripo'
       fullPath: '/api/tripo'
       preLoaderRoute: typeof ApiTripoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/comet-models': {
+      id: '/api/comet-models'
+      path: '/api/comet-models'
+      fullPath: '/api/comet-models'
+      preLoaderRoute: typeof ApiCometModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -294,6 +314,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiCometModelsRoute: ApiCometModelsRoute,
   ApiTripoRoute: ApiTripoRoute,
   ApiPublicDesktopBuildAgentRoute: ApiPublicDesktopBuildAgentRoute,
 }
