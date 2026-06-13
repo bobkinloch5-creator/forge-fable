@@ -47,6 +47,14 @@ function StudioDashboard() {
   useEffect(() => {
     getOverview().then(setData);
   }, [getOverview]);
+  useEffect(() => {
+    const savedIdea = sessionStorage.getItem("fableforge:draft-idea");
+    const savedMode = sessionStorage.getItem("fableforge:draft-mode");
+    if (!savedIdea) return;
+    sessionStorage.removeItem("fableforge:draft-idea");
+    sessionStorage.removeItem("fableforge:draft-mode");
+    launchFromIdea(savedIdea, savedMode ?? "Cross-Platform");
+  }, []);
   const games = data?.games ?? [];
   const isOwner = data?.roles.some((item) => item.role === "owner") ?? false;
   function launchFromIdea(idea: string, mode: string) {
