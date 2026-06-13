@@ -145,6 +145,8 @@ export const Route = createFileRoute("/api/chat")({
           "lovable:pro": "openai/gpt-5.4",
         } as const;
         const lovableModel = models[modelId as keyof typeof models];
+        if (!isCometModel && !lovableModel)
+          return new Response("Selected FableForge model is unavailable", { status: 400 });
         if (isCometModel) {
           const catalog = await getCometChatModels();
           if (!catalog.models.some((item) => item.id === modelId))
