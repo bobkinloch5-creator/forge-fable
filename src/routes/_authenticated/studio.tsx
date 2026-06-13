@@ -321,12 +321,21 @@ function StudioDashboard() {
             ))}
           </div>
         </section>
-        <section id="project-tools" className="mt-10 scroll-mt-20">
+        <section id="assets" className="mt-10 scroll-mt-20">
           <div className="glass-panel rounded-2xl p-5">
-            <h3 className="text-lg font-semibold">Project tools</h3>
+            <h3 className="text-lg font-semibold">Assets</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Open a project to use AI models, 3D asset generation, playtesting, native builds, and
-              publishing tools with that project&apos;s private data.
+              Open a project to manage its private files, generated assets, previews, and connected
+              build outputs.
+            </p>
+          </div>
+        </section>
+        <section id="ai-models" className="mt-4 scroll-mt-20">
+          <div className="glass-panel rounded-2xl p-5">
+            <h3 className="text-lg font-semibold">AI Models</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Model selection belongs to each project workspace so access, credit costs, project
+              memory, and generation history remain tied to the correct account and project.
             </p>
           </div>
         </section>

@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { workspaceNav } from "@/lib/studio-data";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, Cloud, Command, LogOut, Menu, Plus } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 export function StudioShell({
@@ -25,8 +25,34 @@ export function StudioShell({
 }) {
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const location = useLocation();
+  const [activeSection, setActiveSection] = useState(
+    location.pathname === "/studio" ? location.hash.replace("#", "") || "projects" : "",
+  );
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  useEffect(() => {
+    if (location.pathname !== "/studio") {
+      setActiveSection("");
+      return;
+    }
+    const sectionId = location.hash.replace("#", "") || "projects";
+    setActiveSection(sectionId);
+    requestAnimationFrame(() => {
+      document.getElementById(sectionId)?.scrollIntoView({ block: "start" });
+    });
+  }, [location.hash, location.pathname]);
+
+  async function openSection(sectionId: string) {
+    setOpen(false);
+    setActiveSection(sectionId);
+    if (location.pathname !== "/studio") {
+      await navigate({ to: "/studio", hash: sectionId });
+      return;
+    }
+    window.history.replaceState(null, "", `/studio#${sectionId}`);
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
   async function signOut() {
     if (signingOut) return;
     setSigningOut(true);
@@ -67,16 +93,18 @@ export function StudioShell({
           </Button>
         </div>
         <nav className="flex-1 space-y-1 p-2">
-          {workspaceNav.map((item, index) => (
-            <a
+          {workspaceNav.map((item) => (
+            <button
+              type="button"
               key={item.label}
-              href={item.href}
               title={compact ? item.label : undefined}
-              className={`flex h-10 items-center gap-3 rounded-xl px-3 font-mono text-[11px] transition-all duration-300 ${index === 0 ? "spectrum-border bg-primary/10 text-neon-cyan" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_12%,transparent)]"}`}
+              aria-current={activeSection === item.sectionId ? "page" : undefined}
+              onClick={() => void openSection(item.sectionId)}
+              className={`flex h-10 w-full items-center gap-3 rounded-xl px-3 text-left font-mono text-[11px] transition-all duration-300 ${activeSection === item.sectionId ? "spectrum-border bg-primary/10 text-neon-cyan" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_12%,transparent)]"}`}
             >
               <item.icon className="size-4 shrink-0" />
               {!compact && item.label}
-            </a>
+            </button>
           ))}
         </nav>
         <div className="space-y-2 border-t border-sidebar-border p-2">
@@ -157,14 +185,16 @@ export function StudioShell({
           className="glass-panel fixed inset-x-2 bottom-[max(.5rem,env(safe-area-inset-bottom))] z-30 grid grid-cols-4 rounded-2xl p-1 lg:hidden"
           aria-label="Mobile navigation"
         >
-          {workspaceNav.map((item, index) => (
-            <a
+          {workspaceNav.map((item) => (
+            <button
+              type="button"
               key={item.label}
-              href={item.href}
-              className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[9px] ${index === 0 ? "bg-primary/10 text-neon-cyan" : "text-muted-foreground"}`}
+              aria-current={activeSection === item.sectionId ? "page" : undefined}
+              onClick={() => void openSection(item.sectionId)}
+              className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-[9px] ${activeSection === item.sectionId ? "bg-primary/10 text-neon-cyan" : "text-muted-foreground"}`}
             >
               <item.icon className="size-4" /> {item.label}
-            </a>
+            </button>
           ))}
         </nav>
       </div>
