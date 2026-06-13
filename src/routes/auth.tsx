@@ -26,18 +26,31 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [recovery, setRecovery] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
+    if (recovery) {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      setBusy(false);
+      if (error) return toast.error(error.message);
+      toast.success("Password reset link sent. Check your email.");
+      return;
+    }
     const result =
       mode === "signin"
         ? await supabase.auth.signInWithPassword({ email, password })
         : await supabase.auth.signUp({
             email,
             password,
-            options: { data: { display_name: email.split("@")[0] } },
+            options: {
+              data: { display_name: email.split("@")[0] },
+              emailRedirectTo: `${window.location.origin}/studio`,
+            },
           });
     setBusy(false);
     if (result.error) return toast.error(result.error.message);
@@ -91,7 +104,9 @@ function AuthPage() {
             <div className="mb-3 inline-flex size-10 items-center justify-center rounded-lg bg-secondary">
               <LockKeyhole className="size-5 text-primary" />
             </div>
-            <h2 className="text-3xl font-semibold tracking-tight">Enter the forge</h2>
+            <h2 className="text-3xl font-semibold tracking-tight">
+              {recovery ? "Recover your account" : "Enter the forge"}
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Your projects, files, and build sessions sync securely.
             </p>
@@ -113,28 +128,50 @@ function AuthPage() {
               placeholder="you@studio.com"
               className="h-11"
             />
-            <Input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="h-11"
-            />
+            {!recovery && (
+              <Input
+                type="password"
+                required
+                minLength={8}
+                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="h-11"
+              />
+            )}
             <Button disabled={busy} className="h-11 w-full">
-              {busy ? "Working…" : mode === "signin" ? "Sign in" : "Create account"}
+              {busy
+                ? "Working…"
+                : recovery
+                  ? "Send reset link"
+                  : mode === "signin"
+                    ? "Sign in"
+                    : "Create account"}
               <ArrowRight />
             </Button>
           </form>
-          <button
-            className="mt-6 w-full text-center text-sm text-muted-foreground hover:text-foreground"
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          >
-            {mode === "signin"
-              ? "New creator? Create an account"
-              : "Already have an account? Sign in"}
-          </button>
+          <div className="mt-4 space-y-1">
+            {mode === "signin" && !recovery && (
+              <Button variant="link" className="w-full text-muted-foreground" onClick={() => setRecovery(true)}>
+                Forgot your password?
+              </Button>
+            )}
+            <Button
+              variant="link"
+              className="w-full text-muted-foreground"
+              onClick={() => {
+                setRecovery(false);
+                setMode(mode === "signin" ? "signup" : "signin");
+              }}
+            >
+              {recovery
+                ? "Back to sign in"
+                : mode === "signin"
+                  ? "New creator? Create an account"
+                  : "Already have an account? Sign in"}
+            </Button>
+          </div>
         </div>
       </section>
     </main>
