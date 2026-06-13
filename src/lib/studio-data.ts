@@ -44,12 +44,13 @@ export const artStyles = [
 
 export const templates = [
   {
-    name: "2D RPG Starter",
+    name: "Fantasy RPG",
     genre: "RPG",
-    credits: 85,
-    difficulty: "Beginner",
+    credits: 180,
+    difficulty: "Web · PC",
     icon: Swords,
     tone: "ember",
+    systems: "Quests · Combat · Bosses",
   },
   {
     name: "Pet Simulator",
@@ -58,6 +59,7 @@ export const templates = [
     difficulty: "Intermediate",
     icon: Rabbit,
     tone: "cyan",
+    systems: "Pets · Shops · Progression",
   },
   {
     name: "Dungeon Crawler",
@@ -66,6 +68,7 @@ export const templates = [
     difficulty: "Advanced",
     icon: Shield,
     tone: "violet",
+    systems: "Loot · Enemies · Levels",
   },
   {
     name: "Tower Defense",
@@ -74,6 +77,7 @@ export const templates = [
     difficulty: "Intermediate",
     icon: Target,
     tone: "gold",
+    systems: "Waves · Towers · Upgrades",
   },
   {
     name: "Horror Survival",
@@ -82,6 +86,7 @@ export const templates = [
     difficulty: "Advanced",
     icon: Ghost,
     tone: "rose",
+    systems: "Survival · AI · Inventory",
   },
   {
     name: "Farming Game",
@@ -90,6 +95,7 @@ export const templates = [
     difficulty: "Beginner",
     icon: Leaf,
     tone: "lime",
+    systems: "Farming · Crafting · Shops",
   },
   {
     name: "Multiplayer Arena",
@@ -98,6 +104,7 @@ export const templates = [
     difficulty: "Expert",
     icon: Trophy,
     tone: "cyan",
+    systems: "Lobbies · Combat · Ranking",
   },
   {
     name: "Browser Tycoon",
@@ -106,6 +113,43 @@ export const templates = [
     difficulty: "Beginner",
     icon: Gem,
     tone: "ember",
+    systems: "Economy · Upgrades · Saving",
+  },
+  {
+    name: "Racing Game",
+    genre: "Racing",
+    credits: 150,
+    difficulty: "PC · Mobile",
+    icon: Target,
+    tone: "rose",
+    systems: "Vehicles · Tracks · Timing",
+  },
+  {
+    name: "Idle Game",
+    genre: "Idle",
+    credits: 70,
+    difficulty: "Web · Mobile",
+    icon: Gem,
+    tone: "gold",
+    systems: "Economy · Offline gains · Upgrades",
+  },
+  {
+    name: "Platformer",
+    genre: "Platformer",
+    credits: 90,
+    difficulty: "All platforms",
+    icon: Gamepad2,
+    tone: "cyan",
+    systems: "Movement · Levels · Checkpoints",
+  },
+  {
+    name: "Mobile Adventure",
+    genre: "Adventure",
+    credits: 110,
+    difficulty: "Android · iOS",
+    icon: Rabbit,
+    tone: "violet",
+    systems: "Touch input · Quests · Saving",
   },
 ];
 
