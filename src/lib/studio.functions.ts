@@ -3,9 +3,28 @@ import { developmentStageBlueprint, fileSeed } from "@/lib/studio-data";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+const platformValues = [
+  "PC Game",
+  "Windows PC game",
+  "Windows only",
+  "macOS game",
+  "Linux game",
+  "Cross-platform desktop release",
+  "Android mobile game",
+  "iPhone/iPad game",
+  "Web browser game",
+  "Cross-platform game",
+] as const;
+
+function normalizePlatform(platform: (typeof platformValues)[number]): "web" | "mobile" | "pc" {
+  if (platform === "Web browser game") return "web";
+  if (platform === "Android mobile game" || platform === "iPhone/iPad game") return "mobile";
+  return "pc";
+}
+
 const GameInput = z.object({
   name: z.string().min(1).max(80),
-  platform: z.string().min(1).max(60),
+  platform: z.enum(platformValues),
   dimension: z.enum(["2D", "3D"]),
   genre: z.string().min(1).max(40),
   artStyle: z.string().min(1).max(40),
@@ -50,12 +69,13 @@ export const createGame = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => GameInput.parse(input))
   .handler(async ({ data, context }) => {
+    const storedPlatform = normalizePlatform(data.platform);
     const { data: game, error } = await context.supabase
       .from("games")
       .insert({
         owner_id: context.userId,
         name: data.name,
-        platform: data.platform,
+        platform: storedPlatform,
         genre: data.genre,
         art_style: data.artStyle,
         player_mode: data.playerMode,
