@@ -79,7 +79,7 @@ export const Route = createFileRoute("/_authenticated/studio/$gameId/$threadId")
 type Workspace = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getWorkspace>>>>;
 type ReadyWorkspace = Omit<Workspace, "game"> & { game: NonNullable<Workspace["game"]> };
 type StudioTab = "preview" | "models" | "code" | "console" | "export";
-type ModelTier = "fast" | "balanced" | "pro";
+type ModelTier = "fast" | "balanced" | "pro" | "comet";
 
 const buildStates = [
   "Planning",
@@ -424,6 +424,7 @@ function ChatWorkspace({
                   <SelectItem value="fast">Fable 5 Fast</SelectItem>
                   <SelectItem value="balanced">Fable 5</SelectItem>
                   <SelectItem value="pro">Claude Fable 5 Pro</SelectItem>
+                  <SelectItem value="comet">Comet Codex</SelectItem>
                 </SelectContent>
               </Select>
               <PromptInputSubmit status={status} onStop={stop} />

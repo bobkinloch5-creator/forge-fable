@@ -41,6 +41,14 @@ export function createLovableAiGatewayProvider(apiKey: string, initialRunId?: st
   });
 }
 
+export function createCometApiProvider(apiKey: string) {
+  return createOpenAICompatible({
+    name: "cometapi",
+    baseURL: "https://api.cometapi.com/v1",
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
+}
+
 export function getGatewayRunId(request: Request) {
   return request.headers.get(RUN_ID_HEADER)?.trim() || undefined;
 }

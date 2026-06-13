@@ -1,4 +1,5 @@
 import {
+  createCometApiProvider,
   createLovableAiGatewayProvider,
   getGatewayRunId,
   withGatewayRunId,
@@ -12,7 +13,7 @@ const Body = z.object({
   messages: z.array(z.custom<UIMessage>()),
   gameId: z.string().uuid(),
   threadId: z.string().uuid(),
-  modelTier: z.enum(["fast", "balanced", "pro"]).default("balanced"),
+  modelTier: z.enum(["fast", "balanced", "pro", "comet"]).default("balanced"),
 });
 
 export const Route = createFileRoute("/api/chat")({
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/api/chat")({
         const url = process.env.SUPABASE_URL;
         const key = process.env.SUPABASE_PUBLISHABLE_KEY;
         const aiKey = process.env.LOVABLE_API_KEY;
+        const cometKey = process.env.COMET_API_KEY;
         if (!url || !key || !aiKey)
           return new Response("Server configuration missing", { status: 500 });
         const db = createClient(url, key, {
@@ -67,8 +69,15 @@ export const Route = createFileRoute("/api/chat")({
           balanced: "google/gemini-3-flash-preview",
           pro: "openai/gpt-5.4",
         } as const;
+        const model =
+          modelTier === "comet"
+            ? cometKey
+              ? createCometApiProvider(cometKey)("gpt-5.3-codex")
+              : null
+            : gateway(models[modelTier]);
+        if (!model) return new Response("CometAPI is not configured", { status: 503 });
         const result = streamText({
-          model: gateway(models[modelTier]),
+          model,
           system: `You are FableForge, a senior game director, systems designer, gameplay engineer, technical artist, and QA lead inside a professional AI game engine. You remember and preserve this project's genre, visual language, characters, mechanics, platform, and prior instructions from the full conversation. Turn even short ideas into coherent, production-minded game plans, but ask a question only when a missing decision would make the result unsafe or fundamentally ambiguous.
 
 Write useful, confident, non-robotic responses in Markdown using these headings when relevant:
@@ -113,7 +122,7 @@ For file reports, use bullets prefixed with Created, Updated, Removed, or Backed
               .eq("owner_id", userId);
           },
         });
-        return withGatewayRunId(response, gateway);
+        return modelTier === "comet" ? response : withGatewayRunId(response, gateway);
       },
     },
   },
