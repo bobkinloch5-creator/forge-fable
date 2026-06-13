@@ -4,21 +4,15 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const platformValues = [
-  "PC Game",
+  "Website game",
   "Windows PC game",
-  "Windows only",
-  "macOS game",
-  "Linux game",
-  "Cross-platform desktop release",
-  "Android mobile game",
-  "iPhone/iPad game",
-  "Web browser game",
+  "Mobile game",
   "Cross-platform game",
 ] as const;
 
 function normalizePlatform(platform: (typeof platformValues)[number]): "web" | "mobile" | "pc" {
-  if (platform === "Web browser game") return "web";
-  if (platform === "Android mobile game" || platform === "iPhone/iPad game") return "mobile";
+  if (platform === "Website game") return "web";
+  if (platform === "Mobile game") return "mobile";
   return "pc";
 }
 
@@ -81,7 +75,7 @@ export const createGame = createServerFn({ method: "POST" })
         art_style: data.artStyle,
         player_mode: data.playerMode,
         monetization: data.monetization,
-        status: "approved",
+        status: "draft",
         description: `${data.description}\n\nDimension: ${data.dimension}`,
       })
       .select()
@@ -93,7 +87,7 @@ export const createGame = createServerFn({ method: "POST" })
       .insert({
         game_id: game.id,
         owner_id: context.userId,
-        title: "Initial build",
+        title: "First build session",
       })
       .select()
       .single();
