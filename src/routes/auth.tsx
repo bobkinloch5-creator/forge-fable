@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Chrome, LockKeyhole } from "lucide-react";
+import { ArrowRight, Globe2, LockKeyhole } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -49,7 +49,7 @@ function AuthPage() {
       <div className="w-full max-w-sm">
         <div className="mb-9 flex items-center gap-3 lg:hidden"><BrandMark className="size-10" /><span className="text-lg font-bold">FableForge AI</span></div>
         <div className="mb-8"><div className="mb-3 inline-flex size-10 items-center justify-center rounded-lg bg-secondary"><LockKeyhole className="size-5 text-primary" /></div><h2 className="text-3xl font-semibold tracking-tight">Enter the forge</h2><p className="mt-2 text-sm text-muted-foreground">Your projects, files, and build sessions sync securely.</p></div>
-        <Button variant="outline" className="h-11 w-full" onClick={google}><Chrome /> Continue with Google</Button>
+        <Button variant="outline" className="h-11 w-full" onClick={google}><Globe2 /> Continue with Google</Button>
         <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />OR USE EMAIL<span className="h-px flex-1 bg-border" /></div>
         <form onSubmit={submit} className="space-y-4"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@studio.com" className="h-11" /><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="h-11" /><Button disabled={busy} className="h-11 w-full">{busy ? "Working…" : mode === "signin" ? "Sign in" : "Create account"}<ArrowRight /></Button></form>
         <button className="mt-6 w-full text-center text-sm text-muted-foreground hover:text-foreground" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>{mode === "signin" ? "New creator? Create an account" : "Already have an account? Sign in"}</button>
