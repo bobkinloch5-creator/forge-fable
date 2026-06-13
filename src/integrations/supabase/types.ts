@@ -500,7 +500,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_desktop_build_job: {
+        Args: { _agent_id: string }
+        Returns: {
+          agent_id: string | null
+          claimed_at: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string
+          game_id: string
+          id: string
+          known_issues: string
+          logs: string
+          minimum_requirements: string
+          owner_id: string
+          package_type: string
+          platform: string
+          progress_percent: number
+          progress_stage: string
+          recommended_requirements: string
+          release_notes: string
+          status: string
+          updated_at: string
+          verification_results: Json
+          version: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "desktop_build_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       [_ in never]: never
