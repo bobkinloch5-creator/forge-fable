@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTripoRouteImport } from './routes/api/tripo'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
+import { Route as ApiPublicDesktopBuildAgentRouteImport } from './routes/api/public/desktop-build-agent'
 import { Route as AuthenticatedStudioGameIdRouteImport } from './routes/_authenticated/studio.$gameId'
 import { Route as AuthenticatedStudioGameIdThreadIdRouteImport } from './routes/_authenticated/studio.$gameId.$threadId'
 
@@ -59,6 +60,12 @@ const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
   path: '/studio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicDesktopBuildAgentRoute =
+  ApiPublicDesktopBuildAgentRouteImport.update({
+    id: '/api/public/desktop-build-agent',
+    path: '/api/public/desktop-build-agent',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedStudioGameIdRoute =
   AuthenticatedStudioGameIdRouteImport.update({
     id: '/$gameId',
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/api/tripo': typeof ApiTripoRoute
   '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
+  '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
   '/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
 export interface FileRoutesByTo {
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/api/tripo': typeof ApiTripoRoute
   '/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
+  '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
   '/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
 export interface FileRoutesById {
@@ -105,6 +114,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/api/tripo': typeof ApiTripoRoute
   '/_authenticated/studio/$gameId': typeof AuthenticatedStudioGameIdRouteWithChildren
+  '/api/public/desktop-build-agent': typeof ApiPublicDesktopBuildAgentRoute
   '/_authenticated/studio/$gameId/$threadId': typeof AuthenticatedStudioGameIdThreadIdRoute
 }
 export interface FileRouteTypes {
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/tripo'
     | '/studio/$gameId'
+    | '/api/public/desktop-build-agent'
     | '/studio/$gameId/$threadId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/tripo'
     | '/studio/$gameId'
+    | '/api/public/desktop-build-agent'
     | '/studio/$gameId/$threadId'
   id:
     | '__root__'
@@ -141,6 +153,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/tripo'
     | '/_authenticated/studio/$gameId'
+    | '/api/public/desktop-build-agent'
     | '/_authenticated/studio/$gameId/$threadId'
   fileRoutesById: FileRoutesById
 }
@@ -152,6 +165,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiTripoRoute: typeof ApiTripoRoute
+  ApiPublicDesktopBuildAgentRoute: typeof ApiPublicDesktopBuildAgentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +225,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/studio'
       preLoaderRoute: typeof AuthenticatedStudioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/desktop-build-agent': {
+      id: '/api/public/desktop-build-agent'
+      path: '/api/public/desktop-build-agent'
+      fullPath: '/api/public/desktop-build-agent'
+      preLoaderRoute: typeof ApiPublicDesktopBuildAgentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/studio/$gameId': {
       id: '/_authenticated/studio/$gameId'
@@ -274,7 +295,18 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
   ApiTripoRoute: ApiTripoRoute,
+  ApiPublicDesktopBuildAgentRoute: ApiPublicDesktopBuildAgentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
