@@ -7,13 +7,16 @@ import { ArrowRight, Check, Cloud, Gamepad2, ShieldCheck } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FableForge AI | Build Any Game with AI" },
+      { title: "AI Game Builder for Web, Mobile & PC | FableForge" },
       {
         name: "description",
         content:
           "Design, code, preview, and export games for web, mobile, and PC in one AI-powered game studio.",
       },
-      { property: "og:title", content: "FableForge AI | Build Any Game with AI" },
+      {
+        property: "og:title",
+        content: "AI Game Builder for Web, Mobile & PC | FableForge",
+      },
       {
         property: "og:description",
         content: "Design, code, preview, and export games for web, mobile, and PC.",
