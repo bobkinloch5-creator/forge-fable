@@ -11,7 +11,10 @@ export const Route = createFileRoute("/api/comet-models")({
             headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=900" },
           });
         } catch {
-          return Response.json({ error: "CometAPI catalog is temporarily unavailable" }, { status: 502 });
+          return Response.json(
+            { error: "CometAPI catalog is temporarily unavailable" },
+            { status: 502 },
+          );
         }
       },
     },

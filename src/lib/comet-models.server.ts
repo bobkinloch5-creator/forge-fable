@@ -57,6 +57,10 @@ export async function getCometChatModels() {
     })
     .filter((model, index, list) => list.findIndex((item) => item.id === model.id) === index)
     .sort((a, b) => a.provider.localeCompare(b.provider) || a.name.localeCompare(b.name));
-  cache = { expiresAt: Date.now() + CACHE_TTL_MS, models, total: catalog.total ?? catalog.data.length };
+  cache = {
+    expiresAt: Date.now() + CACHE_TTL_MS,
+    models,
+    total: catalog.total ?? catalog.data.length,
+  };
   return cache;
 }

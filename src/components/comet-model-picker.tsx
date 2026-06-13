@@ -24,7 +24,13 @@ const builtInModels: AiModelOption[] = [
   { id: "lovable:pro", name: "Fable 5 Pro", provider: "FableForge" },
 ];
 
-export function CometModelPicker({ value, onValueChange }: { value: string; onValueChange: (value: string) => void }) {
+export function CometModelPicker({
+  value,
+  onValueChange,
+}: {
+  value: string;
+  onValueChange: (value: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [cometModels, setCometModels] = useState<AiModelOption[]>([]);
   const [catalogTotal, setCatalogTotal] = useState<number>();
@@ -55,7 +61,13 @@ export function CometModelPicker({ value, onValueChange }: { value: string; onVa
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" role="combobox" aria-expanded={open} className="h-8 max-w-52 justify-between gap-2 px-2 text-xs">
+        <Button
+          variant="ghost"
+          size="sm"
+          role="combobox"
+          aria-expanded={open}
+          className="h-8 max-w-52 justify-between gap-2 px-2 text-xs"
+        >
           {loading ? <LoaderCircle className="animate-spin" /> : <Sparkles />}
           <span className="truncate">{selected.name}</span>
           <ChevronsUpDown className="opacity-50" />
@@ -68,19 +80,40 @@ export function CometModelPicker({ value, onValueChange }: { value: string; onVa
             <CommandEmpty>No matching model found.</CommandEmpty>
             <CommandGroup heading="FableForge recommended">
               {builtInModels.map((model) => (
-                <CommandItem key={model.id} value={`${model.name} ${model.provider}`} onSelect={() => { onValueChange(model.id); setOpen(false); }}>
+                <CommandItem
+                  key={model.id}
+                  value={`${model.name} ${model.provider}`}
+                  onSelect={() => {
+                    onValueChange(model.id);
+                    setOpen(false);
+                  }}
+                >
                   <Check className={value === model.id ? "opacity-100" : "opacity-0"} />
                   <span>{model.name}</span>
                 </CommandItem>
               ))}
             </CommandGroup>
-            <CommandGroup heading={`CometAPI · ${cometModels.length} chat routes${catalogTotal ? ` from ${catalogTotal} live model families` : ""}`}>
+            <CommandGroup
+              heading={`CometAPI · ${cometModels.length} chat routes${catalogTotal ? ` from ${catalogTotal} live model families` : ""}`}
+            >
               {cometModels.map((model) => (
-                <CommandItem key={model.id} value={`${model.name} ${model.id} ${model.provider}`} onSelect={() => { onValueChange(model.id); setOpen(false); }} className="items-start py-2">
-                  <Check className={value === model.id ? "mt-0.5 opacity-100" : "mt-0.5 opacity-0"} />
+                <CommandItem
+                  key={model.id}
+                  value={`${model.name} ${model.id} ${model.provider}`}
+                  onSelect={() => {
+                    onValueChange(model.id);
+                    setOpen(false);
+                  }}
+                  className="items-start py-2"
+                >
+                  <Check
+                    className={value === model.id ? "mt-0.5 opacity-100" : "mt-0.5 opacity-0"}
+                  />
                   <span className="min-w-0">
                     <span className="block truncate">{model.name}</span>
-                    <span className="block truncate text-[10px] text-muted-foreground">{model.provider} · {model.id}</span>
+                    <span className="block truncate text-[10px] text-muted-foreground">
+                      {model.provider} · {model.id}
+                    </span>
                   </span>
                 </CommandItem>
               ))}
