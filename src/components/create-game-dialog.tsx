@@ -498,3 +498,30 @@ function GddItem({ title, value }: { title: string; value: string }) {
     </div>
   );
 }
+
+function WizardChoice({
+  label,
+  value,
+  options,
+  onChange,
+  choice,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+  choice: (selected: boolean) => string;
+}) {
+  return (
+    <div>
+      <p className="mb-2 text-xs font-medium">{label}</p>
+      <div className="grid gap-2">
+        {options.map((option) => (
+          <Button key={option} variant="outline" className={choice(value === option)} onClick={() => onChange(option)}>
+            {value === option && <Check />} {option}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
