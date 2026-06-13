@@ -47,18 +47,16 @@ export const Route = createFileRoute("/api/chat")({
 
         const latestUser = [...messages].reverse().find((message) => message.role === "user");
         if (latestUser) {
-          const { error } = await db
-            .from("chat_messages")
-            .upsert(
-              {
-                thread_id: threadId,
-                owner_id: userId,
-                ai_message_id: latestUser.id,
-                role: "user",
-                parts: latestUser.parts,
-              },
-              { onConflict: "thread_id,ai_message_id", ignoreDuplicates: true },
-            );
+          const { error } = await db.from("chat_messages").upsert(
+            {
+              thread_id: threadId,
+              owner_id: userId,
+              ai_message_id: latestUser.id,
+              role: "user",
+              parts: latestUser.parts,
+            },
+            { onConflict: "thread_id,ai_message_id", ignoreDuplicates: true },
+          );
           if (error) return new Response("Could not save message", { status: 500 });
         }
 
@@ -79,18 +77,16 @@ export const Route = createFileRoute("/api/chat")({
           originalMessages: messages,
           onFinish: async ({ responseMessage, isAborted }) => {
             if (isAborted) return;
-            const { error } = await db
-              .from("chat_messages")
-              .upsert(
-                {
-                  thread_id: threadId,
-                  owner_id: userId,
-                  ai_message_id: responseMessage.id,
-                  role: "assistant",
-                  parts: responseMessage.parts,
-                },
-                { onConflict: "thread_id,ai_message_id", ignoreDuplicates: true },
-              );
+            const { error } = await db.from("chat_messages").upsert(
+              {
+                thread_id: threadId,
+                owner_id: userId,
+                ai_message_id: responseMessage.id,
+                role: "assistant",
+                parts: responseMessage.parts,
+              },
+              { onConflict: "thread_id,ai_message_id", ignoreDuplicates: true },
+            );
             if (error) console.error("Assistant persistence failed", error.message);
             await db
               .from("chat_threads")
