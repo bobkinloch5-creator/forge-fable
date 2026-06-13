@@ -60,9 +60,9 @@ function StudioDashboard() {
   function launchFromIdea(idea: string, mode: string) {
     const platform =
       mode === "Website Game"
-        ? "Web browser game"
+        ? "Website game"
         : mode === "Mobile Game"
-          ? "Android mobile game"
+          ? "Mobile game"
           : mode === "PC Game"
             ? "Windows PC game"
             : "Cross-platform game";
@@ -131,7 +131,7 @@ function StudioDashboard() {
               </span>
               <strong>Forge your first game</strong>
               <span className="mt-1 text-sm text-muted-foreground">
-                A playable starter project is four choices away.
+                 Start with a clean workspace, then build through conversation.
               </span>
             </Button>
           ) : (
