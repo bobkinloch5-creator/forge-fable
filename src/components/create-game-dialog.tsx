@@ -51,9 +51,12 @@ const initial: Draft = {
 };
 
 const platforms = [
+  { label: "PC Game", icon: Gamepad2 },
   { label: "Windows PC game", icon: Monitor },
+  { label: "Windows only", icon: Monitor },
   { label: "macOS game", icon: Apple },
   { label: "Linux game", icon: Laptop },
+  { label: "Cross-platform desktop release", icon: Laptop },
   { label: "Android mobile game", icon: Smartphone },
   { label: "iPhone/iPad game", icon: Smartphone },
   { label: "Web browser game", icon: Globe2 },
